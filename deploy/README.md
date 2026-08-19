@@ -22,12 +22,60 @@ solo en `127.0.0.1`, y 2 GB de swap porque la t3.micro tiene 1 GB de RAM.
 
 ## Desplegar cambios
 
+Normalmente no hay que hacer nada: **cada push a `main` despliega solo** (ver
+*Autodeploy*). El despliegue manual queda como respaldo:
+
 ```powershell
 .\deploy\deploy.ps1
 ```
 
 `-Solo front` o `-Solo api` para subir una sola parte. Usa el `ssh` de Windows:
 el de Git Bash no lee la llave `.pem` del CLI de AWS.
+
+## Autodeploy
+
+GitHub avisa de cada push a `main` con un webhook; el servidor trae el código,
+compila y se reinicia. No hay llaves de AWS ni de SSH en GitHub, y no se abre
+ningún puerto nuevo: el aviso entra por el 80.
+
+| Pieza | Dónde |
+| --- | --- |
+| Endpoint que recibe el aviso | `POST /api/deploy` — `server/src/deploy.js` |
+| Secreto compartido | `DEPLOY_SECRET` en `/srv/guia-jc-api/.env` (solo en el servidor) |
+| Script de redespliegue | `/usr/local/bin/guia-jc-redeploy` |
+| Copia del repo | `/srv/guia-jc-src` |
+| Bitácora | `/var/log/guia-jc-deploy.log` |
+
+El endpoint verifica la firma HMAC de GitHub sobre el cuerpo crudo, ignora todo
+lo que no sea `refs/heads/main`, y lanza el script con `systemd-run` para que
+quede fuera del cgroup del servicio — si corriera como hijo, el `systemctl
+restart` del final se mataría a sí mismo. El usuario `ubuntu` solo puede
+ejecutar como root ese comando exacto (`/etc/sudoers.d/guia-jc-deploy`).
+
+El script hace `git reset --hard origin/main`, `npm ci`, compila, sincroniza
+`dist/` a `/var/www/guia-jc` y `server/` a `/srv/guia-jc-api` — **sin tocar el
+`.env`** — y reinicia el servicio. Tarda alrededor de un minuto.
+
+### Ver qué pasó en el último despliegue
+
+```bash
+ssh -i $env:USERPROFILE\.ssh\guia-jc.pem ubuntu@3.141.72.146 "tail -30 /var/log/guia-jc-deploy.log"
+```
+
+### Volver a conectar el webhook (si se pierde)
+
+1. Leer el secreto: `sudo grep DEPLOY_SECRET /srv/guia-jc-api/.env`
+2. En GitHub → repo → Settings → Webhooks → Add webhook
+   - Payload URL: `http://3.141.72.146/api/deploy`
+   - Content type: `application/json`
+   - Secret: el valor del paso 1
+   - Solo el evento `push`
+
+### Forzar un despliegue a mano
+
+```bash
+sudo systemd-run --unit=guia-jc-deploy --collect /usr/local/bin/guia-jc-redeploy
+```
 
 ## Conectarse
 
