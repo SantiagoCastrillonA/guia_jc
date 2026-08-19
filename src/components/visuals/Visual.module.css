@@ -1,0 +1,148 @@
+/* Material gráfico de las lecciones: figuras, pasos, notas y comparaciones.
+   Todo sale de los tokens de Nocturne — ni un hex ni un px suelto. */
+
+/* — figura — */
+.figure {
+  margin: var(--leading) 0;
+  padding: var(--space-6);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-neutral-900) 55%, transparent);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.figure svg { width: 100%; height: auto; display: block; }
+.caption {
+  font-size: 12.5px;
+  line-height: 20px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  margin: var(--space-4) 0 0;
+}
+
+/* — pasos numerados — */
+.steps {
+  list-style: none;
+  margin: var(--leading) 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-6);
+  counter-reset: paso;
+}
+.step {
+  position: relative;
+  padding-left: calc(var(--space-8) + 18px);
+  counter-increment: paso;
+}
+.step::before {
+  content: counter(paso, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 13px;
+  font-feature-settings: 'tnum' 1;
+  color: var(--color-accent);
+}
+/* La línea que une los pasos: el acento como línea, nunca como relleno. */
+.step::after {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 22px;
+  bottom: calc(-1 * var(--space-6));
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-accent) 45%, transparent),
+    transparent
+  );
+}
+.step:last-child::after { display: none; }
+.stepTitle {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 17px;
+  line-height: 24px;
+  margin: 0 0 var(--space-2);
+}
+.stepBody { font-size: 15.5px; line-height: var(--leading); margin: 0; }
+.stepBody > :last-child { margin-bottom: 0; }
+
+/* — nota al margen — */
+.callout {
+  display: flex;
+  gap: var(--space-4);
+  margin: var(--leading) 0;
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  box-shadow: inset 1px 0 0 var(--color-accent);
+  font-size: 15px;
+  line-height: 24px;
+}
+.calloutWarn {
+  background: color-mix(in srgb, var(--color-text) 7%, transparent);
+  box-shadow: inset 1px 0 0 var(--color-neutral-400);
+}
+.calloutMark { flex: none; font-size: 15px; line-height: 24px; }
+.calloutBody > :last-child { margin-bottom: 0; }
+
+/* — comparación lado a lado — */
+.compare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+  margin: var(--leading) 0;
+}
+.compareCol {
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-neutral-900) 55%, transparent);
+}
+.compareHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-3);
+  color: color-mix(in srgb, var(--color-text) 62%, transparent);
+}
+.compareGood .compareHead { color: var(--color-accent); }
+.compareList { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.compareList li { font-size: 14px; line-height: 22px; }
+.compareList code { font-size: 13px; }
+
+/* — tabla compacta de referencia — */
+.refTable { margin: var(--leading) 0; overflow-x: auto; }
+.refTable table { min-width: 420px; }
+
+/* — terminal / consola — */
+.terminal {
+  margin: var(--leading) 0;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-neutral-900) 75%, transparent);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.terminalBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-2) var(--space-4);
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+}
+.terminalBody {
+  margin: 0;
+  padding: var(--space-4) var(--space-6);
+  font-size: 13.5px;
+  line-height: 22px;
+  overflow-x: auto;
+}
+.prompt { color: var(--color-accent); user-select: none; }
+.comment { color: color-mix(in srgb, var(--color-text) 45%, transparent); }
