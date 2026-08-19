@@ -1,0 +1,34 @@
+.page {
+  padding: calc(3 * var(--leading)) 0 calc(3 * var(--leading));
+  max-width: 420px;
+}
+
+.card {
+  gap: var(--space-4);
+  padding: var(--space-8);
+  margin-top: var(--leading);
+}
+
+.tabs { align-self: flex-start; }
+
+.form {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.error {
+  font-size: 14px;
+  line-height: 22px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  color: color-mix(in srgb, var(--color-text) 88%, transparent);
+  margin: 0;
+}
+
+.hint {
+  font-size: 13px;
+  line-height: 20px;
+  color: color-mix(in srgb, var(--color-text) 58%, transparent);
+  margin: 0;
+}

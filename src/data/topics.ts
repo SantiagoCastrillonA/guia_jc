@@ -1,0 +1,294 @@
+import { lazy } from 'react';
+import { MODULES, type Module, type Topic } from '../types';
+
+/**
+ * El registro de temas — la única fuente de verdad de la app.
+ *
+ * Sigue el cronograma del curso de Desarrollo Web (25 sesiones). Las sesiones
+ * sin página todavía viven aquí con `published: false`: se ven en la home como
+ * "próximamente" y no generan ruta.
+ *
+ * Para publicar un tema:
+ *   1. crear `src/topics/<slug>/index.tsx` con un componente por defecto
+ *      construido sobre <TopicPage slug="<slug>">
+ *   2. en su entrada de abajo: poner `published: true`, la cantidad real de
+ *      ejercicios y `Page: lazy(() => import('../topics/<slug>'))`
+ */
+export const topics: Topic[] = [
+  {
+    slug: 'introduccion-ia',
+    session: 1,
+    module: 'Introducción a la IA',
+    title: 'Introducción a la IA',
+    summary: 'Qué es la IA, cómo se usa ChatGPT, Copilot y Gemini, y para qué sirven en el día a día.',
+    level: 'inicial',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'logica-scratch-1',
+    session: 2,
+    module: 'Lógica de Programación',
+    title: 'Lógica de programación con Scratch',
+    summary: 'Secuencias, variables y condicionales usando bloques, antes de escribir código.',
+    level: 'inicial',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'git-y-trabajo-en-equipo',
+    session: 3,
+    module: 'Git',
+    title: 'Git y trabajo en equipo',
+    summary: 'Control de versiones, commits, ramas y GitHub para trabajar sin pisarse el código.',
+    level: 'inicial',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'taller-logica-git-ia',
+    session: 4,
+    module: 'Git',
+    title: 'Taller: lógica, Git e IA como asistente',
+    summary: 'Integrar lo aprendido: resolver un reto de lógica, versionarlo y apoyarse en la IA sin depender de ella.',
+    level: 'inicial',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'html-semantico',
+    session: 5,
+    module: 'Fundamentos Web',
+    title: 'HTML semántico',
+    summary:
+      'La estructura de una página con etiquetas que significan algo: header, nav, main, section, article y footer, más las tres reglas de accesibilidad.',
+    level: 'inicial',
+    exercises: 5,
+    published: true,
+    Page: lazy(() => import('../topics/html-semantico')),
+  },
+  {
+    slug: 'css-box-model-flexbox',
+    session: 6,
+    module: 'Fundamentos Web',
+    title: 'CSS: box model, Flexbox y Tailwind',
+    summary: 'Darle identidad visual a la página: colores, tipografía, espaciado y layout con Flexbox.',
+    level: 'inicial',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'sitio-estatico-deploy',
+    session: 7,
+    module: 'Fundamentos Web',
+    title: 'Sitio estático completo y deploy',
+    summary: 'Publicar el sitio en internet con GitHub Pages y entender qué pasa al desplegar.',
+    level: 'inicial',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'repaso-html-css-git',
+    session: 8,
+    module: 'Fundamentos Web',
+    title: 'Repaso: HTML, CSS, Git e IA',
+    summary: 'Consolidar los módulos anteriores antes de entrar a JavaScript.',
+    level: 'inicial',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'js-variables-tipos-operadores',
+    session: 9,
+    module: 'JavaScript',
+    title: 'JavaScript: variables, tipos y operadores',
+    summary:
+      'Guardar datos con let y const, reconocer el tipo de cada valor y entender qué hace JavaScript cuando se mezclan tipos distintos.',
+    level: 'inicial',
+    exercises: 5,
+    published: true,
+    Page: lazy(() => import('../topics/js-variables-tipos-operadores')),
+  },
+  {
+    slug: 'dom-eventos-apis',
+    session: 10,
+    module: 'JavaScript',
+    title: 'DOM, eventos, APIs y Node.js',
+    summary: 'Que el código controle lo que el usuario ve: seleccionar elementos, escuchar eventos y traer datos.',
+    level: 'intermedio',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'api-sencilla-node',
+    session: 11,
+    module: 'JavaScript',
+    title: 'API sencilla con Node.js',
+    summary: 'Primer servidor propio: responder peticiones y devolver JSON.',
+    level: 'intermedio',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'express-rutas-middleware',
+    session: 12,
+    module: 'Backend',
+    title: 'Express: rutas, middleware y JSON',
+    summary: 'Organizar el servidor con Express: rutas, middleware y respuestas JSON.',
+    level: 'intermedio',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'mongodb-crud',
+    session: 13,
+    module: 'Backend',
+    title: 'MongoDB: instalación y CRUD',
+    summary: 'Guardar datos de verdad: crear, leer, actualizar y borrar documentos.',
+    level: 'intermedio',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'mongoose-esquemas',
+    session: 14,
+    module: 'Backend',
+    title: 'Mongoose: esquemas y validaciones',
+    summary: 'Darle forma y reglas a los datos antes de que lleguen a la base.',
+    level: 'intermedio',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'todo-app-login',
+    session: 15,
+    module: 'Backend',
+    title: 'Todo App con login',
+    summary: 'Reto integrador de backend: autenticación y CRUD sobre datos propios.',
+    level: 'intermedio',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'react-componentes-props-state',
+    session: 16,
+    module: 'React',
+    title: 'React: componentes, JSX, props y state',
+    summary: 'Partir la interfaz en piezas reutilizables y que reaccionen a los datos.',
+    level: 'intermedio',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'react-hooks',
+    session: 17,
+    module: 'React',
+    title: 'Hooks: useState y useEffect',
+    summary: 'Estado y efectos: cómo un componente recuerda cosas y habla con el mundo exterior.',
+    level: 'intermedio',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'react-router',
+    session: 18,
+    module: 'React',
+    title: 'React Router: navegación en SPA',
+    summary: 'Varias pantallas en una sola aplicación, sin recargar la página.',
+    level: 'intermedio',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'reto-todo-app-react',
+    session: 19,
+    module: 'React',
+    title: 'Reto integrador: Todo App con login y CRUD',
+    summary: 'Unir frontend y backend en una aplicación completa.',
+    level: 'avanzado',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'ia-en-desarrollo',
+    session: 20,
+    module: 'IA en Desarrollo',
+    title: 'IA en desarrollo',
+    summary: 'Usar la IA como herramienta real de trabajo: prompts útiles, revisión crítica y límites.',
+    level: 'intermedio',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'apis-de-ia',
+    session: 21,
+    module: 'IA en Desarrollo',
+    title: 'APIs de IA desde el backend',
+    summary: 'Consumir una API de IA desde el servidor y devolver el resultado a la interfaz.',
+    level: 'avanzado',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'proyecto-inicio',
+    session: 22,
+    module: 'Proyecto Integrador',
+    title: 'Proyecto integrador: inicio',
+    summary: 'Planear el proyecto final: alcance, pantallas y datos.',
+    level: 'avanzado',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'proyecto-backend',
+    session: 23,
+    module: 'Proyecto Integrador',
+    title: 'Proyecto integrador: backend',
+    summary: 'Rutas, base de datos y autenticación del proyecto final.',
+    level: 'avanzado',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'proyecto-cierre-deploy',
+    session: 24,
+    module: 'Proyecto Integrador',
+    title: 'Proyecto integrador: cierre y deploy',
+    summary: 'Dejar el proyecto publicado, funcionando y presentable.',
+    level: 'avanzado',
+    exercises: 0,
+    published: false,
+  },
+  {
+    slug: 'defensa-de-proyectos',
+    session: 25,
+    module: 'Proyecto Integrador',
+    title: 'Defensa de proyectos',
+    summary: 'Presentar el emprendimiento digital: qué hace, cómo se construyó y qué sigue.',
+    level: 'avanzado',
+    exercises: 0,
+    published: false,
+  },
+];
+
+export function getTopic(slug: string): Topic | undefined {
+  return topics.find((topic) => topic.slug === slug);
+}
+
+export const publishedTopics = () => topics.filter((topic) => topic.published && topic.Page);
+
+/** Total de ejercicios publicados — la banda de cifras de la home. */
+export const totalExercises = () =>
+  topics.reduce((sum, topic) => sum + (topic.published ? topic.exercises : 0), 0);
+
+/** Los temas agrupados por módulo, en el orden del cronograma. */
+export function topicsByModule(): { module: Module; topics: Topic[] }[] {
+  return MODULES.map((module) => ({
+    module,
+    topics: topics.filter((topic) => topic.module === module),
+  })).filter((group) => group.topics.length > 0);
+}
+
+/** El rótulo corto de un tema: "Sesión 09 · JavaScript". */
+export const topicKicker = (topic: Topic) =>
+  `Sesión ${String(topic.session).padStart(2, '0')} · ${topic.module}`;

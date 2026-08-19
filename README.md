@@ -1,32 +1,106 @@
-# React + TypeScript + Vite
+# Guía Jóvenes creaTIvos
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Ejercicios interactivos para el curso de Desarrollo Web de Jóvenes creaTIvos
+(25 sesiones). React + TypeScript + Vite, con el sistema de diseño **Nocturne**
+(proyecto de Claude Design) como base visual.
 
-Currently, two official plugins are available:
+Las 25 sesiones del cronograma ya están registradas en `src/data/topics.ts`.
+Las que no tienen página aparecen en la home como "Próximamente" y no generan
+ruta; publicar una es crear su carpeta y cambiar tres campos.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm run dev      # servidor de desarrollo
+npm run build    # typecheck + build de producción
+npm run lint     # oxlint
+```
 
-## React Compiler
+## Cómo se organiza
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```
+src/
+  data/topics.ts          registro central de temas (única fuente de verdad)
+  router.tsx              rutas derivadas del registro
+  pages/Home.tsx          bienvenida + banda de cifras + grilla de temas
+  topics/<slug>/index.tsx una subpágina por tema
+  components/
+    TopicPage.tsx         marco común de un tema: hero, progreso, contexto
+    TopicCard.tsx         tarjeta del tema en la home
+    exercises/            primitivas de ejercicio reutilizables
+  lib/progress.ts         progreso por ejercicio en localStorage
+  styles/nocturne.css     tokens y componentes del sistema de diseño
+  styles/layout.css       ritmo de página, fondo iluminado, tokens de motion
+```
 
-## Expanding the Oxlint configuration
+## Publicar un tema
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+1. Crear `src/topics/<slug>/index.tsx`:
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
+```tsx
+import { Exercises, Lesson, TopicPage } from '../../components/TopicPage';
+import { Quiz } from '../../components/exercises';
+
+export default function MiTema() {
+  return (
+    <TopicPage slug="mi-tema">
+      <Lesson title="Qué vamos a ver">
+        <p>Explicación corta.</p>
+      </Lesson>
+
+      <Exercises>
+        <Quiz
+          id="ej-1"
+          index={1}
+          title="Título del ejercicio"
+          code={'print("hola")'}
+          options={[{ id: 'a', label: 'hola' }, { id: 'b', label: 'error' }]}
+          answer="a"
+          explanation="Por qué es esa."
+        />
+      </Exercises>
+    </TopicPage>
+  );
 }
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+2. Actualizar su entrada en `src/data/topics.ts`:
+
+```ts
+{
+  slug: 'mi-tema',
+  session: 10,                  // número de sesión del cronograma
+  module: 'JavaScript',         // uno de los módulos de src/types.ts
+  title: 'Mi tema',
+  summary: 'Una o dos frases.',
+  level: 'inicial',
+  exercises: 5,                 // debe coincidir con la cantidad real
+  published: true,              // false = tarjeta "Próximamente", sin ruta
+  Page: lazy(() => import('../topics/mi-tema')),
+}
+```
+
+La ruta (`/tema/mi-tema`), la tarjeta en su módulo, el contador de ejercicios y
+las barras de progreso salen de ese registro. No hay nada más que tocar.
+
+## Primitivas de ejercicio
+
+| Componente | Para qué sirve |
+| --- | --- |
+| `Quiz` | Opción múltiple con explicación y pista. Corrige al instante. |
+| `PredictOutput` | "¿Qué imprime este código?" — respuesta escrita, comparada sin distinguir mayúsculas ni espacios de más. |
+| `OrderSteps` | Ordenar líneas o pasos. Las filas se mueven con transición de layout. |
+| `CodeBlock` | Bloque de código, con numeración opcional. |
+| `ExerciseShell` / `Feedback` | Base para armar un tipo de ejercicio nuevo. |
+
+Cada ejercicio necesita un `id` único **dentro de su tema**: es la clave con la
+que se guarda el progreso.
+
+## Reglas de diseño y movimiento
+
+- Todo color, tipografía, radio y sombra sale de las variables de
+  `styles/nocturne.css`. No se escriben hex ni px sueltos.
+- El acento (`#9184d9`) se usa como línea y como brillo, nunca como relleno
+  grande. La única superficie saturada es la banda de cifras de la home.
+- Curvas y duraciones salen de `lib/motion.ts` y de los tokens `--ease-*` /
+  `--dur-*`. Nada de UI por encima de 300 ms.
+- Toda animación respeta `prefers-reduced-motion`, y los efectos de `:hover`
+  están limitados a punteros finos.

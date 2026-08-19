@@ -1,0 +1,79 @@
+/* Page-level scaffolding for the Nocturne system: rhythm, the lit ground,
+   the wrap, the kicker grammar and the motion tokens. Every color, font,
+   radius and shadow still comes from nocturne.css — nothing is hard-coded. */
+
+:root {
+  --leading: 28px;          /* the 17px body at its ~1.65 web leading */
+  --half: 14px;
+  --edge: clamp(20px, 5vw, 72px);
+  --measure: 58ch;
+
+  /* Motion — strong curves; the browser built-ins are too weak. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --dur-press: 120ms;
+  --dur-fast: 180ms;
+  --dur-base: 240ms;
+}
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  /* The lit ground: an accent bloom from the top right, a black fall-off at
+     the lower left. Shade, not color. */
+  background:
+    radial-gradient(1200px 720px at 82% -160px,
+      color-mix(in srgb, var(--color-accent-900) 75%, transparent), transparent 60%),
+    radial-gradient(1100px 800px at -10% 100%,
+      color-mix(in srgb, black 30%, transparent), transparent 55%),
+    var(--color-bg);
+  background-attachment: fixed;
+  min-height: 100dvh;
+  text-wrap: pretty;
+}
+
+#root { min-height: 100dvh; display: flex; flex-direction: column; }
+
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 var(--edge); width: 100%; }
+
+/* — section separator — the divider token, faded at both ends — */
+.rule {
+  height: 1px; border: 0; margin: 0;
+  background: linear-gradient(to right,
+    transparent, var(--color-divider) 48px calc(100% - 48px), transparent);
+}
+
+/* — kicker grammar: solid 44px accent dash, uppercase, tabular figures — */
+.kicker {
+  position: relative; display: block;
+  font-size: 13px; line-height: var(--half); letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--color-accent);
+  font-feature-settings: "tnum" 1;
+  margin: 0 0 calc(var(--leading) - var(--half));
+}
+.kicker::before {
+  content: ""; position: absolute; left: -64px; top: calc(50% - 0.5px);
+  width: 44px; height: 1px; background: var(--color-accent);
+}
+/* below 1280px the gutter drops under the 64px hang — the mark folds away
+   rather than cropping at the viewport edge */
+@media (max-width: 1280px) { .kicker::before { display: none; } }
+
+/* — display header — tight, ratio-governed leading; caps optically aligned — */
+.display {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: clamp(40px, 6vw, 80px);
+  line-height: clamp(44px, 6.66vw, 89px);
+  letter-spacing: -0.015em;
+  margin: 0 0 0 -0.06em;
+}
+.display .line { display: block; }
+
+/* Code — the one monospace role in the system. */
+code, pre, .mono {
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  font-feature-settings: "tnum" 1;
+}

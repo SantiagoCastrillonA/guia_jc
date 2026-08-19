@@ -1,0 +1,39 @@
+import 'dotenv/config';
+import express from 'express';
+import 'express-async-errors'; // los errores de los handlers async llegan al middleware de error
+import mongoose from 'mongoose';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import { loadUser } from './src/auth.js';
+import { router } from './src/routes.js';
+
+const PORT = Number(process.env.PORT ?? 3000);
+const MONGO_URL = process.env.MONGO_URL ?? 'mongodb://127.0.0.1:27017/guia_jc';
+
+const app = express();
+
+// nginx es quien habla con el cliente: sin esto el rate limit vería una sola IP.
+app.set('trust proxy', 1);
+
+app.use(helmet());
+app.use(express.json({ limit: '32kb' }));
+app.use(cookieParser());
+app.use(loadUser);
+
+app.get('/api/health', (_req, res) => res.json({ ok: true }));
+app.use('/api', router);
+
+app.use((_req, res) => res.status(404).json({ error: 'Ruta no encontrada.' }));
+
+// Último recurso: nunca se filtra el stack al cliente.
+app.use((err, _req, res, _next) => {
+  console.error(err);
+  res.status(500).json({ error: 'Algo falló en el servidor.' });
+});
+
+await mongoose.connect(MONGO_URL);
+console.log('Conectado a MongoDB');
+
+app.listen(PORT, '127.0.0.1', () => {
+  console.log(`API escuchando en http://127.0.0.1:${PORT}`);
+});

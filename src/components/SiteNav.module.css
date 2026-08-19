@@ -1,0 +1,64 @@
+/* The header is a translucent layer content scrolls under — not an opaque
+   strip that eats a band of the page. */
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: color-mix(in srgb, var(--color-bg) 62%, transparent);
+  backdrop-filter: blur(20px) saturate(180%);
+  padding-inline: max(var(--edge), calc((100% - 1200px) / 2 + var(--edge)));
+}
+
+/* Scroll edge, not a divider: the rule only appears once content is under it. */
+.bar::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(to right,
+    transparent, var(--color-divider) 48px calc(100% - 48px), transparent);
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+.scrolled::after { opacity: 1; }
+
+.brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-right: auto;
+  text-decoration: none;
+  color: inherit;
+}
+.brandMark { color: var(--color-accent); }
+.brandSub {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+
+.link { white-space: nowrap; }
+
+/* Quién está en sesión: presente, sin competir con los enlaces. */
+.who {
+  font-size: 13px;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  white-space: nowrap;
+}
+@media (max-width: 700px) {
+  .who { display: none; }
+}
+
+@media (max-width: 560px) {
+  .brandSub { display: none; }
+  .link { font-size: 13px; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .bar {
+    background: var(--color-bg);
+    backdrop-filter: none;
+  }
+}
