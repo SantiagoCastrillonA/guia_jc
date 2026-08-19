@@ -1,0 +1,129 @@
+.demo {
+  margin: var(--leading) 0;
+  padding: var(--space-6);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-neutral-900) 55%, transparent);
+  box-shadow: var(--shadow-sm);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+.control { display: grid; gap: var(--space-2); }
+.controlLabel {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+.row { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.opt {
+  font: inherit;
+  font-size: 12.5px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-divider);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  transition:
+    transform var(--dur-press) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .opt:hover { border-color: color-mix(in srgb, var(--color-accent) 55%, transparent); }
+}
+.opt:active { transform: scale(0.96); }
+.optOn {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+/* — escenario de flex — */
+.stage {
+  display: flex;
+  gap: 10px;
+  min-height: 190px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px dashed color-mix(in srgb, var(--color-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--color-text) 3%, transparent);
+}
+.box {
+  display: grid;
+  place-items: center;
+  width: 66px;
+  min-height: 48px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 60%, transparent);
+  color: var(--color-accent-100);
+  font-size: 13px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+.boxTall { min-height: 92px; }
+.boxShort { min-height: 40px; }
+
+.code {
+  margin: var(--space-6) 0 0;
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-neutral-900) 75%, transparent);
+  font-size: 13px;
+  line-height: 21px;
+  overflow-x: auto;
+}
+.prop { color: var(--color-accent); }
+
+/* — box model — */
+.boxModel {
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+}
+.marginBox {
+  border: 1px dashed color-mix(in srgb, var(--color-text) 35%, transparent);
+  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+  position: relative;
+}
+.borderBox {
+  border-style: solid;
+  border-color: color-mix(in srgb, var(--color-accent) 70%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+.paddingBox {
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+}
+.contentBox {
+  display: grid;
+  place-items: center;
+  min-height: 56px;
+  background: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--color-accent-100);
+  font-size: 12px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+.tag {
+  position: absolute;
+  top: 2px;
+  left: 6px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: color-mix(in srgb, var(--color-text) 45%, transparent);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+.slider { width: 150px; accent-color: var(--color-accent); }
+.total {
+  margin-top: var(--space-4);
+  font-size: 13px;
+  font-feature-settings: 'tnum' 1;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+}
+.totalNum { color: var(--color-accent); }

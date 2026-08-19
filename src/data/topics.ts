@@ -71,7 +71,7 @@ export const topics: Topic[] = [
     summary:
       'La estructura de una página con etiquetas que significan algo: header, nav, main, section, article y footer, más las tres reglas de accesibilidad.',
     level: 'inicial',
-    exercises: 5,
+    exercises: 19,
     published: true,
     Page: lazy(() => import('../topics/html-semantico')),
   },
@@ -79,11 +79,13 @@ export const topics: Topic[] = [
     slug: 'css-box-model-flexbox',
     session: 6,
     module: 'Fundamentos Web',
-    title: 'CSS: box model, Flexbox y Tailwind',
-    summary: 'Darle identidad visual a la página: colores, tipografía, espaciado y layout con Flexbox.',
+    title: 'CSS: box model, Flexbox y Grid',
+    summary:
+      'Darle identidad a la página: selectores, el box model con demo interactiva, variables de marca, Flexbox para probar en vivo, Grid y responsive.',
     level: 'inicial',
-    exercises: 0,
-    published: false,
+    exercises: 20,
+    published: true,
+    Page: lazy(() => import('../topics/css-box-model-flexbox')),
   },
   {
     slug: 'sitio-estatico-deploy',
