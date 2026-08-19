@@ -145,7 +145,9 @@ cat > /etc/systemd/system/guia-jc-deploy.path <<'UNIT'
 Description=Señal de redespliegue de la guía
 
 [Path]
-PathExists=/run/guia-jc/deploy.request
+# PathModified: cada escritura de la señal dispara el servicio, sin tener que
+# borrar el archivo para rearmar la unidad.
+PathModified=/run/guia-jc/deploy.request
 Unit=guia-jc-deploy.service
 
 [Install]
