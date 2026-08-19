@@ -146,3 +146,12 @@
 }
 .prompt { color: var(--color-accent); user-select: none; }
 .comment { color: color-mix(in srgb, var(--color-text) 45%, transparent); }
+
+/* Misma razón que en TopicPage: sin esto, un paso con un bloque de código
+   ancho desborda la pantalla del celular. */
+.steps { grid-template-columns: minmax(0, 1fr); }
+.steps > * { min-width: 0; }
+.stepBody { min-width: 0; overflow-wrap: anywhere; }
+.compare > * { min-width: 0; }
+.callout { min-width: 0; }
+.calloutBody { min-width: 0; }

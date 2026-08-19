@@ -286,3 +286,9 @@
 @media (max-width: 620px) {
   .pairs { grid-template-columns: 1fr; }
 }
+
+/* El contenido ancho se desplaza dentro de su tarjeta, nunca empuja la página. */
+.shell { min-width: 0; }
+.shell > * { min-width: 0; }
+.options > * { min-width: 0; }
+.option { overflow-wrap: anywhere; }

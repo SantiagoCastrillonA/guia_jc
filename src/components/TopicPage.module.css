@@ -88,3 +88,14 @@
 }
 
 .exercises { display: grid; gap: var(--leading); }
+
+/* Los hijos de un grid traen min-width: auto, así que un bloque de código
+   ancho empuja la columna y genera scroll horizontal en el celular.
+   minmax(0, 1fr) y min-width: 0 los obligan a encogerse y a desplazar
+   internamente su propio contenido. */
+.body { grid-template-columns: minmax(0, 1fr); }
+.body > * { min-width: 0; }
+.exercises { grid-template-columns: minmax(0, 1fr); }
+.exercises > * { min-width: 0; }
+.section { min-width: 0; }
+.section pre { overflow-x: auto; }
