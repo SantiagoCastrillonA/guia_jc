@@ -119,7 +119,7 @@ export const topics: Topic[] = [
     summary:
       'Guardar datos con let y const, reconocer el tipo de cada valor y entender qué hace JavaScript cuando se mezclan tipos distintos.',
     level: 'inicial',
-    exercises: 5,
+    exercises: 19,
     published: true,
     Page: lazy(() => import('../topics/js-variables-tipos-operadores')),
   },
@@ -130,8 +130,9 @@ export const topics: Topic[] = [
     title: 'DOM, eventos, APIs y Node.js',
     summary: 'Que el código controle lo que el usuario ve: seleccionar elementos, escuchar eventos y traer datos.',
     level: 'intermedio',
-    exercises: 0,
-    published: false,
+    exercises: 20,
+    published: true,
+    Page: lazy(() => import('../topics/dom-eventos-apis')),
   },
   {
     slug: 'api-sencilla-node',
@@ -140,8 +141,9 @@ export const topics: Topic[] = [
     title: 'API sencilla con Node.js',
     summary: 'Primer servidor propio: responder peticiones y devolver JSON.',
     level: 'intermedio',
-    exercises: 0,
-    published: false,
+    exercises: 20,
+    published: true,
+    Page: lazy(() => import('../topics/api-sencilla-node')),
   },
   {
     slug: 'express-rutas-middleware',
