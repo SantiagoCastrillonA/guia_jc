@@ -42,15 +42,19 @@ ningún puerto nuevo: el aviso entra por el 80.
 | --- | --- |
 | Endpoint que recibe el aviso | `POST /api/deploy` — `server/src/deploy.js` |
 | Secreto compartido | `DEPLOY_SECRET` en `/srv/guia-jc-api/.env` (solo en el servidor) |
+| Señal en disco | `/run/guia-jc/deploy.request` |
+| Disparador | `guia-jc-deploy.path` → `guia-jc-deploy.service` |
 | Script de redespliegue | `/usr/local/bin/guia-jc-redeploy` |
 | Copia del repo | `/srv/guia-jc-src` |
 | Bitácora | `/var/log/guia-jc-deploy.log` |
 
 El endpoint verifica la firma HMAC de GitHub sobre el cuerpo crudo, ignora todo
-lo que no sea `refs/heads/main`, y lanza el script con `systemd-run` para que
-quede fuera del cgroup del servicio — si corriera como hijo, el `systemctl
-restart` del final se mataría a sí mismo. El usuario `ubuntu` solo puede
-ejecutar como root ese comando exacto (`/etc/sudoers.d/guia-jc-deploy`).
+lo que no sea `refs/heads/main`, y **solo escribe la señal en disco**. El API no
+escala privilegios: corre con `NoNewPrivileges=true`, que bloquea `sudo` — el
+primer intento usaba `sudo systemd-run` y por eso GitHub recibía 202 sin que
+pasara nada. Una `systemd.path` observa la señal y arranca el despliegue como
+root en su propio cgroup, que es lo que permite que el script reinicie el API
+sin matarse a sí mismo.
 
 El script hace `git reset --hard origin/main`, `npm ci`, compila, sincroniza
 `dist/` a `/var/www/guia-jc` y `server/` a `/srv/guia-jc-api` — **sin tocar el
@@ -74,7 +78,7 @@ ssh -i $env:USERPROFILE\.ssh\guia-jc.pem ubuntu@3.141.72.146 "tail -30 /var/log/
 ### Forzar un despliegue a mano
 
 ```bash
-sudo systemd-run --unit=guia-jc-deploy --collect /usr/local/bin/guia-jc-redeploy
+sudo systemctl start guia-jc-deploy.service
 ```
 
 ## Conectarse
