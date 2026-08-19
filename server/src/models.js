@@ -69,5 +69,19 @@ progressSchema.methods.toMap = function toMap() {
   return map;
 };
 
+/**
+ * Si un tema está apagado por el profe. Solo existe un documento por tema
+ * cuando alguna vez se desactivó: su ausencia significa "disponible" (el
+ * valor por defecto que ya trae `topics.ts` en el frontend).
+ */
+const topicSettingSchema = new Schema(
+  {
+    slug: { type: String, required: true, unique: true, trim: true },
+    enabled: { type: Boolean, default: true },
+  },
+  { timestamps: true },
+);
+
 export const User = model('User', userSchema);
 export const Progress = model('Progress', progressSchema);
+export const TopicSetting = model('TopicSetting', topicSettingSchema);

@@ -2,7 +2,7 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import rateLimit from 'express-rate-limit';
 import { z } from 'zod';
-import { Progress, User } from './models.js';
+import { Progress, TopicSetting, User } from './models.js';
 import { clearSession, issueSession, requireAdmin, requireAuth } from './auth.js';
 
 const BCRYPT_ROUNDS = 12;
@@ -175,7 +175,47 @@ router.delete('/progress/:topicSlug', requireAuth, async (req, res) => {
   res.json({ progress: progress ? progress.toMap() : {} });
 });
 
+// ── visibilidad de temas ─────────────────────────────────────────────────
+
+/** Público: qué temas apagó el profe. Ausencia = disponible. */
+router.get('/topics/visibility', async (_req, res) => {
+  const off = await TopicSetting.find({ enabled: false }).select('slug');
+  res.json({ disabled: off.map((t) => t.slug) });
+});
+
+router.patch('/admin/topics/:slug', requireAdmin, async (req, res) => {
+  const data = parse(z.object({ enabled: z.boolean() }), req.body, res);
+  if (!data) return;
+
+  await TopicSetting.findOneAndUpdate(
+    { slug: req.params.slug },
+    { enabled: data.enabled },
+    { upsert: true },
+  );
+  res.json({ slug: req.params.slug, enabled: data.enabled });
+});
+
 // ── panel de administración ───────────────────────────────────────────────
+
+router.post('/admin/users', requireAdmin, async (req, res) => {
+  // A diferencia de /auth/register, no depende de ALLOW_REGISTRATION: es como
+  // el profe crea cuentas (incluidas las de otros profes) una vez cerrado el
+  // registro público.
+  const data = parse(registration.extend({ role: z.enum(['student', 'admin']) }), req.body, res);
+  if (!data) return;
+
+  if (await User.exists({ username: data.username })) {
+    return res.status(409).json({ error: 'Ese usuario ya existe.' });
+  }
+
+  const user = await User.create({
+    username: data.username,
+    name: data.name,
+    passwordHash: await bcrypt.hash(data.password, BCRYPT_ROUNDS),
+    role: data.role,
+  });
+  res.status(201).json({ user: user.toPublic() });
+});
 
 router.get('/admin/users', requireAdmin, async (_req, res) => {
   const users = await User.find().sort({ createdAt: 1 });

@@ -1,5 +1,29 @@
 .hero {
   padding: calc(3.5 * var(--leading)) 0 calc(2.5 * var(--leading));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(2 * var(--leading));
+}
+.heroText { flex: 1 1 480px; min-width: 0; }
+/* La orbe es puro adorno junto al título. Pesa casi nada (canvas 2D, sin
+   dependencias) así que a diferencia de otros adornos más pesados no hace
+   falta esconderla en el celular — solo se encoge. */
+.heroOrb {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 220px;
+  height: 220px;
+}
+.heroOrb :global(canvas) { transform: scale(2.4); }
+@media (max-width: 1024px) {
+  .heroOrb { width: 160px; height: 160px; }
+  .heroOrb :global(canvas) { transform: scale(1.8); }
+}
+@media (max-width: 640px) {
+  .heroOrb { width: 96px; height: 96px; }
+  .heroOrb :global(canvas) { transform: scale(1.1); }
 }
 .sub {
   font-size: 17px;
@@ -55,6 +79,9 @@
 
 .module { margin-top: calc(1.75 * var(--leading)); }
 .moduleTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   font-size: 13px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -65,6 +92,7 @@
   background: linear-gradient(to right,
     transparent, var(--color-divider) 48px calc(100% - 48px), transparent) no-repeat bottom / 100% 1px;
 }
+.moduleIcon { flex: none; color: var(--color-accent); }
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));

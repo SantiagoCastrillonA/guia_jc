@@ -40,6 +40,9 @@
 }
 
 .link { white-space: nowrap; }
+@media (pointer: coarse) {
+  .link { padding-block: var(--space-2); }
+}
 
 /* Quién está en sesión: presente, sin competir con los enlaces. */
 .who {

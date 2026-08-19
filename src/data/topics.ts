@@ -1,4 +1,4 @@
-import { lazy } from 'react';
+import { lazy, type ComponentType } from 'react';
 import { MODULES, type Module, type Topic } from '../types';
 
 /**
@@ -303,6 +303,32 @@ export const topics: Topic[] = [
 
 export function getTopic(slug: string): Topic | undefined {
   return topics.find((topic) => topic.slug === slug);
+}
+
+/** El mismo módulo que carga cada `Page` de arriba — separado para poder
+ *  adelantar la descarga (al pasar el mouse sobre una tarjeta) o dársela al
+ *  router como ruta `lazy`, sin duplicar el chunk: es el mismo import(), así
+ *  que el navegador reutiliza la petición ya en curso o ya resuelta. */
+const topicModules = import.meta.glob<{ default: ComponentType }>('../topics/*/index.tsx');
+
+export function preloadTopic(slug: string) {
+  void topicModules[`../topics/${slug}/index.tsx`]?.();
+}
+
+/**
+ * `route.lazy` en vez de `React.lazy` + `<Suspense>`: React Router espera a
+ * que el módulo esté listo COMO PARTE de la navegación, antes de intentar
+ * pintar la ruta nueva. Con `React.lazy` normal, el import ocurre DURANTE el
+ * render dentro de una transición — y React puede quedarse mostrando la
+ * página vieja congelada, sin spinner, hasta que el chunk cargue (a veces
+ * varios segundos). `route.lazy` evita ese punto muerto: `useNavigation()`
+ * refleja el estado "cargando" al instante, apenas se hace clic.
+ */
+export function loadTopicRoute(slug: string) {
+  return async () => {
+    const mod = await topicModules[`../topics/${slug}/index.tsx`]();
+    return { Component: mod.default };
+  };
 }
 
 export const publishedTopics = () => topics.filter((topic) => topic.published && topic.Page);

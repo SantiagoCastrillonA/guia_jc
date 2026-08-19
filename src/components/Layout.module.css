@@ -1,5 +1,44 @@
 .main { flex: 1; }
 
+.fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  min-height: 70vh;
+  min-height: 70dvh;
+}
+.orbScale { transform: scale(1.75); }
+
+.anonBar {
+  background: color-mix(in srgb, var(--color-text) 6%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent);
+}
+.anonBar :global(.wrap) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding: var(--space-3) var(--space-4);
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+  color: color-mix(in srgb, var(--color-text) 78%, transparent);
+}
+.anonBarLink {
+  flex: none;
+  font-weight: 500;
+  color: var(--color-accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.anonBarLink:hover { text-decoration: underline; }
+@media (pointer: coarse) {
+  .anonBarLink { padding-block: var(--space-2); }
+}
+
 .footer {
   padding: calc(2 * var(--leading)) 0;
   margin-top: calc(2 * var(--leading));

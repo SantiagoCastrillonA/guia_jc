@@ -38,6 +38,11 @@ body {
 #root { min-height: 100dvh; display: flex; flex-direction: column; }
 
 .wrap { max-width: 1200px; margin: 0 auto; padding: 0 var(--edge); width: 100%; }
+/* En pantallas grandes 1200px deja demasiado margen muerto a los lados —
+   el contenedor crece con la pantalla; el texto de prosa sigue topado
+   aparte en --measure, así que las líneas no se alargan. */
+@media (min-width: 1440px) { .wrap { max-width: 1360px; } }
+@media (min-width: 1800px) { .wrap { max-width: 1520px; } }
 
 /* — section separator — the divider token, faded at both ends — */
 .rule {

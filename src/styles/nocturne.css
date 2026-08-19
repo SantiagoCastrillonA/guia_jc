@@ -140,6 +140,14 @@ figcaption {
 .btn-icon { width: 36px; height: 36px; padding: 0; }
 .btn-block { width: 100%; margin-top: var(--space-2); }
 
+/* Con dedo en vez de mouse, 30px de alto se queda corto: el estándar de
+   accesibilidad táctil ronda los 44px. En desktop (mouse fino) el botón
+   compacto se queda igual. */
+@media (pointer: coarse) {
+  .btn { min-height: 44px; padding-block: var(--space-3); }
+  .btn-icon { width: 44px; height: 44px; }
+}
+
 /* — forms — */
 .field > label {
   display: block; font-size: 12px; margin-bottom: 5px;

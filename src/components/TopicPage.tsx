@@ -2,9 +2,11 @@ import { useEffect, useMemo, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'motion/react';
 import { getTopic, topicKicker } from '../data/topics';
+import { useAuth } from '../lib/auth';
 import { useTopicProgress } from '../lib/progress';
+import { useTopicVisibility } from '../lib/topicVisibility';
 import { ExerciseContext } from './exercises/context';
-import { STAGGER, enter, settle } from '../lib/motion';
+import { STAGGER, enter } from '../lib/motion';
 import styles from './TopicPage.module.css';
 
 interface TopicPageProps {
@@ -20,7 +22,13 @@ interface TopicPageProps {
 export function TopicPage({ slug, children }: TopicPageProps) {
   const topic = getTopic(slug);
   const { solved, count, markSolved, reset } = useTopicProgress(slug);
+  const { isAvailable, loading: visLoading } = useTopicVisibility();
+  const { user } = useAuth();
   const reduce = useReducedMotion();
+
+  const isAdmin = user?.role === 'admin';
+  const available = isAvailable(slug);
+  const blocked = !visLoading && !available && !isAdmin;
 
   useEffect(() => {
     document.title = topic
@@ -31,7 +39,21 @@ export function TopicPage({ slug, children }: TopicPageProps) {
   const value = useMemo(() => ({ topicSlug: slug, solved, markSolved }), [slug, solved, markSolved]);
 
   const total = topic?.exercises ?? 0;
-  const progress = total > 0 ? Math.min(count / total, 1) : 0;
+
+  if (blocked) {
+    return (
+      <div className="wrap" style={{ padding: 'calc(4 * var(--leading)) 0' }}>
+        <span className="kicker">No disponible</span>
+        <h1>{topic?.title ?? slug}</h1>
+        <p className="text-muted" style={{ maxWidth: 'var(--measure)' }}>
+          Tu profe desactivó este tema por ahora. Vuelve más tarde.
+        </p>
+        <Link to="/#temas" className="btn btn-primary" style={{ marginTop: 'var(--space-4)' }}>
+          Volver a los temas
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="wrap">
@@ -42,23 +64,29 @@ export function TopicPage({ slug, children }: TopicPageProps) {
         {topic && <span className="kicker">{topicKicker(topic)}</span>}
         <h1 className={styles.title}>{topic?.title ?? slug}</h1>
         {topic && <p className={styles.summary}>{topic.summary}</p>}
+        {!available && isAdmin && (
+          <p className={styles.previewNote} role="status">
+            Desactivado para estudiantes — solo tú lo ves como admin.
+          </p>
+        )}
 
         <div className={styles.progress}>
-          <span>
-            {count} de {total} ejercicios resueltos
-          </span>
-          <span className={styles.track} aria-hidden="true">
-            <motion.span
-              className={styles.fill}
-              initial={false}
-              animate={{ transform: `scaleX(${progress})` }}
-              transition={reduce ? { duration: 0 } : settle}
-            />
-          </span>
-          {count > 0 && (
-            <button type="button" className="btn btn-ghost" onClick={reset}>
-              Reiniciar
-            </button>
+          <div className={styles.progressRow}>
+            <span>
+              {count} de {total} ejercicios resueltos
+            </span>
+            {count > 0 && (
+              <button type="button" className="btn btn-ghost" onClick={reset}>
+                Reiniciar
+              </button>
+            )}
+          </div>
+          {total > 0 && (
+            <div className={styles.ticks} aria-hidden="true">
+              {Array.from({ length: total }, (_, i) => (
+                <span key={i} className={i < count ? styles.tickOn : styles.tick} />
+              ))}
+            </div>
           )}
         </div>
       </header>
