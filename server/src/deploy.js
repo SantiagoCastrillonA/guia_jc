@@ -1,5 +1,5 @@
 import crypto from 'node:crypto';
-import { spawn } from 'node:child_process';
+import fs from 'node:fs';
 import { Router } from 'express';
 
 /**
@@ -9,10 +9,14 @@ import { Router } from 'express';
  * .env, el mismo que se configura en GitHub). No se abre ningún puerto nuevo:
  * la petición entra por el 80 que ya sirve el sitio.
  *
- * El trabajo pesado lo hace /usr/local/bin/guia-jc-redeploy, lanzado con
- * systemd-run para que quede fuera del cgroup de este servicio: si corriera
- * como hijo, el `systemctl restart` del final se mataría a sí mismo.
+ * Este proceso no despliega ni escala privilegios: solo deja una señal en
+ * disco. Una `systemd.path` la ve y arranca guia-jc-deploy.service como root,
+ * en su propio cgroup — así el `systemctl restart` del final no se mata a sí
+ * mismo, y el API puede seguir con NoNewPrivileges=true (sin sudo, que es
+ * justo lo que esa opción bloquea).
  */
+
+const SIGNAL = process.env.DEPLOY_SIGNAL ?? '/run/guia-jc/deploy.request';
 export const deployRouter = Router();
 
 /** Compara en tiempo constante, tolerando longitudes distintas. */
@@ -51,17 +55,12 @@ deployRouter.post('/deploy', (req, res) => {
     return res.json({ skipped: `ignorado: ${ref}` });
   }
 
-  const child = spawn(
-    'sudo',
-    [
-      '/usr/bin/systemd-run',
-      '--unit=guia-jc-deploy',
-      '--collect',
-      '/usr/local/bin/guia-jc-redeploy',
-    ],
-    { detached: true, stdio: 'ignore' },
-  );
-  child.unref();
+  try {
+    fs.writeFileSync(SIGNAL, `${new Date().toISOString()}\n`);
+  } catch (err) {
+    console.error('No se pudo señalar el despliegue:', err);
+    return res.status(500).json({ error: 'No se pudo lanzar el despliegue.' });
+  }
 
   // 202: se aceptó el aviso; el despliegue sigue en segundo plano.
   res.status(202).json({ ok: true, mensaje: 'Despliegue lanzado.' });

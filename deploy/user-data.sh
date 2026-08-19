@@ -118,12 +118,43 @@ Restart=always
 RestartSec=3
 NoNewPrivileges=true
 PrivateTmp=true
+# /run/guia-jc, del usuario del servicio: ahí deja la señal de autodeploy.
+RuntimeDirectory=guia-jc
+RuntimeDirectoryPreserve=yes
 
 [Install]
 WantedBy=multi-user.target
 UNIT
+
+# ── autodeploy: la señal del webhook dispara el redespliegue como root ────
+# El API corre con NoNewPrivileges=true (no puede usar sudo), así que en vez de
+# escalar privilegios solo crea /run/guia-jc/deploy.request. Esta path unit lo
+# ve y arranca el servicio de despliegue en su propio cgroup, que es lo que
+# permite que el script reinicie el API sin matarse a sí mismo.
+cat > /etc/systemd/system/guia-jc-deploy.service <<'UNIT'
+[Unit]
+Description=Redespliegue de la guía desde GitHub
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/guia-jc-redeploy
+UNIT
+
+cat > /etc/systemd/system/guia-jc-deploy.path <<'UNIT'
+[Unit]
+Description=Señal de redespliegue de la guía
+
+[Path]
+PathExists=/run/guia-jc/deploy.request
+Unit=guia-jc-deploy.service
+
+[Install]
+WantedBy=multi-user.target
+UNIT
+
 systemctl daemon-reload
-# Se habilita cuando el código exista; arrancarlo vacío solo genera ruido.
+systemctl enable --now guia-jc-deploy.path
+# guia-jc-api se habilita cuando el código exista; arrancarlo vacío solo genera ruido.
 
 nginx -t
 systemctl enable nginx
