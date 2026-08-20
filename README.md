@@ -5,7 +5,8 @@ Ejercicios interactivos para el curso de Desarrollo Web de Jóvenes creaTIvos
 (proyecto de Claude Design) como base visual.
 
 **En producción: https://3-141-72-146.nip.io** — cada push a `main` se despliega
-solo (ver [deploy/README.md](deploy/README.md)).
+solo (ver [deploy/README.md](deploy/README.md)). Se trabaja en la rama `dev`:
+ver [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Las **25 sesiones** del cronograma están publicadas, con explicación paso a paso,
 diagramas y demos interactivas, y entre 18 y 20 ejercicios cada una (491 en
@@ -126,6 +127,8 @@ que se guarda el progreso.
   `styles/nocturne.css`. No se escriben hex ni px sueltos.
 - El acento (`#9184d9`) se usa como línea y como brillo, nunca como relleno
   grande. La única superficie saturada es la banda de cifras de la home.
+- Colores de apoyo en `styles/layout.css`: `--color-tech` (cian, para datos y
+  progreso) y `--color-ok` / `--color-off` (estado encendido o apagado).
 - Curvas y duraciones salen de `lib/motion.ts` y de los tokens `--ease-*` /
   `--dur-*`. Nada de UI por encima de 300 ms.
 - Toda animación respeta `prefers-reduced-motion`, y los efectos de `:hover`
