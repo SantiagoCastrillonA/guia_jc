@@ -50,3 +50,15 @@
   flex-wrap: wrap;
   justify-content: space-between;
 }
+
+/* — error de ruta — lo que se ve si un módulo no carga o una página se rompe */
+.routeError {
+  padding: calc(4 * var(--leading)) 0;
+  max-width: var(--measure);
+}
+.routeErrorActions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-top: var(--space-6);
+}

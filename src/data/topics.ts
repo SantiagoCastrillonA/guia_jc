@@ -1,5 +1,6 @@
 import { lazy, type ComponentType } from 'react';
 import { MODULES, type Module, type Topic } from '../types';
+import { importarConReintentos } from '../lib/lazyRoute';
 
 /**
  * El registro de temas — la única fuente de verdad de la app.
@@ -326,7 +327,7 @@ export function preloadTopic(slug: string) {
  */
 export function loadTopicRoute(slug: string) {
   return async () => {
-    const mod = await topicModules[`../topics/${slug}/index.tsx`]();
+    const mod = await importarConReintentos(() => topicModules[`../topics/${slug}/index.tsx`]());
     return { Component: mod.default };
   };
 }

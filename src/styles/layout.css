@@ -14,6 +14,12 @@
   --dur-press: 120ms;
   --dur-fast: 180ms;
   --dur-base: 240ms;
+
+  /* Estado encendido/apagado. Se usan como línea y tinte, nunca como relleno. */
+  --color-ok: #63c79b;
+  --color-ok-tint: color-mix(in srgb, var(--color-ok) 14%, transparent);
+  --color-off: #d9a441;
+  --color-off-tint: color-mix(in srgb, var(--color-off) 14%, transparent);
 }
 
 html { scroll-behavior: smooth; }

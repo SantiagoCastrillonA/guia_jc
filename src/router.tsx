@@ -1,14 +1,17 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { Layout, PageFallback } from './components/Layout';
+import { RouteError } from './components/RouteError';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 import { loadTopicRoute, publishedTopics } from './data/topics';
+import { rutaLazy } from './lib/lazyRoute';
 
 /** Las rutas de temas salen del registro — nunca se escriben dos veces. */
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
+    errorElement: <RouteError />,
     children: [
       { index: true, element: <Home /> },
       // `lazy` en vez de React.lazy: el router espera el módulo COMO PARTE
@@ -19,19 +22,15 @@ export const router = createBrowserRouter([
       // hasta que el módulo cargue, y la página se ve en blanco.
       {
         path: 'entrar',
-        lazy: async () => {
-          const { default: Component } = await import('./pages/Login');
-          return { Component };
-        },
+        lazy: rutaLazy(() => import('./pages/Login')),
         HydrateFallback: PageFallback,
+        errorElement: <RouteError />,
       },
       {
         path: 'admin',
-        lazy: async () => {
-          const { default: Component } = await import('./pages/Admin');
-          return { Component };
-        },
+        lazy: rutaLazy(() => import('./pages/Admin')),
         HydrateFallback: PageFallback,
+        errorElement: <RouteError />,
       },
       // Solo los temas con página tienen ruta; el resto son tarjetas
       // "próximamente" en la home.
@@ -39,6 +38,7 @@ export const router = createBrowserRouter([
         path: `tema/${topic.slug}`,
         lazy: loadTopicRoute(topic.slug),
         HydrateFallback: PageFallback,
+        errorElement: <RouteError />,
       })),
       { path: '*', element: <NotFound /> },
     ],

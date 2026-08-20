@@ -2,6 +2,7 @@ import { Fragment, useCallback, useEffect, useId, useState, type FormEvent } fro
 import { Navigate } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ThinkingOrb } from 'thinking-orbs';
+import { PageFallback } from '../components/Layout';
 import { ApiError, api, del, patch, post } from '../lib/api';
 import { useAuth, type AuthUser } from '../lib/auth';
 import { topics, topicKicker, topicsByModule } from '../data/topics';
@@ -42,7 +43,8 @@ export default function Admin() {
     if (user?.role === 'admin') load();
   }, [user, load]);
 
-  if (authLoading) return null;
+  // Sin esto la pantalla queda en blanco mientras responde /auth/me.
+  if (authLoading) return <PageFallback />;
   if (!user) return <Navigate to="/entrar" replace />;
   if (user.role !== 'admin') return <Navigate to="/" replace />;
 
@@ -108,7 +110,7 @@ export default function Admin() {
                   <th>Usuario</th>
                   <th>Rol</th>
                   <th>Estado</th>
-                  <th>Resueltos</th>
+                  <th>Progreso</th>
                   <th>Último ingreso</th>
                   <th aria-label="Acciones" />
                 </tr>
@@ -124,9 +126,11 @@ export default function Admin() {
                           {row.role === 'admin' ? 'admin' : 'estudiante'}
                         </span>
                       </td>
-                      <td>{row.active ? 'Activa' : 'Desactivada'}</td>
-                      <td className={styles.num}>
-                        {row.solvedTotal}/{publishedExercises}
+                      <td>
+                        <Estado activo={row.active} textoOn="Activa" textoOff="Desactivada" />
+                      </td>
+                      <td>
+                        <BarraProgreso resueltos={row.solvedTotal} total={publishedExercises} progreso={row.progress} />
                       </td>
                       <td className={styles.num}>
                         {row.lastLoginAt
@@ -160,7 +164,7 @@ export default function Admin() {
                           </button>
                           <button
                             type="button"
-                            className="btn btn-ghost"
+                            className={`btn ${row.active ? styles.btnApagar : styles.btnActivar}`}
                             onClick={() =>
                               run(() => patch(`/admin/users/${row.id}`, { active: !row.active }))
                             }
@@ -229,20 +233,16 @@ export default function Admin() {
                       <td className={styles.num}>{topicKicker(topic)}</td>
                       <td className={styles.name}>{topic.title}</td>
                       <td>
-                        <span className={`tag ${available ? 'tag-accent' : 'tag-neutral'}`}>
-                          {available ? 'Disponible' : 'Apagado'}
-                        </span>
+                        <Estado activo={available} textoOn="Disponible" textoOff="Apagado" />
                       </td>
                       <td>
                         <div className={styles.actions}>
                           <button
                             type="button"
-                            className="btn btn-ghost"
-                            onClick={() =>
-                              run(() => setEnabled(topic.slug, !available))
-                            }
+                            className={`btn ${available ? styles.btnApagar : styles.btnActivar}`}
+                            onClick={() => run(() => setEnabled(topic.slug, !available))}
                           >
-                            {available ? 'Apagar' : 'Activar'}
+                            {available ? 'Apagar tema' : 'Activar tema'}
                           </button>
                         </div>
                       </td>
@@ -271,36 +271,148 @@ export default function Admin() {
   );
 }
 
-/** El detalle de progreso de un estudiante, agrupado por módulo. */
+/** Estado encendido/apagado: color y forma, para distinguirlo de un vistazo. */
+function Estado({ activo, textoOn, textoOff }: { activo: boolean; textoOn: string; textoOff: string }) {
+  return (
+    <span className={`${styles.estado} ${activo ? styles.estadoOn : styles.estadoOff}`}>
+      <span
+        className={`${styles.punto} ${activo ? styles.puntoOn : styles.puntoOff}`}
+        aria-hidden="true"
+      />
+      {activo ? textoOn : textoOff}
+    </span>
+  );
+}
+
+/** Cuántos temas empezó y cuántos terminó, a partir del mapa de progreso. */
+function contarTemas(progreso: Record<string, string[]>) {
+  let completos = 0;
+  let empezados = 0;
+  for (const topic of topics) {
+    if (!topic.published || topic.exercises === 0) continue;
+    const resueltos = progreso[topic.slug]?.length ?? 0;
+    if (resueltos >= topic.exercises) completos += 1;
+    else if (resueltos > 0) empezados += 1;
+  }
+  return { completos, empezados };
+}
+
+/** El progreso de un estudiante en una celda: proporción, porcentaje y temas. */
+function BarraProgreso({
+  resueltos,
+  total,
+  progreso,
+}: {
+  resueltos: number;
+  total: number;
+  progreso: Record<string, string[]>;
+}) {
+  const reduce = useReducedMotion();
+  const fraccion = total > 0 ? Math.min(resueltos / total, 1) : 0;
+  const { completos, empezados } = contarTemas(progreso);
+
+  return (
+    <div className={styles.progreso}>
+      <div className={styles.progresoCifras}>
+        <span className={styles.progresoPct}>{Math.round(fraccion * 100)}%</span>
+        <span className={styles.progresoDetalle}>
+          {resueltos} de {total} ejercicios
+        </span>
+      </div>
+      <span className={`${styles.barra} ${fraccion >= 1 ? styles.barraCompleta : ''}`}>
+        <motion.span
+          className={styles.barraFill}
+          initial={false}
+          animate={{ transform: `scaleX(${fraccion})` }}
+          transition={reduce ? { duration: 0 } : settle}
+          style={{ width: '100%' }}
+        />
+      </span>
+      <span className={styles.progresoDetalle}>
+        {completos > 0 || empezados > 0
+          ? `${completos} tema${completos === 1 ? '' : 's'} completo${completos === 1 ? '' : 's'}` +
+            (empezados > 0 ? ` · ${empezados} en curso` : '')
+          : 'Todavía no empieza'}
+      </span>
+    </div>
+  );
+}
+
+/** El detalle de progreso de un estudiante, módulo por módulo. */
 function StudentProgress({ user }: { user: AdminUser }) {
+  const reduce = useReducedMotion();
   const groups = topicsByModule()
     .map((group) => ({
       module: group.module,
-      topics: group.topics.filter((topic) => topic.published),
+      topics: group.topics.filter((topic) => topic.published && topic.exercises > 0),
     }))
     .filter((group) => group.topics.length > 0);
 
+  const algoHecho = Object.values(user.progress).some((ids) => ids.length > 0);
+  if (!algoHecho) {
+    return (
+      <p className={styles.detalleVacio}>
+        {user.name} todavía no ha resuelto ningún ejercicio.
+      </p>
+    );
+  }
+
   return (
-    <div className={styles.detail}>
-      {groups.map((group) => (
-        <div key={group.module} className={styles.detailGroup}>
-          <p className={styles.detailModule}>{group.module}</p>
-          <ul className={styles.detailList}>
-            {group.topics.map((topic) => {
-              const solved = user.progress[topic.slug]?.length ?? 0;
-              const done = topic.exercises > 0 && solved >= topic.exercises;
-              return (
-                <li key={topic.slug} className={done ? styles.detailDone : undefined}>
-                  <span>{topic.title}</span>
-                  <span className={styles.num}>
-                    {solved}/{topic.exercises}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ))}
+    <div className={styles.detalle}>
+      {groups.map((group) => {
+        const totalModulo = group.topics.reduce((sum, t) => sum + t.exercises, 0);
+        const hechosModulo = group.topics.reduce(
+          (sum, t) => sum + Math.min(user.progress[t.slug]?.length ?? 0, t.exercises),
+          0,
+        );
+        const temasCompletos = group.topics.filter(
+          (t) => (user.progress[t.slug]?.length ?? 0) >= t.exercises,
+        ).length;
+        const fraccion = totalModulo > 0 ? hechosModulo / totalModulo : 0;
+
+        return (
+          <div key={group.module} className={styles.modulo}>
+            <div className={styles.moduloHead}>
+              <p className={styles.moduloNombre}>{group.module}</p>
+              <span className={`${styles.barra} ${styles.moduloBarra}`}>
+                <motion.span
+                  className={styles.barraFill}
+                  initial={false}
+                  animate={{ transform: `scaleX(${fraccion})` }}
+                  transition={reduce ? { duration: 0 } : settle}
+                  style={{ width: '100%' }}
+                />
+              </span>
+              <span className={styles.moduloCifra}>
+                {temasCompletos}/{group.topics.length} temas · {hechosModulo}/{totalModulo} ejercicios
+              </span>
+            </div>
+
+            <ul className={styles.temas}>
+              {group.topics.map((topic) => {
+                const resueltos = Math.min(user.progress[topic.slug]?.length ?? 0, topic.exercises);
+                const completo = resueltos >= topic.exercises;
+                const empezado = resueltos > 0 && !completo;
+                return (
+                  <li
+                    key={topic.slug}
+                    className={`${styles.tema} ${
+                      completo ? styles.temaCompleto : empezado ? styles.temaEmpezado : ''
+                    }`}
+                    title={`${topic.title}: ${resueltos} de ${topic.exercises}`}
+                  >
+                    <span aria-hidden="true">{completo ? '●' : empezado ? '◐' : '○'}</span>
+                    <span>{topic.title}</span>
+                    <span className={styles.temaCifra}>
+                      {resueltos}/{topic.exercises}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+      })}
     </div>
   );
 }

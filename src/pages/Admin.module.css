@@ -87,3 +87,146 @@
 .inactive { opacity: 0.5; }
 
 .loading { display: flex; align-items: center; gap: var(--space-3); }
+
+/* ── estado: encendido / apagado ─────────────────────────────────────────
+   Se lee por color y por forma; la acción lleva el color de su consecuencia. */
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  padding: 3px 10px 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.estadoOn { background: var(--color-ok-tint); color: var(--color-ok); }
+.estadoOff { background: var(--color-off-tint); color: var(--color-off); }
+.punto {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+}
+.puntoOn { background: currentColor; }
+.puntoOff { box-shadow: inset 0 0 0 1.5px currentColor; }
+
+/* Botones de acción con el color de su consecuencia. */
+.btnApagar,
+.btnActivar {
+  border-width: 1px;
+  border-style: solid;
+  background: transparent;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+.btnApagar { color: var(--color-off); border-color: color-mix(in srgb, var(--color-off) 45%, transparent); }
+.btnActivar { color: var(--color-ok); border-color: color-mix(in srgb, var(--color-ok) 45%, transparent); }
+@media (hover: hover) and (pointer: fine) {
+  .btnApagar:hover { background: var(--color-off-tint); border-color: var(--color-off); }
+  .btnActivar:hover { background: var(--color-ok-tint); border-color: var(--color-ok); }
+}
+.btnApagar:active,
+.btnActivar:active { transform: scale(0.98); }
+
+/* ── progreso ────────────────────────────────────────────────────────── */
+.progreso {
+  display: grid;
+  gap: 5px;
+  min-width: 150px;
+}
+.progresoCifras {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  font-feature-settings: 'tnum' 1;
+}
+.progresoPct {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 15px;
+}
+.progresoDetalle {
+  font-size: 11.5px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+.barra {
+  height: 4px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+  overflow: hidden;
+}
+.barraFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-ok));
+  transform-origin: left;
+}
+.barraCompleta .barraFill { background: var(--color-ok); }
+
+/* ── detalle por módulo ─────────────────────────────────────────────── */
+.detalle {
+  display: grid;
+  gap: var(--space-6);
+  padding: var(--space-6) 0 var(--space-4);
+}
+.detalleVacio {
+  font-size: 13.5px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  padding: var(--space-4) 0;
+}
+.modulo { display: grid; gap: var(--space-3); }
+.moduloHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+.moduloNombre {
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: 14px;
+  margin: 0;
+  min-width: 190px;
+}
+.moduloBarra { flex: 1 1 160px; max-width: 260px; }
+.moduloCifra {
+  font-size: 12.5px;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  font-feature-settings: 'tnum' 1;
+  white-space: nowrap;
+}
+.temas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.tema {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-divider);
+  color: color-mix(in srgb, var(--color-text) 72%, transparent);
+}
+.temaCompleto {
+  border-color: color-mix(in srgb, var(--color-ok) 45%, transparent);
+  background: var(--color-ok-tint);
+  color: var(--color-ok);
+}
+.temaEmpezado {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--color-accent-200);
+}
+.temaCifra { font-feature-settings: 'tnum' 1; opacity: 0.75; }
+
+@media (max-width: 620px) {
+  .moduloNombre { min-width: 0; }
+  .moduloBarra { max-width: none; }
+}
