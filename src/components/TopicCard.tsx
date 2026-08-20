@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { motion, useReducedMotion } from 'motion/react';
+import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring } from 'motion/react';
 import type { Topic } from '../types';
 import { preloadTopic, topicKicker } from '../data/topics';
 import { enter, settle } from '../lib/motion';
@@ -19,6 +19,25 @@ export function TopicCard({ topic, solved, available = true }: Props) {
   const progress = topic.exercises > 0 ? solved / topic.exercises : 0;
   const done = topic.exercises > 0 && solved >= topic.exercises;
   const locked = !topic.published || !available;
+
+  // Inclinación 3D siguiendo el puntero. Solo con mouse; el resorte evita que
+  // el movimiento se sienta pegado al cursor.
+  const rx = useSpring(useMotionValue(0), { stiffness: 220, damping: 22 });
+  const ry = useSpring(useMotionValue(0), { stiffness: 220, damping: 22 });
+  const escala = useSpring(useMotionValue(1), { stiffness: 400, damping: 30 });
+  const transform = useMotionTemplate`perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${escala})`;
+
+  const inclinar = (e: React.PointerEvent<HTMLElement>) => {
+    if (reduce || e.pointerType !== 'mouse') return;
+    const r = e.currentTarget.getBoundingClientRect();
+    ry.set(((e.clientX - r.left) / r.width - 0.5) * 7);
+    rx.set(-((e.clientY - r.top) / r.height - 0.5) * 7);
+  };
+  const enderezar = () => {
+    rx.set(0);
+    ry.set(0);
+    escala.set(1);
+  };
 
   const variants = {
     hidden: { opacity: 0, transform: reduce ? 'none' : 'translateY(12px)' },
@@ -80,8 +99,13 @@ export function TopicCard({ topic, solved, available = true }: Props) {
       to={`/tema/${topic.slug}`}
       variants={variants}
       className={`card elev-sm ${styles.card}`}
+      style={{ transform, transformStyle: 'preserve-3d' }}
       onMouseEnter={() => preloadTopic(topic.slug)}
       onFocus={() => preloadTopic(topic.slug)}
+      onPointerMove={inclinar}
+      onPointerLeave={enderezar}
+      onPointerDown={() => escala.set(0.985)}
+      onPointerUp={() => escala.set(1)}
     >
       {body}
     </MotionLink>

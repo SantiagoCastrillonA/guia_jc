@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { ThinkingOrb } from 'thinking-orbs';
+import { HeroGrid } from '../components/HeroGrid';
 import { ModuleIcon } from '../components/ModuleIcon';
 import { TopicCard } from '../components/TopicCard';
 import { topics, topicsByModule, totalExercises } from '../data/topics';
@@ -26,6 +27,7 @@ export default function Home() {
     <>
       <div className="wrap">
         <section className={styles.hero}>
+          <HeroGrid />
           <div className={styles.heroText}>
             <h1 className="display">
               <span className="line">Aprende programando.</span>

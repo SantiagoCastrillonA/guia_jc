@@ -15,6 +15,10 @@
   --dur-fast: 180ms;
   --dur-base: 240ms;
 
+  /* Acento secundario: cian de instrumento. Solo en datos y detalles. */
+  --color-tech: #57cfe0;
+  --color-tech-tint: color-mix(in srgb, var(--color-tech) 14%, transparent);
+
   /* Estado encendido/apagado. Se usan como línea y tinte, nunca como relleno. */
   --color-ok: #63c79b;
   --color-ok-tint: color-mix(in srgb, var(--color-ok) 14%, transparent);

@@ -30,7 +30,7 @@
   .card:hover { box-shadow: var(--shadow-md); }
 }
 
-.card:active { transform: scale(0.99); }
+/* El press de la tarjeta enlazada lo maneja el resorte en TopicCard.tsx. */
 
 .head {
   display: flex;
@@ -76,3 +76,6 @@
 
 .soon { opacity: 0.55; cursor: not-allowed; }
 .soon:active { transform: none; }
+
+/* El relleno de progreso pasa del acento al cian a medida que avanza. */
+.fill { background: linear-gradient(90deg, var(--color-accent), var(--color-tech)); }

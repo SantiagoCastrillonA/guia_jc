@@ -110,3 +110,7 @@
   .hero { padding-top: calc(2 * var(--leading)); }
   .statGrid { grid-template-columns: repeat(2, 1fr); justify-content: start; }
 }
+
+/* El canvas del hero va detrás del texto. */
+.hero { position: relative; }
+.heroText, .heroOrb { position: relative; z-index: 1; }
