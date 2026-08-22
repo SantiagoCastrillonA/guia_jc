@@ -22,6 +22,11 @@ type Dialog =
   | { kind: 'create' }
   | null;
 
+interface Orden<T extends string> {
+  clave: T;
+  asc: boolean;
+}
+
 type Columna = 'name' | 'username' | 'role' | 'active' | 'solvedTotal' | 'lastLoginAt';
 
 const COLUMNAS: { clave: Columna; titulo: string }[] = [
@@ -55,15 +60,252 @@ function comparar(a: AdminUser, b: AdminUser, clave: Columna) {
   }
 }
 
+type ColumnaTema = 'session' | 'title' | 'estado';
+
+const COLUMNAS_TEMA: { clave: ColumnaTema; titulo: string }[] = [
+  { clave: 'session', titulo: 'Sesión' },
+  { clave: 'title', titulo: 'Tema' },
+  { clave: 'estado', titulo: 'Estado' },
+];
+
+interface HerramientasProps {
+  busqueda: string;
+  onBuscar: (texto: string) => void;
+  porPagina: number;
+  onPorPagina: (n: number) => void;
+  etiqueta: string;
+}
+
+/** Buscador y selector de filas por página, encima de una tabla. */
+function Herramientas({ busqueda, onBuscar, porPagina, onPorPagina, etiqueta }: HerramientasProps) {
+  return (
+    <div className={styles.herramientas}>
+      <input
+        type="search"
+        className={`input ${styles.buscar}`}
+        placeholder={etiqueta}
+        aria-label={etiqueta}
+        value={busqueda}
+        onChange={(e) => onBuscar(e.target.value)}
+      />
+      <label className={styles.porPagina}>
+        Ver
+        <select
+          className={`input ${styles.selectPagina}`}
+          value={porPagina}
+          onChange={(e) => onPorPagina(Number(e.target.value))}
+        >
+          {TAMANOS.map((n) => (
+            <option key={n} value={n}>
+              {n}
+            </option>
+          ))}
+        </select>
+        por página
+      </label>
+    </div>
+  );
+}
+
+interface ThOrdenProps<T extends string> {
+  clave: T;
+  titulo: string;
+  orden: Orden<T>;
+  onOrdenar: (clave: T) => void;
+}
+
+/** Encabezado que ordena por su columna. */
+function ThOrden<T extends string>({ clave, titulo, orden, onOrdenar }: ThOrdenProps<T>) {
+  const activa = orden.clave === clave;
+  return (
+    <th aria-sort={activa ? (orden.asc ? 'ascending' : 'descending') : 'none'}>
+      <button type="button" className={styles.ordenar} onClick={() => onOrdenar(clave)}>
+        {titulo}
+        <span aria-hidden="true" className={styles.flecha}>
+          {activa ? (orden.asc ? '↑' : '↓') : '↕'}
+        </span>
+      </button>
+    </th>
+  );
+}
+
+interface PaginadorProps {
+  desde: number;
+  mostradas: number;
+  total: number;
+  pagina: number;
+  totalPaginas: number;
+  onPagina: (n: number) => void;
+  vacio: string;
+}
+
+function Paginador({ desde, mostradas, total, pagina, totalPaginas, onPagina, vacio }: PaginadorProps) {
+  return (
+    <div className={styles.pie}>
+      <p className={styles.conteo}>
+        {total === 0 ? vacio : `${desde + 1}–${desde + mostradas} de ${total}`}
+      </p>
+      <div className={styles.paginador}>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => onPagina(pagina - 1)}
+          disabled={pagina <= 1}
+        >
+          Anterior
+        </button>
+        <span className={styles.num}>
+          {pagina} / {totalPaginas}
+        </span>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => onPagina(pagina + 1)}
+          disabled={pagina >= totalPaginas}
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * La tabla de temas: mismo trato que la de cuentas —orden, buscador y
+ * paginación— porque con 25 sesiones el scroll se vuelve interminable.
+ */
+function TemasDisponibles({
+  run,
+}: {
+  run: (accion: () => Promise<unknown>, exito?: string) => Promise<void>;
+}) {
+  const { isAvailable, setEnabled } = useTopicVisibility();
+  const [busqueda, setBusqueda] = useState('');
+  const [orden, setOrden] = useState<Orden<ColumnaTema>>({ clave: 'session', asc: true });
+  const [porPagina, setPorPagina] = useState(TAMANOS[0]);
+  const [pagina, setPagina] = useState(1);
+
+  const publicados = useMemo(() => topics.filter((tema) => tema.published), []);
+
+  const filtrados = useMemo(() => {
+    const texto = busqueda.trim().toLowerCase();
+    const base = texto
+      ? publicados.filter(
+          (tema) =>
+            tema.title.toLowerCase().includes(texto) || tema.module.toLowerCase().includes(texto),
+        )
+      : publicados;
+    const signo = orden.asc ? 1 : -1;
+    return [...base].sort((a, b) => {
+      if (orden.clave === 'title') return a.title.localeCompare(b.title, 'es') * signo;
+      if (orden.clave === 'estado') {
+        return (Number(isAvailable(a.slug)) - Number(isAvailable(b.slug))) * signo;
+      }
+      return (a.session - b.session) * signo;
+    });
+  }, [publicados, busqueda, orden, isAvailable]);
+
+  const totalPaginas = Math.max(1, Math.ceil(filtrados.length / porPagina));
+  const paginaActual = Math.min(pagina, totalPaginas);
+  const desde = (paginaActual - 1) * porPagina;
+  const visibles = filtrados.slice(desde, desde + porPagina);
+
+  function ordenarPor(clave: ColumnaTema) {
+    setOrden((prev) => (prev.clave === clave ? { clave, asc: !prev.asc } : { clave, asc: true }));
+    setPagina(1);
+  }
+
+  return (
+    <>
+      <Herramientas
+        busqueda={busqueda}
+        onBuscar={(texto) => {
+          setBusqueda(texto);
+          setPagina(1);
+        }}
+        porPagina={porPagina}
+        onPorPagina={(n) => {
+          setPorPagina(n);
+          setPagina(1);
+        }}
+        etiqueta="Buscar por tema o módulo"
+      />
+
+      <div className={styles.tableWrap}>
+        <table className={`table ${styles.table}`}>
+          <thead>
+            <tr>
+              {COLUMNAS_TEMA.map((col) => (
+                <ThOrden
+                  key={col.clave}
+                  clave={col.clave}
+                  titulo={col.titulo}
+                  orden={orden}
+                  onOrdenar={ordenarPor}
+                />
+              ))}
+              <th aria-label="Acciones" />
+            </tr>
+          </thead>
+          <tbody>
+            {visibles.map((tema) => {
+              const disponible = isAvailable(tema.slug);
+              return (
+                <tr key={tema.slug}>
+                  <td className={styles.num}>{topicKicker(tema)}</td>
+                  <td className={styles.name}>
+                    {tema.title}
+                    <span className={styles.temaModulo}>{tema.module}</span>
+                  </td>
+                  <td>
+                    <Estado activo={disponible} textoOn="Disponible" textoOff="Apagado" />
+                  </td>
+                  <td>
+                    <div className={styles.actions}>
+                      <button
+                        type="button"
+                        className={`btn ${disponible ? styles.btnApagar : styles.btnActivar}`}
+                        onClick={() =>
+                          run(
+                            () => setEnabled(tema.slug, !disponible),
+                            disponible
+                              ? `${tema.title} quedó oculto`
+                              : `${tema.title} ya está disponible`,
+                          )
+                        }
+                      >
+                        {disponible ? 'Apagar tema' : 'Activar tema'}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <Paginador
+        desde={desde}
+        mostradas={visibles.length}
+        total={filtrados.length}
+        pagina={paginaActual}
+        totalPaginas={totalPaginas}
+        onPagina={setPagina}
+        vacio="Ningún tema coincide"
+      />
+    </>
+  );
+}
+
 export default function Admin() {
   const { user, loading: authLoading } = useAuth();
-  const { isAvailable, setEnabled } = useTopicVisibility();
   const [users, setUsers] = useState<AdminUser[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [busqueda, setBusqueda] = useState('');
-  const [orden, setOrden] = useState<{ clave: Columna; asc: boolean }>({ clave: 'name', asc: true });
+  const [orden, setOrden] = useState<Orden<Columna>>({ clave: 'name', asc: true });
   const [porPagina, setPorPagina] = useState(TAMANOS[0]);
   const [pagina, setPagina] = useState(1);
 
@@ -166,64 +408,32 @@ export default function Admin() {
           </div>
         ) : (
           <>
-            <div className={styles.barra}>
-              <input
-                type="search"
-                className={`input ${styles.buscar}`}
-                placeholder="Buscar por nombre o usuario"
-                aria-label="Buscar cuentas"
-                value={busqueda}
-                onChange={(e) => {
-                  setBusqueda(e.target.value);
-                  setPagina(1);
-                }}
-              />
-              <label className={styles.porPagina}>
-                Ver
-                <select
-                  className={`input ${styles.selectPagina}`}
-                  value={porPagina}
-                  onChange={(e) => {
-                    setPorPagina(Number(e.target.value));
-                    setPagina(1);
-                  }}
-                >
-                  {TAMANOS.map((n) => (
-                    <option key={n} value={n}>
-                      {n}
-                    </option>
-                  ))}
-                </select>
-                por página
-              </label>
-            </div>
+            <Herramientas
+              busqueda={busqueda}
+              onBuscar={(texto) => {
+                setBusqueda(texto);
+                setPagina(1);
+              }}
+              porPagina={porPagina}
+              onPorPagina={(n) => {
+                setPorPagina(n);
+                setPagina(1);
+              }}
+              etiqueta="Buscar por nombre o usuario"
+            />
 
             <div className={styles.tableWrap}>
               <table className={`table ${styles.table}`}>
                 <thead>
                   <tr>
                     {COLUMNAS.map((col) => (
-                      <th
+                      <ThOrden
                         key={col.clave}
-                        aria-sort={
-                          orden.clave === col.clave
-                            ? orden.asc
-                              ? 'ascending'
-                              : 'descending'
-                            : 'none'
-                        }
-                      >
-                        <button
-                          type="button"
-                          className={styles.ordenar}
-                          onClick={() => ordenarPor(col.clave)}
-                        >
-                          {col.titulo}
-                          <span aria-hidden="true" className={styles.flecha}>
-                            {orden.clave === col.clave ? (orden.asc ? '↑' : '↓') : '↕'}
-                          </span>
-                        </button>
-                      </th>
+                        clave={col.clave}
+                        titulo={col.titulo}
+                        orden={orden}
+                        onOrdenar={ordenarPor}
+                      />
                     ))}
                     <th aria-label="Acciones" />
                   </tr>
@@ -325,34 +535,15 @@ export default function Admin() {
               </table>
             </div>
 
-            <div className={styles.pie}>
-              <p className={styles.conteo}>
-                {filtradas.length === 0
-                  ? 'Ninguna cuenta coincide'
-                  : `${desde + 1}–${desde + visibles.length} de ${filtradas.length}`}
-              </p>
-              <div className={styles.paginador}>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setPagina(paginaActual - 1)}
-                  disabled={paginaActual <= 1}
-                >
-                  Anterior
-                </button>
-                <span className={styles.num}>
-                  {paginaActual} / {totalPaginas}
-                </span>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setPagina(paginaActual + 1)}
-                  disabled={paginaActual >= totalPaginas}
-                >
-                  Siguiente
-                </button>
-              </div>
-            </div>
+            <Paginador
+              desde={desde}
+              mostradas={visibles.length}
+              total={filtradas.length}
+              pagina={paginaActual}
+              totalPaginas={totalPaginas}
+              onPagina={setPagina}
+              vacio="Ninguna cuenta coincide"
+            />
           </>
         )}
       </section>
@@ -365,52 +556,7 @@ export default function Admin() {
           deploy. Los cambios se ven al instante.
         </p>
 
-        <div className={styles.tableWrap}>
-          <table className={`table ${styles.table}`}>
-            <thead>
-              <tr>
-                <th>Sesión</th>
-                <th>Tema</th>
-                <th>Estado</th>
-                <th aria-label="Acciones" />
-              </tr>
-            </thead>
-            <tbody>
-              {topics
-                .filter((topic) => topic.published)
-                .map((topic) => {
-                  const available = isAvailable(topic.slug);
-                  return (
-                    <tr key={topic.slug}>
-                      <td className={styles.num}>{topicKicker(topic)}</td>
-                      <td className={styles.name}>{topic.title}</td>
-                      <td>
-                        <Estado activo={available} textoOn="Disponible" textoOff="Apagado" />
-                      </td>
-                      <td>
-                        <div className={styles.actions}>
-                          <button
-                            type="button"
-                            className={`btn ${available ? styles.btnApagar : styles.btnActivar}`}
-                            onClick={() =>
-                              run(
-                                () => setEnabled(topic.slug, !available),
-                                available
-                                  ? `${topic.title} quedó oculto`
-                                  : `${topic.title} ya está disponible`,
-                              )
-                            }
-                          >
-                            {available ? 'Apagar tema' : 'Activar tema'}
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
-        </div>
+        <TemasDisponibles run={run} />
       </section>
 
       <AdminDialog
