@@ -118,12 +118,27 @@ actualizar el DNS o el enlace que se haya compartido:
 aws ec2 start-instances --instance-ids i-09ef5799efa12aed0 --region us-east-2
 ```
 
+## Dominio
+
+El sitio vive en **https://jovenescreativos.duckdns.org** (DuckDNS, gratis, un
+registro A hacia la IP elástica `3.141.72.146`). No hace falta el actualizador
+automático de IP que ofrece DuckDNS: la IP es elástica y no cambia.
+
+El dominio anterior, `3-141-72-146.nip.io`, sigue atendido y redirige al nuevo,
+para no romper los enlaces ya repartidos. El certificado de Let's Encrypt cubre
+los dos nombres:
+
+```bash
+sudo certbot certonly --webroot -w /var/www/html --cert-name 3-141-72-146.nip.io --expand -d 3-141-72-146.nip.io -d jovenescreativos.duckdns.org
+```
+
+Se usa `--webroot` y no `--nginx` porque el bloque HTTP redirige todo a HTTPS: el
+reto ACME terminaba servido por el `index.html` del SPA y fallaba. Por eso el
+bloque HTTP lleva un `location ^~ /.well-known/acme-challenge/` apuntando a
+`/var/www/html`, antes del redirect.
+
 ## Pendientes
 
-- **Dominio + HTTPS**: con un dominio apuntando a la IP,
-  `sudo apt-get install -y certbot python3-certbot-nginx && sudo certbot --nginx -d <dominio>`.
-  Después poner `COOKIE_SECURE=true` en `.env` y reiniciar el servicio: la cookie
-  de sesión solo debería viajar por HTTPS.
 - **Backups de Mongo**: `mongodump` periódico a S3 si el progreso importa.
 
 ## Costos

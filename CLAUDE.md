@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Guía interactiva (React + TypeScript + Vite) para el curso de Desarrollo Web
 de Jóvenes creaTIvos: 25 sesiones, cada una con explicación, diagramas y
 ejercicios interactivos. Backend en Express + MongoDB para cuentas y progreso.
-En producción: https://3-141-72-146.nip.io — cada push a `main` se despliega
+En producción: https://jovenescreativos.duckdns.org — cada push a `main` se despliega
 solo (ver [deploy/README.md](deploy/README.md)).
 
 ## Comandos

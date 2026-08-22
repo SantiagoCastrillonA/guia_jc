@@ -4,7 +4,7 @@ Ejercicios interactivos para el curso de Desarrollo Web de Jóvenes creaTIvos
 (25 sesiones). React + TypeScript + Vite, con el sistema de diseño **Nocturne**
 (proyecto de Claude Design) como base visual.
 
-**En producción: https://3-141-72-146.nip.io** — cada push a `main` se despliega
+**En producción: https://jovenescreativos.duckdns.org** — cada push a `main` se despliega
 solo (ver [deploy/README.md](deploy/README.md)). Se trabaja en la rama `dev`:
 ver [CONTRIBUTING.md](CONTRIBUTING.md).
 
