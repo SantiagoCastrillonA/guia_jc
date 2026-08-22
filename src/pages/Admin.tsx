@@ -305,6 +305,7 @@ export default function Admin() {
   const [orden, setOrden] = useState<Orden<Columna>>({ clave: 'name', asc: true });
   const [porPagina, setPorPagina] = useState(TAMANOS[0]);
   const [pagina, setPagina] = useState(1);
+  const reduce = useReducedMotion();
 
   useEffect(() => {
     document.title = 'Panel de admin — Jóvenes creaTIvos';
@@ -519,13 +520,28 @@ export default function Admin() {
                           </div>
                         </td>
                       </tr>
-                      {expandedId === row.id && (
-                        <tr>
-                          <td colSpan={7}>
-                            <StudentProgress user={row} />
-                          </td>
-                        </tr>
-                      )}
+                      <AnimatePresence initial={false}>
+                        {expandedId === row.id && (
+                          <motion.tr
+                            exit={{ opacity: 0 }}
+                            transition={reduce ? { duration: 0 } : enter}
+                          >
+                            <td colSpan={7} className={styles.celdaDetalle}>
+                              {/* La altura es la excepcion sancionada: en un acordeon no hay
+                                  transform equivalente. Se anima la caja, no la fila. */}
+                              <motion.div
+                                className={styles.detalleCaja}
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={reduce ? { duration: 0 } : enter}
+                              >
+                                <StudentProgress user={row} />
+                              </motion.div>
+                            </td>
+                          </motion.tr>
+                        )}
+                      </AnimatePresence>
                     </Fragment>
                   ))}
                 </tbody>

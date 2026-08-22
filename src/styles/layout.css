@@ -92,3 +92,46 @@ code, pre, .mono {
   font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
   font-feature-settings: "tnum" 1;
 }
+
+/* — capa de movimiento —
+   La respuesta va en el pointer-down, no en el click: el press hunde el boton
+   al instante y se relaja al soltar. El color, en cambio, se funde, porque un
+   salto de color en el hover se lee como parpadeo.
+
+   Vive aqui y no en nocturne.css porque nocturne es espejo del sistema de
+   diseno remoto; el movimiento es de esta app. */
+.btn {
+  transition-property: background-color, border-color, color, transform;
+  transition-duration: var(--dur-fast);
+  transition-timing-function: var(--ease-out);
+}
+.btn:not(:disabled):active {
+  transform: scale(0.97);
+  transition-duration: var(--dur-press);
+}
+
+.input {
+  transition-property: background-color, border-color;
+  transition-duration: var(--dur-fast);
+  transition-timing-function: var(--ease-out);
+}
+
+.nav a {
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Se conserva el fundido de color, que ayuda a entender; se va el
+     desplazamiento, que es lo vestibular. */
+  .btn:not(:disabled):active { transform: none; }
+}
+
+/* Con dedo no hay hover de verdad: el navegador lo deja pegado despues del
+   toque y el boton se queda encendido hasta que tocas otra cosa. Los :hover
+   viven en nocturne.css, que es espejo del sistema remoto, asi que se anulan
+   desde aqui. El arreglo de fondo es envolverlos alla en
+   @media (hover: hover) and (pointer: fine). */
+@media (hover: none) {
+  .btn:hover { background: transparent; }
+  .nav a:hover:not([aria-current='page']) { color: inherit; }
+}

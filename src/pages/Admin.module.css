@@ -279,7 +279,12 @@
   color: inherit;
   cursor: pointer;
 }
-.ordenar:hover { color: var(--color-accent); }
+.ordenar { transition: color var(--dur-fast) var(--ease-out); }
+/* Con dedo, el :hover se queda pegado despues del toque. */
+@media (hover: hover) and (pointer: fine) {
+  .ordenar:hover { color: var(--color-accent); }
+}
+.ordenar:active { color: var(--color-accent-300); transition-duration: var(--dur-press); }
 .flecha {
   font-size: 10px;
   opacity: 0.5;
@@ -309,3 +314,8 @@ th[aria-sort="descending"] .flecha { opacity: 1; }
   margin-left: auto;
   font-size: 13px;
 }
+
+/* La celda no pone padding propio: si lo pusiera, la fila nunca colapsaria
+   del todo al cerrar el detalle. El respiro lo da .detail. */
+.celdaDetalle { padding: 0; }
+.detalleCaja { overflow: hidden; }
