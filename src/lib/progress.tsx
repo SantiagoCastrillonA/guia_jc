@@ -10,6 +10,8 @@ import {
 } from 'react';
 import { api, del, post } from './api';
 import { useAuth } from './auth';
+import { avisar } from './avisos';
+import { topics } from '../data/topics';
 
 /**
  * El progreso de ejercicios.
@@ -57,6 +59,14 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const [progress, setProgress] = useState<ProgressMap>(() => readLocal());
   const [loading, setLoading] = useState(false);
   const syncedFor = useRef<string | null>(null);
+  // Foto del progreso anterior, para detectar qué sesión se acaba de completar.
+  const anterior = useRef<ProgressMap | null>(null);
+
+  // Al cambiar de sesión de usuario se vuelve a partir de cero: lo que ya
+  // estaba resuelto en la cuenta no se anuncia como recién terminado.
+  useEffect(() => {
+    anterior.current = null;
+  }, [user?.id]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -88,6 +98,18 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       })
       .finally(() => setLoading(false));
   }, [user, authLoading]);
+
+  useEffect(() => {
+    const previo = anterior.current;
+    anterior.current = progress;
+    if (!previo) return; // primera lectura: solo sirve de referencia
+    for (const tema of topics) {
+      if (!tema.published) continue;
+      const antes = previo[tema.slug]?.length ?? 0;
+      const ahora = progress[tema.slug]?.length ?? 0;
+      if (antes < tema.exercises && ahora >= tema.exercises) avisar.sesionCompleta(tema.title);
+    }
+  }, [progress]);
 
   const markSolved = useCallback(
     (topicSlug: string, exerciseId: string) => {

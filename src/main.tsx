@@ -5,6 +5,7 @@ import { router } from './router';
 import { AuthProvider } from './lib/auth';
 import { ProgressProvider } from './lib/progress';
 import { TopicVisibilityProvider } from './lib/topicVisibility';
+import { AvisosToaster } from './lib/avisos';
 import './styles/nocturne.css';
 import './styles/layout.css';
 
@@ -14,6 +15,7 @@ createRoot(document.getElementById('root')!).render(
       <TopicVisibilityProvider>
         <ProgressProvider>
           <RouterProvider router={router} />
+          <AvisosToaster />
         </ProgressProvider>
       </TopicVisibilityProvider>
     </AuthProvider>

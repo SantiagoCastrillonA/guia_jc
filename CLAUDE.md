@@ -55,6 +55,13 @@ clave con la que se guarda el progreso.
 Material gráfico reutilizable en `src/components/visuals/`: `Figure`,
 `Steps`/`Step`, `Callout`, `Compare`, `RefTable`, `Terminal`.
 
+Avisos flotantes (`src/lib/avisos.tsx`): envoltura sobre `sileo`. El
+`<AvisosToaster />` se monta una sola vez en `main.tsx` y todos los mensajes
+salen del objeto
+`avisar` — así el tono y los colores viven en un solo sitio. Se disparan al
+completar una sesión (`progress.tsx`), al aparecer una sesión nueva desde la
+última visita (`topicVisibility.tsx`) y en cada acción del panel de admin.
+
 Progreso y sesión (`src/lib/progress.tsx`, `src/lib/auth.tsx`): con sesión
 activa el progreso se guarda en el servidor; sin sesión, en `localStorage`.
 `src/lib/api.ts` es el único cliente HTTP — todo va al mismo origen
