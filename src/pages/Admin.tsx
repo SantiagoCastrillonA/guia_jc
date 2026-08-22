@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useId, useState, type FormEvent } from 'react';
+import { Fragment, useCallback, useEffect, useId, useMemo, useState, type FormEvent } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ThinkingOrb } from 'thinking-orbs';
@@ -8,6 +8,7 @@ import { useAuth, type AuthUser } from '../lib/auth';
 import { topics, topicKicker, topicsByModule } from '../data/topics';
 import { useTopicVisibility } from '../lib/topicVisibility';
 import { enter, settle } from '../lib/motion';
+import { avisar } from '../lib/avisos';
 import styles from './Admin.module.css';
 
 interface AdminUser extends AuthUser {
@@ -21,6 +22,39 @@ type Dialog =
   | { kind: 'create' }
   | null;
 
+type Columna = 'name' | 'username' | 'role' | 'active' | 'solvedTotal' | 'lastLoginAt';
+
+const COLUMNAS: { clave: Columna; titulo: string }[] = [
+  { clave: 'name', titulo: 'Nombre' },
+  { clave: 'username', titulo: 'Usuario' },
+  { clave: 'role', titulo: 'Rol' },
+  { clave: 'active', titulo: 'Estado' },
+  { clave: 'solvedTotal', titulo: 'Progreso' },
+  { clave: 'lastLoginAt', titulo: 'Último ingreso' },
+];
+
+const TAMANOS = [10, 25, 50];
+
+/** Compara dos cuentas por una columna, siempre en orden ascendente. */
+function comparar(a: AdminUser, b: AdminUser, clave: Columna) {
+  switch (clave) {
+    case 'name':
+    case 'username':
+    case 'role':
+      return a[clave].localeCompare(b[clave], 'es');
+    case 'active':
+      return Number(a.active) - Number(b.active);
+    case 'solvedTotal':
+      return a.solvedTotal - b.solvedTotal;
+    case 'lastLoginAt': {
+      // Quien nunca entró queda al final cuando se ordena de más viejo a más nuevo.
+      const ta = a.lastLoginAt ? Date.parse(a.lastLoginAt) : -Infinity;
+      const tb = b.lastLoginAt ? Date.parse(b.lastLoginAt) : -Infinity;
+      return ta - tb;
+    }
+  }
+}
+
 export default function Admin() {
   const { user, loading: authLoading } = useAuth();
   const { isAvailable, setEnabled } = useTopicVisibility();
@@ -28,6 +62,10 @@ export default function Admin() {
   const [error, setError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [busqueda, setBusqueda] = useState('');
+  const [orden, setOrden] = useState<{ clave: Columna; asc: boolean }>({ clave: 'name', asc: true });
+  const [porPagina, setPorPagina] = useState(TAMANOS[0]);
+  const [pagina, setPagina] = useState(1);
 
   useEffect(() => {
     document.title = 'Panel de admin — Jóvenes creaTIvos';
@@ -43,19 +81,44 @@ export default function Admin() {
     if (user?.role === 'admin') load();
   }, [user, load]);
 
+  const filtradas = useMemo(() => {
+    const texto = busqueda.trim().toLowerCase();
+    const base = texto
+      ? (users ?? []).filter(
+          (u) => u.name.toLowerCase().includes(texto) || u.username.toLowerCase().includes(texto),
+        )
+      : (users ?? []);
+    const signo = orden.asc ? 1 : -1;
+    return [...base].sort((a, b) => comparar(a, b, orden.clave) * signo);
+  }, [users, busqueda, orden]);
+
+  const totalPaginas = Math.max(1, Math.ceil(filtradas.length / porPagina));
+  // Se recorta aquí y no con un efecto: al filtrar, la página vieja puede ya no existir.
+  const paginaActual = Math.min(pagina, totalPaginas);
+  const desde = (paginaActual - 1) * porPagina;
+  const visibles = filtradas.slice(desde, desde + porPagina);
+
   // Sin esto la pantalla queda en blanco mientras responde /auth/me.
   if (authLoading) return <PageFallback />;
   if (!user) return <Navigate to="/entrar" replace />;
   if (user.role !== 'admin') return <Navigate to="/" replace />;
 
-  async function run(action: () => Promise<unknown>) {
+  async function run(action: () => Promise<unknown>, exito?: string) {
     setError(null);
     try {
       await action();
       load();
+      if (exito) avisar.exito(exito);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo completar la acción.');
+      const mensaje = err instanceof ApiError ? err.message : 'No se pudo completar la acción.';
+      setError(mensaje);
+      avisar.error('No se pudo completar', mensaje);
     }
+  }
+
+  function ordenarPor(clave: Columna) {
+    setOrden((prev) => (prev.clave === clave ? { clave, asc: !prev.asc } : { clave, asc: true }));
+    setPagina(1);
   }
 
   const totalSolved = users?.reduce((sum, u) => sum + u.solvedTotal, 0) ?? 0;
@@ -102,106 +165,195 @@ export default function Admin() {
             <p className="text-muted">Cargando…</p>
           </div>
         ) : (
-          <div className={styles.tableWrap}>
-            <table className={`table ${styles.table}`}>
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Usuario</th>
-                  <th>Rol</th>
-                  <th>Estado</th>
-                  <th>Progreso</th>
-                  <th>Último ingreso</th>
-                  <th aria-label="Acciones" />
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((row) => (
-                  <Fragment key={row.id}>
-                    <tr className={row.active ? undefined : styles.inactive}>
-                      <td className={styles.name}>{row.name}</td>
-                      <td className={styles.user}>{row.username}</td>
-                      <td>
-                        <span className={`tag ${row.role === 'admin' ? 'tag-accent' : 'tag-neutral'}`}>
-                          {row.role === 'admin' ? 'admin' : 'estudiante'}
-                        </span>
-                      </td>
-                      <td>
-                        <Estado activo={row.active} textoOn="Activa" textoOff="Desactivada" />
-                      </td>
-                      <td>
-                        <BarraProgreso resueltos={row.solvedTotal} total={publishedExercises} progreso={row.progress} />
-                      </td>
-                      <td className={styles.num}>
-                        {row.lastLoginAt
-                          ? new Date(row.lastLoginAt).toLocaleDateString('es-CO', {
-                              day: '2-digit',
-                              month: 'short',
-                            })
-                          : '—'}
-                      </td>
-                      <td>
-                        <div className={styles.actions}>
-                          <button
-                            type="button"
-                            className="btn btn-ghost"
-                            onClick={() => setExpandedId(expandedId === row.id ? null : row.id)}
-                          >
-                            {expandedId === row.id ? 'Ocultar' : 'Ver progreso'}
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-ghost"
-                            onClick={() =>
-                              run(() =>
-                                patch(`/admin/users/${row.id}`, {
-                                  role: row.role === 'admin' ? 'student' : 'admin',
-                                }),
-                              )
-                            }
-                          >
-                            {row.role === 'admin' ? 'Quitar admin' : 'Hacer admin'}
-                          </button>
-                          <button
-                            type="button"
-                            className={`btn ${row.active ? styles.btnApagar : styles.btnActivar}`}
-                            onClick={() =>
-                              run(() => patch(`/admin/users/${row.id}`, { active: !row.active }))
-                            }
-                          >
-                            {row.active ? 'Desactivar' : 'Activar'}
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-ghost"
-                            onClick={() => setDialog({ kind: 'password', user: row })}
-                          >
-                            Contraseña
-                          </button>
-                          {row.id !== user.id && (
+          <>
+            <div className={styles.barra}>
+              <input
+                type="search"
+                className={`input ${styles.buscar}`}
+                placeholder="Buscar por nombre o usuario"
+                aria-label="Buscar cuentas"
+                value={busqueda}
+                onChange={(e) => {
+                  setBusqueda(e.target.value);
+                  setPagina(1);
+                }}
+              />
+              <label className={styles.porPagina}>
+                Ver
+                <select
+                  className={`input ${styles.selectPagina}`}
+                  value={porPagina}
+                  onChange={(e) => {
+                    setPorPagina(Number(e.target.value));
+                    setPagina(1);
+                  }}
+                >
+                  {TAMANOS.map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+                por página
+              </label>
+            </div>
+
+            <div className={styles.tableWrap}>
+              <table className={`table ${styles.table}`}>
+                <thead>
+                  <tr>
+                    {COLUMNAS.map((col) => (
+                      <th
+                        key={col.clave}
+                        aria-sort={
+                          orden.clave === col.clave
+                            ? orden.asc
+                              ? 'ascending'
+                              : 'descending'
+                            : 'none'
+                        }
+                      >
+                        <button
+                          type="button"
+                          className={styles.ordenar}
+                          onClick={() => ordenarPor(col.clave)}
+                        >
+                          {col.titulo}
+                          <span aria-hidden="true" className={styles.flecha}>
+                            {orden.clave === col.clave ? (orden.asc ? '↑' : '↓') : '↕'}
+                          </span>
+                        </button>
+                      </th>
+                    ))}
+                    <th aria-label="Acciones" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibles.map((row) => (
+                    <Fragment key={row.id}>
+                      <tr className={row.active ? undefined : styles.inactive}>
+                        <td className={styles.name}>{row.name}</td>
+                        <td className={styles.user}>{row.username}</td>
+                        <td>
+                          <span className={`tag ${row.role === 'admin' ? 'tag-accent' : 'tag-neutral'}`}>
+                            {row.role === 'admin' ? 'admin' : 'estudiante'}
+                          </span>
+                        </td>
+                        <td>
+                          <Estado activo={row.active} textoOn="Activa" textoOff="Desactivada" />
+                        </td>
+                        <td>
+                          <BarraProgreso resueltos={row.solvedTotal} total={publishedExercises} progreso={row.progress} />
+                        </td>
+                        <td className={styles.num}>
+                          {row.lastLoginAt
+                            ? new Date(row.lastLoginAt).toLocaleDateString('es-CO', {
+                                day: '2-digit',
+                                month: 'short',
+                              })
+                            : '—'}
+                        </td>
+                        <td>
+                          <div className={styles.actions}>
                             <button
                               type="button"
                               className="btn btn-ghost"
-                              onClick={() => setDialog({ kind: 'delete', user: row })}
+                              onClick={() => setExpandedId(expandedId === row.id ? null : row.id)}
                             >
-                              Borrar
+                              {expandedId === row.id ? 'Ocultar' : 'Ver progreso'}
                             </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                    {expandedId === row.id && (
-                      <tr>
-                        <td colSpan={7}>
-                          <StudentProgress user={row} />
+                            <button
+                              type="button"
+                              className="btn btn-ghost"
+                              onClick={() =>
+                                run(
+                                  () =>
+                                    patch(`/admin/users/${row.id}`, {
+                                      role: row.role === 'admin' ? 'student' : 'admin',
+                                    }),
+                                  row.role === 'admin'
+                                    ? `${row.name} ya no es admin`
+                                    : `${row.name} ahora es admin`,
+                                )
+                              }
+                            >
+                              {row.role === 'admin' ? 'Quitar admin' : 'Hacer admin'}
+                            </button>
+                            <button
+                              type="button"
+                              className={`btn ${row.active ? styles.btnApagar : styles.btnActivar}`}
+                              onClick={() =>
+                                run(
+                                  () => patch(`/admin/users/${row.id}`, { active: !row.active }),
+                                  row.active
+                                    ? `Cuenta de ${row.name} desactivada`
+                                    : `Cuenta de ${row.name} activada`,
+                                )
+                              }
+                            >
+                              {row.active ? 'Desactivar' : 'Activar'}
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-ghost"
+                              onClick={() => setDialog({ kind: 'password', user: row })}
+                            >
+                              Contraseña
+                            </button>
+                            {row.id !== user.id && (
+                              <button
+                                type="button"
+                                className="btn btn-ghost"
+                                onClick={() => setDialog({ kind: 'delete', user: row })}
+                              >
+                                Borrar
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
-                    )}
-                  </Fragment>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      {expandedId === row.id && (
+                        <tr>
+                          <td colSpan={7}>
+                            <StudentProgress user={row} />
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className={styles.pie}>
+              <p className={styles.conteo}>
+                {filtradas.length === 0
+                  ? 'Ninguna cuenta coincide'
+                  : `${desde + 1}–${desde + visibles.length} de ${filtradas.length}`}
+              </p>
+              <div className={styles.paginador}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setPagina(paginaActual - 1)}
+                  disabled={paginaActual <= 1}
+                >
+                  Anterior
+                </button>
+                <span className={styles.num}>
+                  {paginaActual} / {totalPaginas}
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setPagina(paginaActual + 1)}
+                  disabled={paginaActual >= totalPaginas}
+                >
+                  Siguiente
+                </button>
+              </div>
+            </div>
+          </>
         )}
       </section>
 
@@ -240,7 +392,14 @@ export default function Admin() {
                           <button
                             type="button"
                             className={`btn ${available ? styles.btnApagar : styles.btnActivar}`}
-                            onClick={() => run(() => setEnabled(topic.slug, !available))}
+                            onClick={() =>
+                              run(
+                                () => setEnabled(topic.slug, !available),
+                                available
+                                  ? `${topic.title} quedó oculto`
+                                  : `${topic.title} ya está disponible`,
+                              )
+                            }
                           >
                             {available ? 'Apagar tema' : 'Activar tema'}
                           </button>
@@ -258,13 +417,20 @@ export default function Admin() {
         dialog={dialog}
         onClose={() => setDialog(null)}
         onPassword={(target, newPassword) =>
-          run(() => patch(`/admin/users/${target.id}`, { newPassword })).then(() => setDialog(null))
+          run(
+            () => patch(`/admin/users/${target.id}`, { newPassword }),
+            `Contraseña de ${target.name} cambiada`,
+          ).then(() => setDialog(null))
         }
         onDelete={(target) =>
-          run(() => del(`/admin/users/${target.id}`)).then(() => setDialog(null))
+          run(() => del(`/admin/users/${target.id}`), `Cuenta de ${target.name} borrada`).then(() =>
+            setDialog(null),
+          )
         }
         onCreate={(account) =>
-          run(() => post('/admin/users', account)).then(() => setDialog(null))
+          run(() => post('/admin/users', account), `Cuenta ${account.username} creada`).then(() =>
+            setDialog(null),
+          )
         }
       />
     </div>
