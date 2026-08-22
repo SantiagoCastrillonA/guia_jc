@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Respaldo de MongoDB. Un archivo comprimido por corrida, se conservan los
+# últimos 14. Vive en /usr/local/bin/guia-jc-backup y lo dispara un timer.
+set -euo pipefail
+
+DESTINO=/var/backups/guia-jc
+CONSERVAR=14
+
+mkdir -p "$DESTINO"
+archivo="$DESTINO/guia_jc-$(date +%Y%m%d-%H%M%S).archive.gz"
+
+mongodump --db guia_jc --archive="$archivo" --gzip --quiet
+
+# Un volcado vacío casi siempre significa que algo falló. Se descarta y se sale
+# con error, para que la rotación no borre respaldos buenos a cambio de basura.
+if [ ! -s "$archivo" ]; then
+    echo "respaldo vacío, se descarta: $archivo" >&2
+    rm -f "$archivo"
+    exit 1
+fi
+
+ls -1t "$DESTINO"/guia_jc-*.archive.gz | tail -n +$((CONSERVAR + 1)) | xargs -r rm -f
+
+echo "ok $archivo ($(du -h "$archivo" | cut -f1))"

@@ -1,0 +1,8 @@
+[Unit]
+Description=Respaldo de la base de datos de la guia
+After=mongod.service
+Requires=mongod.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/guia-jc-backup

@@ -1,0 +1,11 @@
+[Unit]
+Description=Respaldo diario de la base de datos de la guia
+
+[Timer]
+# 07:00 UTC = 2 de la madrugada en Colombia, cuando nadie está resolviendo.
+OnCalendar=*-*-* 07:00:00
+RandomizedDelaySec=10m
+Persistent=true
+
+[Install]
+WantedBy=timers.target
