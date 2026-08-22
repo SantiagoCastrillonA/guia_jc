@@ -1,0 +1,9 @@
+/* Retoques a sileo que no caben en sus opciones.
+
+   El titulo viene con `text-transform: capitalize`. En ingles pasa
+   desapercibido; en espanol convierte cada frase en "Ya Esta Disponible". Se
+   apunta desde el viewport para ganarle en especificidad sin depender del
+   orden en que se inserten las hojas de estilo. */
+[data-sileo-viewport] [data-sileo-title] {
+  text-transform: none;
+}

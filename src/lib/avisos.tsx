@@ -1,4 +1,5 @@
 import { Toaster, sileo } from 'sileo';
+import './avisos.css';
 
 /**
  * Avisos flotantes, sobre sileo.

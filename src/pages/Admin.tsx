@@ -253,10 +253,7 @@ function TemasDisponibles({
               return (
                 <tr key={tema.slug}>
                   <td className={styles.num}>{topicKicker(tema)}</td>
-                  <td className={styles.name}>
-                    {tema.title}
-                    <span className={styles.temaModulo}>{tema.module}</span>
-                  </td>
+                  <td className={styles.name}>{tema.title}</td>
                   <td>
                     <Estado activo={disponible} textoOn="Disponible" textoOff="Apagado" />
                   </td>
