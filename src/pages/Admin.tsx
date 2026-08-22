@@ -537,6 +537,23 @@ interface CreateAccountFieldsProps {
   onCreate: (account: NewAccount) => void;
 }
 
+// Sin caracteres que se confundan al dictarlos: ni 0/O, ni 1/l/I.
+const ALFABETO = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+/** Contraseña al azar para una cuenta nueva. */
+function generarContrasena() {
+  const limite = 256 - (256 % ALFABETO.length); // descarta el sesgo del módulo
+  const letras: string[] = [];
+  const bytes = new Uint8Array(32);
+  while (letras.length < 16) {
+    crypto.getRandomValues(bytes);
+    for (const b of bytes) {
+      if (b < limite && letras.length < 16) letras.push(ALFABETO[b % ALFABETO.length]);
+    }
+  }
+  return [0, 4, 8, 12].map((i) => letras.slice(i, i + 4).join('')).join('-');
+}
+
 /** Formulario para que el profe cree cuentas directamente: estudiantes o colegas admin. */
 function CreateAccountFields({ onCancel, onCreate }: CreateAccountFieldsProps) {
   const ids = { name: useId(), user: useId(), pass: useId() };
@@ -589,16 +606,29 @@ function CreateAccountFields({ onCancel, onCreate }: CreateAccountFieldsProps) {
 
       <div className="field">
         <label htmlFor={ids.pass}>Contraseña</label>
-        <input
-          id={ids.pass}
-          className="input"
-          type="text"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          minLength={8}
-          autoComplete="off"
-          required
-        />
+        <div className={styles.filaClave}>
+          <input
+            id={ids.pass}
+            className="input"
+            type="text"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            minLength={8}
+            autoComplete="off"
+            required
+          />
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => setPassword(generarContrasena())}
+          >
+            Generar
+          </button>
+        </div>
+        <p className={styles.ayudaClave}>
+          Cópiala antes de crear la cuenta: después no se vuelve a mostrar. Quien la reciba
+          puede cambiarla desde su perfil.
+        </p>
       </div>
 
       <div className="seg">

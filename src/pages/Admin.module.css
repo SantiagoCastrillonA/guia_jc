@@ -230,3 +230,18 @@
   .moduloNombre { min-width: 0; }
   .moduloBarra { max-width: none; }
 }
+
+/* Campo de contraseña con su botón de generar al lado. */
+.filaClave {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+.filaClave :global(.input) { flex: 1 1 auto; min-width: 0; }
+.filaClave :global(.btn) { flex: none; }
+.ayudaClave {
+  font-size: 13px;
+  line-height: var(--half);
+  color: color-mix(in srgb, var(--color-text) 58%, transparent);
+  margin: var(--space-2) 0 0;
+}
