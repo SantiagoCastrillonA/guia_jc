@@ -46,7 +46,7 @@ export default function LogicaScratch2() {
           caption="Cada vuelta del bucle resta 1 a la velocidad, y la velocidad se le suma a la posición. Por eso los saltos separados abajo son más grandes: eso es la aceleración."
         >
           <svg viewBox="0 0 640 240" xmlns="http://www.w3.org/2000/svg">
-            <text x="0" y="14" fill="var(--color-accent)" fontSize="11" letterSpacing="1.4">
+            <text x="0" y="14" fill="var(--color-accent-text)" fontSize="11" letterSpacing="1.4">
               VUELTA DEL BUCLE
             </text>
             {[
@@ -150,7 +150,7 @@ export default function LogicaScratch2() {
               strokeWidth="1.2"
               strokeDasharray="5 4"
             />
-            <text x="16" y="60" fill="var(--color-accent)" fontSize="12">
+            <text x="16" y="60" fill="var(--color-accent-text)" fontSize="12">
               molde
             </text>
             <text x="16" y="80" fill="var(--color-text)" fontSize="11" opacity="0.6">

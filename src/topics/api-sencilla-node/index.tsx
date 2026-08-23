@@ -46,7 +46,7 @@ export default function ApiSencillaNode() {
 
             <line x1="180" y1="80" x2="455" y2="80" stroke="var(--color-accent)" strokeWidth="1.3" />
             <path d="M462 80 l-8 -4.5 l0 9 z" fill="var(--color-accent)" />
-            <text x="318" y="70" fontSize="12" textAnchor="middle" fill="var(--color-accent)" fontFamily="ui-monospace, monospace">
+            <text x="318" y="70" fontSize="12" textAnchor="middle" fill="var(--color-accent-text)" fontFamily="ui-monospace, monospace">
               GET /acerca
             </text>
 

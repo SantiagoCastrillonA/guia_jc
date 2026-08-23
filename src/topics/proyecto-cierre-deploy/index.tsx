@@ -39,7 +39,7 @@ export default function ProyectoCierreDeploy() {
                 <text x={x + 16} y="84" fontSize="12" fill="var(--color-text)" opacity="0.6">
                   {d}
                 </text>
-                <text x={x + 16} y="112" fontSize="11.5" fill="var(--color-accent)" opacity="0.9">
+                <text x={x + 16} y="112" fontSize="11.5" fill="var(--color-accent-text)" opacity="0.9">
                   {h}
                 </text>
               </g>

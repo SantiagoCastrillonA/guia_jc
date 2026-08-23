@@ -56,11 +56,11 @@ export default function MongodbCrud() {
         >
           <svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg">
             <rect x="0" y="10" width="620" height="170" rx="10" fill="var(--color-text)" opacity="0.04" />
-            <text x="16" y="32" fontSize="11" letterSpacing="1.2" fill="var(--color-accent)">
+            <text x="16" y="32" fontSize="11" letterSpacing="1.2" fill="var(--color-accent-text)">
               BASE DE DATOS · mi_negocio
             </text>
             <rect x="16" y="44" width="588" height="120" rx="8" fill="var(--color-text)" opacity="0.05" />
-            <text x="32" y="66" fontSize="11" letterSpacing="1.2" fill="var(--color-accent)" opacity="0.85">
+            <text x="32" y="66" fontSize="11" letterSpacing="1.2" fill="var(--color-accent-text)" opacity="0.85">
               COLECCIÓN · productos
             </text>
             {[0, 1].map((i) => (

@@ -159,7 +159,7 @@ export default function ReactComponentesPropsState() {
           caption="map transforma cada dato en un componente. La key le dice a React qué elemento es cuál cuando la lista cambia."
         >
           <svg viewBox="0 0 640 160" xmlns="http://www.w3.org/2000/svg">
-            <text x="0" y="16" fontSize="11" letterSpacing="1.2" fill="var(--color-accent)">
+            <text x="0" y="16" fontSize="11" letterSpacing="1.2" fill="var(--color-accent-text)">
               DATOS
             </text>
             {[0, 1, 2].map((i) => (
@@ -180,10 +180,10 @@ export default function ReactComponentesPropsState() {
             ))}
             <line x1="196" y1="80" x2="270" y2="80" stroke="var(--color-accent)" strokeWidth="1.2" />
             <path d="M277 80 l-8 -4.5 l0 9 z" fill="var(--color-accent)" />
-            <text x="204" y="70" fontSize="12" fill="var(--color-accent)" fontFamily="ui-monospace, monospace">
+            <text x="204" y="70" fontSize="12" fill="var(--color-accent-text)" fontFamily="ui-monospace, monospace">
               .map()
             </text>
-            <text x="300" y="16" fontSize="11" letterSpacing="1.2" fill="var(--color-accent)">
+            <text x="300" y="16" fontSize="11" letterSpacing="1.2" fill="var(--color-accent-text)">
               INTERFAZ
             </text>
             {[0, 1, 2].map((i) => (

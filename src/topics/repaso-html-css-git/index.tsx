@@ -47,7 +47,7 @@ export default function RepasoHtmlCssGit() {
                   x="620"
                   y={y + 28}
                   fontSize="12"
-                  fill="var(--color-accent)"
+                  fill="var(--color-accent-text)"
                   textAnchor="end"
                   fontFamily="ui-monospace, monospace"
                 >

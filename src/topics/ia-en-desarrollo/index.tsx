@@ -120,7 +120,7 @@ export default function IaEnDesarrollo() {
         >
           <svg viewBox="0 0 640 180" xmlns="http://www.w3.org/2000/svg">
             <rect x="0" y="20" width="300" height="140" rx="10" fill="var(--color-accent)" opacity="0.1" />
-            <text x="20" y="46" fontSize="11" letterSpacing="1.2" fill="var(--color-accent)">
+            <text x="20" y="46" fontSize="11" letterSpacing="1.2" fill="var(--color-accent-text)">
               SE PUEDE
             </text>
             {['Tu código sin credenciales', 'Mensajes de error', 'Datos inventados de prueba', 'Preguntas de concepto'].map(

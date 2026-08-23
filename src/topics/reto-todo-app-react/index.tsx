@@ -28,7 +28,7 @@ export default function RetoTodoAppReact() {
         >
           <svg viewBox="0 0 640 200" xmlns="http://www.w3.org/2000/svg">
             <rect x="0" y="30" width="270" height="120" rx="10" fill="var(--color-text)" opacity="0.06" />
-            <text x="16" y="52" fontSize="11" letterSpacing="1.2" fill="var(--color-accent)">
+            <text x="16" y="52" fontSize="11" letterSpacing="1.2" fill="var(--color-accent-text)">
               FRONTEND · React
             </text>
             {['Componentes y estado', 'Rutas y navegación', 'Formularios y validación visual'].map((t, i) => (
@@ -39,7 +39,7 @@ export default function RetoTodoAppReact() {
 
             <line x1="286" y1="76" x2="354" y2="76" stroke="var(--color-accent)" strokeWidth="1.2" />
             <path d="M361 76 l-8 -4.5 l0 9 z" fill="var(--color-accent)" />
-            <text x="292" y="66" fontSize="11" fill="var(--color-accent)" fontFamily="ui-monospace, monospace">
+            <text x="292" y="66" fontSize="11" fill="var(--color-accent-text)" fontFamily="ui-monospace, monospace">
               fetch
             </text>
             <line x1="354" y1="104" x2="290" y2="104" stroke="var(--color-text)" strokeWidth="1.2" opacity="0.4" />
@@ -49,7 +49,7 @@ export default function RetoTodoAppReact() {
             </text>
 
             <rect x="370" y="30" width="270" height="120" rx="10" fill="var(--color-text)" opacity="0.06" />
-            <text x="386" y="52" fontSize="11" letterSpacing="1.2" fill="var(--color-accent)">
+            <text x="386" y="52" fontSize="11" letterSpacing="1.2" fill="var(--color-accent-text)">
               BACKEND · Express + Mongo
             </text>
             {['Rutas y middleware', 'Autenticación y permisos', 'Validación y base de datos'].map((t, i) => (

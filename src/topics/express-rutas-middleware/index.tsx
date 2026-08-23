@@ -96,7 +96,7 @@ export default function ExpressRutasMiddleware() {
             ].map(({ m, u, d, y }) => (
               <g key={m + u}>
                 <rect x="0" y={y} width="72" height="34" rx="5" fill="var(--color-accent)" opacity="0.22" />
-                <text x="36" y={y + 22} fontSize="12" textAnchor="middle" fontFamily="ui-monospace, monospace" fill="var(--color-accent)">
+                <text x="36" y={y + 22} fontSize="12" textAnchor="middle" fontFamily="ui-monospace, monospace" fill="var(--color-accent-text)">
                   {m}
                 </text>
                 <text x="92" y={y + 22} fontSize="14" fontFamily="ui-monospace, monospace" fill="var(--color-text)">

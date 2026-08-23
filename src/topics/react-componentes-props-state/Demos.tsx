@@ -30,7 +30,7 @@ function TarjetaProducto({ nombre, precio, destacado }: TarjetaProps) {
       key={`${nombre}-${precio}-${destacado}`}
       transition={springy}
     >
-      <p style={{ margin: 0, fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--color-accent)' }}>
+      <p style={{ margin: 0, fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--color-accent-text)' }}>
         {destacado ? 'Destacado' : 'Producto'}
       </p>
       <p style={{ margin: '6px 0 0', fontSize: 20, fontFamily: 'var(--font-heading)' }}>{nombre}</p>
@@ -150,7 +150,7 @@ export function EstadoDemo() {
           style={{
             fontFamily: 'var(--font-heading)',
             fontSize: 56,
-            color: 'var(--color-accent)',
+            color: 'var(--color-accent-text)',
             fontFeatureSettings: '"tnum" 1',
           }}
         >

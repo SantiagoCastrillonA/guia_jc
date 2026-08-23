@@ -40,7 +40,7 @@ export default function LogicaScratch1() {
         >
           <svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg">
             {/* Secuencia */}
-            <text x="0" y="16" fill="var(--color-accent)" fontSize="11" letterSpacing="1.4">
+            <text x="0" y="16" fill="var(--color-accent-text)" fontSize="11" letterSpacing="1.4">
               SECUENCIA
             </text>
             {[0, 1, 2].map((i) => (
@@ -71,7 +71,7 @@ export default function LogicaScratch1() {
             </text>
 
             {/* Variable */}
-            <text x="170" y="16" fill="var(--color-accent)" fontSize="11" letterSpacing="1.4">
+            <text x="170" y="16" fill="var(--color-accent-text)" fontSize="11" letterSpacing="1.4">
               VARIABLE
             </text>
             <rect
@@ -101,7 +101,7 @@ export default function LogicaScratch1() {
             </text>
 
             {/* Condicional */}
-            <text x="360" y="16" fill="var(--color-accent)" fontSize="11" letterSpacing="1.4">
+            <text x="360" y="16" fill="var(--color-accent-text)" fontSize="11" letterSpacing="1.4">
               CONDICIONAL
             </text>
             <path
@@ -126,7 +126,7 @@ export default function LogicaScratch1() {
             </text>
 
             {/* Bucle */}
-            <text x="0" y="180" fill="var(--color-accent)" fontSize="11" letterSpacing="1.4">
+            <text x="0" y="180" fill="var(--color-accent-text)" fontSize="11" letterSpacing="1.4">
               BUCLE
             </text>
             <rect

@@ -143,7 +143,7 @@ export default function IntroduccionIA() {
                 <text
                   x="20"
                   y={y + 21}
-                  fill="var(--color-accent)"
+                  fill="var(--color-accent-text)"
                   fontSize="11"
                   letterSpacing="1.4"
                 >

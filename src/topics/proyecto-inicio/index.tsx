@@ -95,7 +95,7 @@ export default function ProyectoInicio() {
               { t: 'ENDPOINTS', items: ['GET /productos', 'POST /pedidos', 'POST /auth/login'], x: 430 },
             ].map(({ t, items, x }) => (
               <g key={t}>
-                <text x={x} y="14" fontSize="11" letterSpacing="1.2" fill="var(--color-accent)">
+                <text x={x} y="14" fontSize="11" letterSpacing="1.2" fill="var(--color-accent-text)">
                   {t}
                 </text>
                 {items.map((it, i) => (

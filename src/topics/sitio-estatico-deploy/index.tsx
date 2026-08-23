@@ -44,7 +44,7 @@ export default function SitioEstaticoDeploy() {
           caption="Si tu sitio queda en un subdirectorio, la barra inicial apunta fuera de tu proyecto y el archivo no aparece."
         >
           <svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg">
-            <text x="0" y="16" fontSize="11" letterSpacing="1.4" fill="var(--color-accent)">
+            <text x="0" y="16" fontSize="11" letterSpacing="1.4" fill="var(--color-accent-text)">
               SIN BARRA — RELATIVA
             </text>
             <text x="0" y="42" fontSize="14" fontFamily="ui-monospace, monospace" fill="var(--color-text)">

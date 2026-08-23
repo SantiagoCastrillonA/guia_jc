@@ -119,7 +119,7 @@ export default function ReactHooks() {
                   y={y + 25}
                   fontSize="14"
                   fontFamily="ui-monospace, monospace"
-                  fill="var(--color-accent)"
+                  fill="var(--color-accent-text)"
                 >
                   {c}
                 </text>

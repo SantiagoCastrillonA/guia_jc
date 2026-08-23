@@ -109,7 +109,7 @@ export default function ReactRouterTopic() {
               strokeWidth="1.3"
               strokeDasharray="5 4"
             />
-            <text x="32" y="86" fontSize="12" fill="var(--color-accent)" fontFamily="ui-monospace, monospace">
+            <text x="32" y="86" fontSize="12" fill="var(--color-accent-text)" fontFamily="ui-monospace, monospace">
               &lt;Outlet /&gt;
             </text>
             <text x="32" y="112" fontSize="12.5" fill="var(--color-text)" opacity="0.65">

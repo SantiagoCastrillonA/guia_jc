@@ -43,7 +43,7 @@ export default function ApisDeIa() {
 
             <line x1="160" y1="85" x2="228" y2="85" stroke="var(--color-accent)" strokeWidth="1.2" />
             <path d="M235 85 l-8 -4.5 l0 9 z" fill="var(--color-accent)" />
-            <text x="166" y="75" fontSize="11" fill="var(--color-accent)" fontFamily="ui-monospace, monospace">
+            <text x="166" y="75" fontSize="11" fill="var(--color-accent-text)" fontFamily="ui-monospace, monospace">
               POST /api/chat
             </text>
 
@@ -57,7 +57,7 @@ export default function ApisDeIa() {
 
             <line x1="405" y1="85" x2="473" y2="85" stroke="var(--color-accent)" strokeWidth="1.2" />
             <path d="M480 85 l-8 -4.5 l0 9 z" fill="var(--color-accent)" />
-            <text x="410" y="75" fontSize="11" fill="var(--color-accent)" fontFamily="ui-monospace, monospace">
+            <text x="410" y="75" fontSize="11" fill="var(--color-accent-text)" fontFamily="ui-monospace, monospace">
               + API key
             </text>
 

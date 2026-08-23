@@ -163,7 +163,7 @@ export default function MongooseEsquemas() {
         >
           <svg viewBox="0 0 640 150" xmlns="http://www.w3.org/2000/svg">
             <rect x="0" y="24" width="250" height="90" rx="8" fill="var(--color-text)" opacity="0.06" />
-            <text x="16" y="46" fontSize="11" letterSpacing="1.2" fill="var(--color-accent)">
+            <text x="16" y="46" fontSize="11" letterSpacing="1.2" fill="var(--color-accent-text)">
               PEDIDO
             </text>
             <text x="16" y="72" fontSize="12.5" fontFamily="ui-monospace, monospace" fill="var(--color-text)" opacity="0.85">
@@ -175,12 +175,12 @@ export default function MongooseEsquemas() {
 
             <line x1="262" y1="68" x2="368" y2="68" stroke="var(--color-accent)" strokeWidth="1.2" />
             <path d="M375 68 l-8 -4.5 l0 9 z" fill="var(--color-accent)" />
-            <text x="278" y="58" fontSize="11" fill="var(--color-accent)" fontFamily="ui-monospace, monospace">
+            <text x="278" y="58" fontSize="11" fill="var(--color-accent-text)" fontFamily="ui-monospace, monospace">
               populate
             </text>
 
             <rect x="382" y="24" width="250" height="90" rx="8" fill="var(--color-text)" opacity="0.06" />
-            <text x="398" y="46" fontSize="11" letterSpacing="1.2" fill="var(--color-accent)">
+            <text x="398" y="46" fontSize="11" letterSpacing="1.2" fill="var(--color-accent-text)">
               USUARIO
             </text>
             <text x="398" y="72" fontSize="12.5" fontFamily="ui-monospace, monospace" fill="var(--color-text)" opacity="0.85">

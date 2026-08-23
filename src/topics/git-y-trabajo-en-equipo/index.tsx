@@ -82,7 +82,7 @@ export default function GitYTrabajoEnEquipo() {
                 <text
                   x={x + 8}
                   y="140"
-                  fill="var(--color-accent)"
+                  fill="var(--color-accent-text)"
                   fontSize="11"
                   textAnchor="middle"
                   fontFamily="ui-monospace, monospace"
@@ -235,7 +235,7 @@ export default function GitYTrabajoEnEquipo() {
               stroke="var(--color-accent)"
               strokeWidth="1.5"
             />
-            <text x="262" y="30" fill="var(--color-accent)" fontSize="11">
+            <text x="262" y="30" fill="var(--color-accent-text)" fontSize="11">
               rama santiago-catalogo
             </text>
             {[100, 180, 520, 600].map((x) => (

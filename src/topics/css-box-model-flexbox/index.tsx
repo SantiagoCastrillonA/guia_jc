@@ -35,15 +35,15 @@ export default function CssBoxModelFlexbox() {
               .tarjeta &#123; color: white; &#125;
             </text>
             <line x1="40" y1="64" x2="40" y2="92" stroke="var(--color-accent)" strokeWidth="1" />
-            <text x="14" y="110" fontSize="11" fill="var(--color-accent)">
+            <text x="14" y="110" fontSize="11" fill="var(--color-accent-text)">
               selector
             </text>
             <line x1="160" y1="64" x2="160" y2="112" stroke="var(--color-accent)" strokeWidth="1" />
-            <text x="130" y="130" fontSize="11" fill="var(--color-accent)">
+            <text x="130" y="130" fontSize="11" fill="var(--color-accent-text)">
               propiedad
             </text>
             <line x1="250" y1="64" x2="250" y2="92" stroke="var(--color-accent)" strokeWidth="1" />
-            <text x="232" y="110" fontSize="11" fill="var(--color-accent)">
+            <text x="232" y="110" fontSize="11" fill="var(--color-accent-text)">
               valor
             </text>
           </svg>

@@ -42,7 +42,7 @@ export default function TodoAppLogin() {
           caption="La contraseña original no queda guardada en ninguna parte. Por eso los sistemas serios te dejan restablecerla, no recuperarla."
         >
           <svg viewBox="0 0 640 190" xmlns="http://www.w3.org/2000/svg">
-            <text x="0" y="14" fontSize="11" letterSpacing="1.3" fill="var(--color-accent)">
+            <text x="0" y="14" fontSize="11" letterSpacing="1.3" fill="var(--color-accent-text)">
               REGISTRO
             </text>
             <text x="0" y="44" fontSize="13" fontFamily="ui-monospace, monospace" fill="var(--color-text)">
@@ -50,7 +50,7 @@ export default function TodoAppLogin() {
             </text>
             <line x1="120" y1="39" x2="196" y2="39" stroke="var(--color-accent)" strokeWidth="1.2" />
             <path d="M203 39 l-8 -4.5 l0 9 z" fill="var(--color-accent)" />
-            <text x="128" y="30" fontSize="11" fill="var(--color-accent)" fontFamily="ui-monospace, monospace">
+            <text x="128" y="30" fontSize="11" fill="var(--color-accent-text)" fontFamily="ui-monospace, monospace">
               bcrypt
             </text>
             <text x="215" y="44" fontSize="13" fontFamily="ui-monospace, monospace" fill="var(--color-text)" opacity="0.8">
@@ -59,7 +59,7 @@ export default function TodoAppLogin() {
 
             <line x1="0" y1="76" x2="620" y2="76" stroke="var(--color-divider)" strokeWidth="1" />
 
-            <text x="0" y="106" fontSize="11" letterSpacing="1.3" fill="var(--color-accent)">
+            <text x="0" y="106" fontSize="11" letterSpacing="1.3" fill="var(--color-accent-text)">
               INICIO DE SESIÓN
             </text>
             <text x="0" y="136" fontSize="13" fontFamily="ui-monospace, monospace" fill="var(--color-text)">
@@ -67,7 +67,7 @@ export default function TodoAppLogin() {
             </text>
             <line x1="130" y1="131" x2="206" y2="131" stroke="var(--color-accent)" strokeWidth="1.2" />
             <path d="M213 131 l-8 -4.5 l0 9 z" fill="var(--color-accent)" />
-            <text x="136" y="122" fontSize="11" fill="var(--color-accent)" fontFamily="ui-monospace, monospace">
+            <text x="136" y="122" fontSize="11" fill="var(--color-accent-text)" fontFamily="ui-monospace, monospace">
               compare
             </text>
             <text x="225" y="136" fontSize="13" fontFamily="ui-monospace, monospace" fill="var(--color-text)" opacity="0.8">

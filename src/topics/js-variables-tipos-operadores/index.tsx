@@ -87,7 +87,7 @@ export default function JsVariablesTiposOperadores() {
                   y={y + 24}
                   fontSize="13"
                   fontFamily="ui-monospace, monospace"
-                  fill="var(--color-accent)"
+                  fill="var(--color-accent-text)"
                 >
                   {t}
                 </text>
@@ -170,7 +170,7 @@ export default function JsVariablesTiposOperadores() {
                   y={y + 20}
                   fontSize="20"
                   fontFamily="ui-monospace, monospace"
-                  fill="var(--color-accent)"
+                  fill="var(--color-accent-text)"
                 >
                   {r}
                 </text>

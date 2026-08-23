@@ -41,19 +41,19 @@ export default function HtmlSemantico() {
               &lt;a href="/tienda"&gt;Ver productos&lt;/a&gt;
             </text>
             <line x1="30" y1="82" x2="30" y2="110" stroke="var(--color-accent)" strokeWidth="1" />
-            <text x="20" y="128" fontSize="11" fill="var(--color-accent)">
+            <text x="20" y="128" fontSize="11" fill="var(--color-accent-text)">
               abre
             </text>
             <line x1="120" y1="82" x2="120" y2="130" stroke="var(--color-accent)" strokeWidth="1" />
-            <text x="96" y="148" fontSize="11" fill="var(--color-accent)">
+            <text x="96" y="148" fontSize="11" fill="var(--color-accent-text)">
               atributo
             </text>
             <line x1="290" y1="82" x2="290" y2="110" stroke="var(--color-accent)" strokeWidth="1" />
-            <text x="248" y="128" fontSize="11" fill="var(--color-accent)">
+            <text x="248" y="128" fontSize="11" fill="var(--color-accent-text)">
               contenido
             </text>
             <line x1="450" y1="82" x2="450" y2="130" stroke="var(--color-accent)" strokeWidth="1" />
-            <text x="432" y="148" fontSize="11" fill="var(--color-accent)">
+            <text x="432" y="148" fontSize="11" fill="var(--color-accent-text)">
               cierra
             </text>
           </svg>
@@ -112,8 +112,8 @@ export default function HtmlSemantico() {
         >
           <svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg">
             {[
-              { x: 0, titulo: 'Con divs', color: 'var(--color-neutral-500)', etiquetas: ['div', 'div', 'div', 'div'] },
-              { x: 340, titulo: 'Semántico', color: 'var(--color-accent)', etiquetas: ['header', 'main', 'section', 'footer'] },
+              { x: 0, titulo: 'Con divs', color: 'var(--color-text-2)', etiquetas: ['div', 'div', 'div', 'div'] },
+              { x: 340, titulo: 'Semántico', color: 'var(--color-accent-text)', etiquetas: ['header', 'main', 'section', 'footer'] },
             ].map(({ x, titulo, color, etiquetas }) => (
               <g key={titulo}>
                 <text x={x} y="14" fontSize="11" letterSpacing="1.4" fill={color}>
