@@ -65,6 +65,7 @@ export function Layout() {
             the fade and drops the travel. */}
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
+            className={styles.mainInner}
             key={showLoading ? 'loading' : pathname}
             initial={{ opacity: 0, transform: reduce ? 'none' : 'translateY(8px)' }}
             animate={{ opacity: 1, transform: 'translateY(0px)' }}
@@ -81,6 +82,9 @@ export function Layout() {
           </motion.div>
         </AnimatePresence>
       </main>
+      {/* El panel de admin es un armazon a sangre con su propio pie en la
+          barra lateral: el pie del sitio le dejaba una franja del fondo debajo. */}
+      {!pathname.startsWith('/admin') && (
       <div className="wrap">
         <footer className={styles.footer}>
           <span>Jóvenes creaTIvos — ejercicios interactivos de programación.</span>
@@ -89,6 +93,7 @@ export function Layout() {
           </span>
         </footer>
       </div>
+      )}
     </>
   );
 }

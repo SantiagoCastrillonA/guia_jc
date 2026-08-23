@@ -10,7 +10,10 @@
 .marco {
   display: grid;
   grid-template-columns: 265px minmax(0, 1fr);
-  min-height: 100dvh;
+  /* Llena el hueco que deja el layout en vez de apostar a 100dvh: con la
+     barra arriba y el pie abajo, 100dvh siempre se pasa o se queda corto. */
+  flex: 1;
+  min-height: 0;
   background: var(--color-panel);
   color: var(--color-text);
 }
@@ -24,10 +27,8 @@
   padding: 18px 14px;
   background: var(--color-panel-inset);
   border-right: 1px solid var(--color-hairline);
-  position: sticky;
-  top: 0;
-  height: 100dvh;
-  overflow-y: auto;
+  /* Se estira con la rejilla: si fuera sticky se encogeria a su contenido
+     y el gris no llegaria hasta abajo. */
 }
 
 .marca {
@@ -700,41 +701,89 @@
 
 /* ── responsive ────────────────────────────────────────────────────────── */
 
+/* ── pantallas angostas ────────────────────────────────────────────────── */
+
 @media (max-width: 900px) {
   .marco { grid-template-columns: 1fr; }
+
+  /* La lateral se acuesta y pasa a ser una barra arriba. */
   .lateral {
-    position: static;
     height: auto;
     flex-direction: row;
     align-items: center;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px 14px;
+    padding: 12px var(--space-6);
     border-right: 0;
     border-bottom: 1px solid var(--color-hairline);
   }
-  .menu { flex-direction: row; }
-  .pieLateral { margin-top: 0; margin-left: auto; }
+  .marca { padding: 0; }
+  .pieLateral { margin: 0 0 0 auto; padding: 0; }
   .notaLateral { display: none; }
-  .principal { padding: 20px var(--space-6) 28px; }
+  /* Con dos secciones cabe; si crecen, se desliza en vez de romper la barra. */
+  .menu {
+    flex-direction: row;
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .itemMenu { width: auto; flex: none; }
 
-  /* La rejilla de seis carriles no cabe: cada fila pasa a bloque. */
+  .principal { padding: 20px var(--space-6) 28px; gap: 16px; }
+  .titulo { font-size: 26px; }
+
+  /* Seis carriles no caben. Cada fila se reordena a mano: sin colocacion
+     explicita el boton de acciones cae donde alcance. */
   .cabecera { display: none; }
   .fila {
     grid-template-columns: minmax(0, 1fr) auto;
-    grid-auto-flow: row;
-    gap: 10px;
+    align-items: start;
+    gap: 10px 12px;
+    min-height: 0;
   }
-  .celdaNombre { grid-column: 1; }
-  .fila > :nth-child(2),
-  .fila > :nth-child(3) { grid-column: 1; }
-  .progreso { grid-column: 1 / -1; }
-  .num { grid-column: 1; }
+  .fila > :nth-child(1) { grid-area: 1 / 1; }
+  .fila > :nth-child(6) { grid-area: 1 / 2; }
+  .fila > :nth-child(2) { grid-area: 2 / 1; }
+  .fila > :nth-child(3) { grid-area: 2 / 2; justify-self: start; }
+  .fila > :nth-child(4) { grid-area: 3 / 1 / auto / -1; }
+  .fila > :nth-child(5) { grid-area: 4 / 1 / auto / -1; }
+
   .filaSesion {
     grid-template-columns: minmax(0, 1fr) auto;
-    row-gap: 4px;
+    align-items: center;
+    row-gap: 2px;
+    padding: 13px var(--space-6);
   }
-  .sesionKicker { grid-column: 1; }
-  .sesionTitulo { grid-column: 1; }
+  .sesionKicker { grid-area: 1 / 1; }
+  .sesionTitulo { grid-area: 2 / 1; white-space: normal; }
   .sesionOn,
-  .sesionOff { grid-column: 1; }
+  .sesionOff { grid-area: 3 / 1; }
+  /* El interruptor manda a la derecha, centrado en las tres filas. */
+  .filaSesion > :last-child { grid-area: 1 / 2 / 4 / 3; align-self: center; }
+}
+
+@media (max-width: 560px) {
+  .cifras { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tarjetaCifra { padding: 14px 16px; }
+  .cifraValor { font-size: 24px; }
+  .principal { padding: 16px var(--space-4) 24px; }
+  .lateral { padding: 10px var(--space-4); }
+  .titulo { font-size: 22px; }
+  .tituloSeccion { font-size: 20px; }
+
+  /* El buscador solo, y los filtros deslizandose debajo. */
+  .campoBusqueda { flex: 1 1 100%; max-width: none; }
+  .segmentado {
+    order: 3;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .porPagina { margin-left: 0; }
+
+  .fila { padding: 14px var(--space-4); }
+  .filaSesion { padding: 12px var(--space-4); }
+  .pie { padding: 14px var(--space-4) 0; }
+  .paginador { margin-left: 0; }
 }

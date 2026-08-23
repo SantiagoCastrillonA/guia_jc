@@ -1,4 +1,7 @@
-.main { flex: 1; }
+/* El contenido se estira hasta el pie: asi una pagina que trae su propio
+   armazon a sangre (el panel de admin) no deja una franja del fondo debajo. */
+.main { flex: 1; display: flex; flex-direction: column; }
+.mainInner { flex: 1; display: flex; flex-direction: column; }
 
 .fallback {
   display: flex;
