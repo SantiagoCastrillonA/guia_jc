@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#161826" />
     <meta
       name="description"
@@ -13,6 +13,20 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <title>Jóvenes creaTIvos — Guía de programación</title>
+    <!-- El tema elegido se pinta antes del primer frame: sin esto, quien
+         guardó el tema claro ve un fogonazo oscuro en cada carga. El resto
+         de la lógica vive en src/lib/tema.tsx. -->
+    <script>
+      try {
+        var t = localStorage.getItem('jc:tema');
+        if (t === 'light' || t === 'dark') {
+          document.documentElement.dataset.theme = t;
+          document
+            .querySelector('meta[name=theme-color]')
+            .setAttribute('content', t === 'light' ? '#f5f5f7' : '#161826');
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

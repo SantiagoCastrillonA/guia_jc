@@ -8,6 +8,7 @@ import { TopicVisibilityProvider } from './lib/topicVisibility';
 import { AvisosToaster } from './lib/avisos';
 import './styles/nocturne.css';
 import './styles/layout.css';
+import './styles/temas.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

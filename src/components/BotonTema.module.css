@@ -1,0 +1,53 @@
+.boton {
+  flex: none;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+}
+
+/* Los dos glifos ocupan la misma casilla: asi el boton no cambia de ancho al
+   alternar y el cruce se ve como un giro, no como un salto. */
+.pila {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+}
+.sol,
+.luna {
+  grid-area: 1 / 1;
+  transition:
+    opacity var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+/* Estado por defecto (tema claro puesto): se ve la luna, que es lo que ofrece. */
+.sol {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.6);
+}
+.luna {
+  opacity: 1;
+  transform: none;
+}
+
+/* data-claro = el boton lleva a claro, o sea que ahora estamos en oscuro. */
+.pila[data-claro] .sol {
+  opacity: 1;
+  transform: none;
+}
+.pila[data-claro] .luna {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Se conserva el fundido, que explica el cambio; se va el giro. */
+  .sol,
+  .luna {
+    transition: opacity var(--dur-fast) var(--ease-out);
+  }
+  .sol,
+  .pila[data-claro] .luna {
+    transform: none;
+  }
+}
