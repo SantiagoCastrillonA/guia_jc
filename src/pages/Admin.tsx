@@ -9,6 +9,7 @@ import { ApiError, api, del, patch, post } from '../lib/api';
 import { useAuth, type AuthUser } from '../lib/auth';
 import { topics, topicKicker, topicsByModule } from '../data/topics';
 import { useTopicVisibility } from '../lib/topicVisibility';
+import { semanaDe, semanaPorDefecto, rangoLegible } from '../lib/semanas';
 import { enter, settle } from '../lib/motion';
 import { avisar } from '../lib/avisos';
 import styles from './Admin.module.css';
@@ -289,7 +290,7 @@ function SesionesYTemas({
 }: {
   run: (accion: () => Promise<unknown>, exito?: string) => Promise<void>;
 }) {
-  const { isAvailable, setEnabled } = useTopicVisibility();
+  const { isAvailable, setEnabled, semanas, setSemana } = useTopicVisibility();
   const [busqueda, setBusqueda] = useState('');
 
   const publicados = useMemo(() => topics.filter((t) => t.published), []);
@@ -343,6 +344,35 @@ function SesionesYTemas({
             >
               <span className={styles.sesionKicker}>{topicKicker(tema)}</span>
               <span className={styles.sesionTitulo}>{tema.title}</span>
+              <label className={styles.campoSemana}>
+                <span className={styles.rotuloSemana}>Semana del</span>
+                <input
+                  type="date"
+                  className={styles.fechaSemana}
+                  value={semanaDe(tema, semanas)}
+                  aria-label={`Semana en que se dicta ${tema.title}`}
+                  onChange={(e) =>
+                    run(
+                      () => setSemana(tema.slug, e.target.value || null),
+                      `${tema.title} queda en la semana del ${rangoLegible(e.target.value)}`,
+                    )
+                  }
+                />
+                {semanas[tema.slug] && semanas[tema.slug] !== semanaPorDefecto(tema.session) && (
+                  <button
+                    type="button"
+                    className={styles.limpiarSemana}
+                    onClick={() =>
+                      run(
+                        () => setSemana(tema.slug, null),
+                        `${tema.title} vuelve a su semana por defecto`,
+                      )
+                    }
+                  >
+                    Restablecer
+                  </button>
+                )}
+              </label>
               <span className={disponible ? styles.sesionOn : styles.sesionOff}>
                 {disponible ? 'Disponible' : 'Apagado'}
               </span>

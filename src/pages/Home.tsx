@@ -7,6 +7,7 @@ import type { Topic } from '../types';
 import { useAllProgress } from '../lib/progress';
 import { useTopicVisibility } from '../lib/topicVisibility';
 import { calcularRacha } from '../lib/racha';
+import { lunesDeLaSemana, temasDeLaSemana, rangoLegible } from '../lib/semanas';
 import { STAGGER, enter, settle } from '../lib/motion';
 import styles from './Home.module.css';
 
@@ -22,7 +23,7 @@ function normalizar(texto: string) {
 
 export default function Home() {
   const progress = useAllProgress();
-  const { isAvailable } = useTopicVisibility();
+  const { isAvailable, semanas } = useTopicVisibility();
   const reduce = useReducedMotion();
   const navigate = useNavigate();
   const [busqueda, setBusqueda] = useState('');
@@ -73,6 +74,10 @@ export default function Home() {
     if (primero && isAvailable(primero.slug)) navigate(`/tema/${primero.slug}`);
   }
 
+  // Lunes a sabado. El domingo ya apunta a la semana que arranca manana.
+  const lunes = lunesDeLaSemana();
+  const deLaSemana = temasDeLaSemana(lunes, semanas).filter((t) => t.published);
+
   const grupos = topicsByModule();
 
   return (
@@ -107,6 +112,51 @@ export default function Home() {
             </a>
           </div>
         </section>
+
+        {deLaSemana.length > 0 && (
+          <section className={styles.bannerSemana} aria-label="Tema de la semana">
+            <div className={styles.semanaEncabezado}>
+              <span className={styles.semanaRotulo}>
+                {deLaSemana.length === 1 ? 'Tema de la semana' : 'Temas de la semana'}
+              </span>
+              <span className={styles.semanaFechas}>{rangoLegible(lunes)}</span>
+            </div>
+            <div className={styles.semanaTemas}>
+              {deLaSemana.map((tema) => {
+                const puedeEntrar = isAvailable(tema.slug);
+                const hechos = progress[tema.slug]?.length ?? 0;
+                const contenido = (
+                  <>
+                    <span className={styles.semanaSesion}>
+                      Sesión {String(tema.session).padStart(2, '0')}
+                    </span>
+                    <span className={styles.semanaTitulo}>{tema.title}</span>
+                    <span className={styles.semanaCuenta}>
+                      {puedeEntrar
+                        ? `${hechos} de ${tema.exercises} ejercicios`
+                        : 'Todavía no disponible'}
+                    </span>
+                  </>
+                );
+                return puedeEntrar ? (
+                  <Link
+                    key={tema.slug}
+                    to={`/tema/${tema.slug}`}
+                    className={styles.semanaTema}
+                    onMouseEnter={() => preloadTopic(tema.slug)}
+                    onFocus={() => preloadTopic(tema.slug)}
+                  >
+                    {contenido}
+                  </Link>
+                ) : (
+                  <span key={tema.slug} className={`${styles.semanaTema} ${styles.semanaApagado}`}>
+                    {contenido}
+                  </span>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         <section className={styles.banda} aria-label="Tu avance">
           <div className={styles.celdaBanda}>

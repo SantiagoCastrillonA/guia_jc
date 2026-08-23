@@ -19,6 +19,9 @@ import { topics } from '../data/topics';
 
 interface VisibilityValue {
   loading: boolean;
+  /** slug -> lunes de su semana, solo los que el profe movio a mano. */
+  semanas: Record<string, string>;
+  setSemana: (slug: string, lunes: string | null) => Promise<void>;
   isAvailable: (slug: string) => boolean;
   setEnabled: (slug: string, enabled: boolean) => Promise<void>;
   disabled: Set<string>;
@@ -73,15 +76,17 @@ function avisarDeTemasNuevos(apagados: Set<string>) {
 
 export function TopicVisibilityProvider({ children }: { children: ReactNode }) {
   const [disabled, setDisabled] = useState<Set<string>>(new Set());
+  const [semanas, setSemanas] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    api<{ disabled: string[] }>('/topics/visibility')
+    api<{ disabled: string[]; semanas?: Record<string, string> }>('/topics/visibility')
       .then((data) => {
         if (cancelled) return;
         const apagados = new Set(data.disabled);
         setDisabled(apagados);
+        setSemanas(data.semanas ?? {});
         avisarDeTemasNuevos(apagados);
       })
       .catch(() => {
@@ -107,9 +112,19 @@ export function TopicVisibilityProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const setSemana = useCallback(async (slug: string, lunes: string | null) => {
+    await patch(`/admin/topics/${slug}`, { weekStart: lunes });
+    setSemanas((prev) => {
+      const next = { ...prev };
+      if (lunes) next[slug] = lunes;
+      else delete next[slug]; // vuelve a la fecha calculada
+      return next;
+    });
+  }, []);
+
   const value = useMemo(
-    () => ({ loading, isAvailable, setEnabled, disabled }),
-    [loading, isAvailable, setEnabled, disabled],
+    () => ({ loading, isAvailable, setEnabled, disabled, semanas, setSemana }),
+    [loading, isAvailable, setEnabled, disabled, semanas, setSemana],
   );
 
   return <VisibilityContext.Provider value={value}>{children}</VisibilityContext.Provider>;

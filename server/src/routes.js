@@ -177,22 +177,43 @@ router.delete('/progress/:topicSlug', requireAuth, async (req, res) => {
 
 // ── visibilidad de temas ─────────────────────────────────────────────────
 
-/** Público: qué temas apagó el profe. Ausencia = disponible. */
+/** Público: qué temas apagó el profe y en qué semana va cada uno. */
 router.get('/topics/visibility', async (_req, res) => {
-  const off = await TopicSetting.find({ enabled: false }).select('slug');
-  res.json({ disabled: off.map((t) => t.slug) });
+  const ajustes = await TopicSetting.find().select('slug enabled weekStart');
+  res.json({
+    disabled: ajustes.filter((t) => t.enabled === false).map((t) => t.slug),
+    semanas: Object.fromEntries(
+      ajustes.filter((t) => t.weekStart).map((t) => [t.slug, t.weekStart]),
+    ),
+  });
 });
 
 router.patch('/admin/topics/:slug', requireAdmin, async (req, res) => {
-  const data = parse(z.object({ enabled: z.boolean() }), req.body, res);
+  const data = parse(
+    z
+      .object({
+        enabled: z.boolean().optional(),
+        // null borra la fecha y devuelve el tema a la que toca por defecto.
+        weekStart: z.string().regex(/^d{4}-d{2}-d{2}$/).nullable().optional(),
+      })
+      .refine((v) => v.enabled !== undefined || v.weekStart !== undefined, {
+        message: 'No hay nada que cambiar.',
+      }),
+    req.body,
+    res,
+  );
   if (!data) return;
 
-  await TopicSetting.findOneAndUpdate(
+  const cambios = {};
+  if (data.enabled !== undefined) cambios.enabled = data.enabled;
+  if (data.weekStart !== undefined) cambios.weekStart = data.weekStart;
+
+  const guardado = await TopicSetting.findOneAndUpdate(
     { slug: req.params.slug },
-    { enabled: data.enabled },
-    { upsert: true },
+    cambios,
+    { upsert: true, new: true },
   );
-  res.json({ slug: req.params.slug, enabled: data.enabled });
+  res.json({ slug: req.params.slug, enabled: guardado.enabled, weekStart: guardado.weekStart });
 });
 
 // ── panel de administración ───────────────────────────────────────────────

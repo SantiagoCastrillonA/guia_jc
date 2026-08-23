@@ -374,7 +374,7 @@
   align-items: center;
   gap: 10px;
   flex: none;
-  color: var(--color-text-3);
+  color: var(--color-text-2);
 }
 .cuentaFila {
   font-size: 13px;
@@ -396,7 +396,7 @@
 
 .proximamente {
   font-size: 12.5px;
-  color: var(--color-text-3);
+  color: var(--color-text-2);
   white-space: nowrap;
 }
 
@@ -411,4 +411,84 @@
   }
   .finFila { grid-column: 2; }
   .tituloFila { font-size: 17px; }
+}
+
+/* ── banner del tema de la semana ──────────────────────────────────────── */
+
+.bannerSemana {
+  margin-bottom: 18px;
+  padding: 18px 22px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 28%, transparent);
+}
+.semanaEncabezado {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.semanaRotulo {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-accent-text);
+}
+.semanaFechas {
+  font-size: 13px;
+  color: var(--color-text-2);
+  font-feature-settings: 'tnum' 1;
+}
+
+.semanaTemas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+}
+.semanaTema {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--color-surface);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  a.semanaTema:hover { background: var(--color-surface-2); }
+}
+a.semanaTema:active { transform: scale(0.99); }
+a.semanaTema:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.semanaApagado { opacity: 0.6; }
+
+.semanaSesion {
+  font-size: 12px;
+  color: var(--color-text-2);
+  font-feature-settings: 'tnum' 1;
+}
+.semanaTitulo {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+.semanaCuenta {
+  font-size: 12.5px;
+  color: var(--color-text-2);
+  font-feature-settings: 'tnum' 1;
+}
+
+@media (max-width: 560px) {
+  .bannerSemana { padding: 14px 16px; border-radius: 16px; }
+  .semanaTemas { grid-template-columns: 1fr; }
 }
