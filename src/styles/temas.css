@@ -36,9 +36,12 @@
   --color-panel-hover: #323234;
 
   --color-accent: #0a84ff;
-  /* Acento para texto pequeno sobre una superficie. En oscuro el acento ya
-     pasa AA a 11px (4.85:1); en claro se queda en 4.21 y hay que oscurecerlo. */
-  --color-accent-text: var(--color-accent);
+  /* El acento como TEXTO no llega a AA en ninguno de los dos temas cuando va
+     sobre una superficie tintada: #0a84ff se queda en 3.2-4.3 y #0071e3 en
+     3.5-4.3. Este token es la version legible, y el acento se reserva para
+     rellenos (botones, barras) donde el contraste lo da el fondo.
+     #5eb0ff es el azul que 2c usa para el numero de la sesion en curso. */
+  --color-accent-text: #5eb0ff;
   --color-accent-2: #5eb0ff;
 
   --color-ok: #30d158;
@@ -105,7 +108,7 @@
     --color-panel-hover: #efeff2;
 
     --color-accent: #0071e3;
-    --color-accent-text: #0064c8;
+    --color-accent-text: #005bb5;
     --color-accent-2: #5e5ce6;
 
     --color-ok: #1a7f43;
@@ -147,7 +150,7 @@
   --color-panel-hover: #efeff2;
 
   --color-accent: #0071e3;
-  --color-accent-text: #0064c8;
+  --color-accent-text: #005bb5;
   --color-accent-2: #5e5ce6;
 
   --color-ok: #1a7f43;

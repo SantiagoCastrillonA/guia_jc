@@ -14,7 +14,7 @@
   font-family: var(--font-heading);
   font-weight: var(--font-heading-weight);
   font-size: 13px;
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   font-feature-settings: 'tnum' 1;
 }
 .title { font-size: 20px; margin: 0; }
@@ -172,7 +172,7 @@
 }
 .feedbackOk {
   background: color-mix(in srgb, var(--color-accent) 14%, transparent);
-  color: var(--color-accent-200);
+  color: var(--color-accent-text);
 }
 .feedbackNo {
   background: color-mix(in srgb, var(--color-text) 8%, transparent);
@@ -207,11 +207,11 @@
   border-radius: var(--radius-sm);
   border: 1px dashed color-mix(in srgb, var(--color-accent) 60%, transparent);
   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 .blankFilled {
   border-style: solid;
-  color: var(--color-accent-200);
+  color: var(--color-accent-text);
   background: color-mix(in srgb, var(--color-accent) 22%, transparent);
 }
 .chips { display: flex; gap: var(--space-2); flex-wrap: wrap; }
@@ -287,7 +287,7 @@
   min-width: 18px;
   margin-right: 8px;
   font-size: 11px;
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   font-feature-settings: 'tnum' 1;
 }
 @media (max-width: 620px) {

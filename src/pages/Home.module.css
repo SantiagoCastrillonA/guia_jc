@@ -66,7 +66,7 @@
 .pastilla:active { transform: scale(0.97); }
 
 .enlaceAccion {
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   font-size: 16px;
   text-decoration: none;
 }
@@ -228,7 +228,7 @@
     border-color: var(--color-divider);
   }
 }
-.sugerencia:active { color: var(--color-accent); }
+.sugerencia:active { color: var(--color-accent-text); }
 
 .resultado {
   margin: 0;
@@ -266,14 +266,14 @@
   margin-bottom: 10px;
   padding: 0 2px;
 }
-.iconoModulo { color: var(--color-accent); flex: none; }
+.iconoModulo { color: var(--color-accent-text); flex: none; }
 .nombreModulo {
   font-size: 13px;
   font-weight: 600;
 }
 .cuentaModulo {
   font-size: 13px;
-  color: var(--color-text-3);
+  color: var(--color-text-2);
   margin-left: auto;
 }
 
@@ -305,7 +305,8 @@
   outline-offset: -2px;
 }
 
-.filaActual { background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface)); }
+/* 12% de tinte dejaba el resumen en 4.3:1; con 7% vuelve a pasar AA. */
+.filaActual { background: color-mix(in srgb, var(--color-accent) 7%, var(--color-surface)); }
 .filaApagada { opacity: 0.55; cursor: default; }
 
 .marca {
@@ -327,7 +328,7 @@
 .marcaActual {
   background: transparent;
   border: 2px solid var(--color-accent);
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 
 .textoFila {
@@ -365,7 +366,7 @@
 }
 .vasAqui {
   font-size: 12.5px;
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 
 .finFila {

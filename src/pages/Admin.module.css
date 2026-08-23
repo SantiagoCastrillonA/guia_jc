@@ -367,7 +367,7 @@
 @media (hover: hover) and (pointer: fine) {
   .ordenar:hover { color: var(--color-text); }
 }
-.ordenar:active { color: var(--color-accent); transition-duration: var(--dur-press); }
+.ordenar:active { color: var(--color-accent-text); transition-duration: var(--dur-press); }
 .ordenar:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
@@ -416,7 +416,7 @@
   height: 32px;
   border-radius: 50%;
   background: color-mix(in srgb, var(--color-accent) 16%, var(--color-panel));
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   font-size: 12.5px;
   font-weight: 600;
 }
@@ -678,7 +678,7 @@
 }
 .temaEmpezado {
   border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 .temaCifra { font-feature-settings: 'tnum' 1; opacity: 0.75; }
 

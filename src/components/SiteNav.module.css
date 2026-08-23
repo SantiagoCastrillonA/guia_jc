@@ -31,7 +31,7 @@
   text-decoration: none;
   color: inherit;
 }
-.brandMark { color: var(--color-accent); }
+.brandMark { color: var(--color-accent-text); }
 .brandSub {
   font-size: 12px;
   letter-spacing: 0.06em;

@@ -65,7 +65,7 @@ body {
 .kicker {
   position: relative; display: block;
   font-size: 13px; line-height: var(--half); letter-spacing: 0.06em;
-  text-transform: uppercase; color: var(--color-accent);
+  text-transform: uppercase; color: var(--color-accent-text);
   font-feature-settings: "tnum" 1;
   margin: 0 0 calc(var(--leading) - var(--half));
 }
@@ -135,3 +135,14 @@ code, pre, .mono {
   .btn:hover { background: transparent; }
   .nav a:hover:not([aria-current='page']) { color: inherit; }
 }
+
+/* nocturne.css pinta los enlaces con --color-accent, que como TEXTO no llega
+   a AA en ninguno de los dos temas. Se corrige aqui porque nocturne es espejo
+   del sistema remoto; el arreglo de fondo va alla. */
+a { color: var(--color-accent-text); }
+.btn-primary,
+.btn-ghost { color: var(--color-accent-text); }
+.card-kicker,
+.tag-outline { color: var(--color-accent-text); }
+.nav a:hover,
+.nav a[aria-current='page'] { color: var(--color-accent-text); }

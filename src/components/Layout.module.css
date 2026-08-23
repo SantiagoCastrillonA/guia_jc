@@ -30,7 +30,7 @@
 .anonBarLink {
   flex: none;
   font-weight: 500;
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   text-decoration: none;
   white-space: nowrap;
 }
