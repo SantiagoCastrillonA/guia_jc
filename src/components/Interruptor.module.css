@@ -1,0 +1,62 @@
+/* 48×31 con perilla de 27, las medidas del diseño. */
+.pista {
+  flex: none;
+  width: 48px;
+  height: 31px;
+  padding: 2px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-track);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+.pista[aria-checked='true'] {
+  background: var(--color-ok);
+  justify-content: flex-end;
+}
+.pista:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.pista:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.perilla {
+  display: block;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* La perilla se desplaza en vez de saltar. `justify-content` mueve la caja al
+   instante, así que el recorrido lo hace un transform que compensa. */
+.pista .perilla {
+  transform: translateX(0);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.pista[aria-checked='false'] .perilla {
+  transform: translateX(0);
+}
+
+/* Presionar hunde la perilla: la respuesta va al bajar el dedo. */
+.pista:not(:disabled):active .perilla {
+  transform: scaleX(1.08);
+  transition-duration: var(--dur-press);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pista,
+  .perilla {
+    transition: none;
+  }
+  .pista:not(:disabled):active .perilla {
+    transform: none;
+  }
+}

@@ -1,8 +1,10 @@
-import { Fragment, useCallback, useEffect, useId, useMemo, useState, type FormEvent } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useCallback, useEffect, useId, useMemo, useState, type FormEvent } from 'react';
+import { Navigate, Link } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ThinkingOrb } from 'thinking-orbs';
 import { PageFallback } from '../components/Layout';
+import { Interruptor } from '../components/Interruptor';
+import { MenuAcciones, type Accion } from '../components/MenuAcciones';
 import { ApiError, api, del, patch, post } from '../lib/api';
 import { useAuth, type AuthUser } from '../lib/auth';
 import { topics, topicKicker, topicsByModule } from '../data/topics';
@@ -27,11 +29,10 @@ interface Orden<T extends string> {
   asc: boolean;
 }
 
-type Columna = 'name' | 'username' | 'role' | 'active' | 'solvedTotal' | 'lastLoginAt';
+type Columna = 'name' | 'role' | 'active' | 'solvedTotal' | 'lastLoginAt';
 
 const COLUMNAS: { clave: Columna; titulo: string }[] = [
   { clave: 'name', titulo: 'Nombre' },
-  { clave: 'username', titulo: 'Usuario' },
   { clave: 'role', titulo: 'Rol' },
   { clave: 'active', titulo: 'Estado' },
   { clave: 'solvedTotal', titulo: 'Progreso' },
@@ -40,11 +41,27 @@ const COLUMNAS: { clave: Columna; titulo: string }[] = [
 
 const TAMANOS = [10, 25, 50];
 
+/** Los filtros del control segmentado. */
+type Filtro = 'todas' | 'estudiantes' | 'admins' | 'desactivadas';
+
+const FILTROS: { clave: Filtro; texto: string }[] = [
+  { clave: 'todas', texto: 'Todas' },
+  { clave: 'estudiantes', texto: 'Estudiantes' },
+  { clave: 'admins', texto: 'Admins' },
+  { clave: 'desactivadas', texto: 'Desactivadas' },
+];
+
+function pasaFiltro(u: AdminUser, filtro: Filtro) {
+  if (filtro === 'estudiantes') return u.role === 'student';
+  if (filtro === 'admins') return u.role === 'admin';
+  if (filtro === 'desactivadas') return !u.active;
+  return true;
+}
+
 /** Compara dos cuentas por una columna, siempre en orden ascendente. */
 function comparar(a: AdminUser, b: AdminUser, clave: Columna) {
   switch (clave) {
     case 'name':
-    case 'username':
     case 'role':
       return a[clave].localeCompare(b[clave], 'es');
     case 'active':
@@ -60,13 +77,49 @@ function comparar(a: AdminUser, b: AdminUser, clave: Columna) {
   }
 }
 
-type ColumnaTema = 'session' | 'title' | 'estado';
+/** Las iniciales que van en el avatar. Dos como mucho. */
+function iniciales(nombre: string) {
+  return nombre
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? '')
+    .join('');
+}
 
-const COLUMNAS_TEMA: { clave: ColumnaTema; titulo: string }[] = [
-  { clave: 'session', titulo: 'Sesión' },
-  { clave: 'title', titulo: 'Tema' },
-  { clave: 'estado', titulo: 'Estado' },
-];
+function fechaCorta(iso: string | null) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' });
+}
+
+/* ── piezas del panel ──────────────────────────────────────────────────── */
+
+interface SegmentadoProps<T extends string> {
+  opciones: { clave: T; texto: string }[];
+  valor: T;
+  onElegir: (clave: T) => void;
+  etiqueta: string;
+}
+
+/** Control segmentado: la pastilla blanca marca la opción viva. */
+function Segmentado<T extends string>({ opciones, valor, onElegir, etiqueta }: SegmentadoProps<T>) {
+  return (
+    <div className={styles.segmentado} role="tablist" aria-label={etiqueta}>
+      {opciones.map((o) => (
+        <button
+          key={o.clave}
+          type="button"
+          role="tab"
+          aria-selected={valor === o.clave}
+          className={styles.segmento}
+          onClick={() => onElegir(o.clave)}
+        >
+          {o.texto}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 interface HerramientasProps {
   busqueda: string;
@@ -74,24 +127,40 @@ interface HerramientasProps {
   porPagina: number;
   onPorPagina: (n: number) => void;
   etiqueta: string;
+  children?: React.ReactNode;
 }
 
-/** Buscador y selector de filas por página, encima de una tabla. */
-function Herramientas({ busqueda, onBuscar, porPagina, onPorPagina, etiqueta }: HerramientasProps) {
+/** Buscador, filtros y tamaño de página, encima de una lista. */
+function Herramientas({
+  busqueda,
+  onBuscar,
+  porPagina,
+  onPorPagina,
+  etiqueta,
+  children,
+}: HerramientasProps) {
+  const id = useId();
   return (
     <div className={styles.herramientas}>
-      <input
-        type="search"
-        className={`input ${styles.buscar}`}
-        placeholder={etiqueta}
-        aria-label={etiqueta}
-        value={busqueda}
-        onChange={(e) => onBuscar(e.target.value)}
-      />
+      <div className={styles.campoBusqueda}>
+        <Lupa />
+        <input
+          id={id}
+          type="search"
+          className={styles.buscar}
+          placeholder={etiqueta}
+          aria-label={etiqueta}
+          value={busqueda}
+          onChange={(e) => onBuscar(e.target.value)}
+        />
+      </div>
+
+      {children}
+
       <label className={styles.porPagina}>
         Ver
         <select
-          className={`input ${styles.selectPagina}`}
+          className={styles.selectPagina}
           value={porPagina}
           onChange={(e) => onPorPagina(Number(e.target.value))}
         >
@@ -107,25 +176,54 @@ function Herramientas({ busqueda, onBuscar, porPagina, onPorPagina, etiqueta }: 
   );
 }
 
-interface ThOrdenProps<T extends string> {
-  clave: T;
-  titulo: string;
+function Lupa() {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      width="15"
+      height="15"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      className={styles.lupa}
+      aria-hidden="true"
+    >
+      <circle cx="7" cy="7" r="4.5" />
+      <path d="M10.5 10.5 14 14" />
+    </svg>
+  );
+}
+
+interface CabeceraProps<T extends string> {
+  columnas: { clave: T; titulo: string }[];
   orden: Orden<T>;
   onOrdenar: (clave: T) => void;
 }
 
-/** Encabezado que ordena por su columna. */
-function ThOrden<T extends string>({ clave, titulo, orden, onOrdenar }: ThOrdenProps<T>) {
-  const activa = orden.clave === clave;
+/** La fila de encabezados: mismos carriles que las filas, pero pulsable. */
+function Cabecera<T extends string>({ columnas, orden, onOrdenar }: CabeceraProps<T>) {
   return (
-    <th aria-sort={activa ? (orden.asc ? 'ascending' : 'descending') : 'none'}>
-      <button type="button" className={styles.ordenar} onClick={() => onOrdenar(clave)}>
-        {titulo}
-        <span aria-hidden="true" className={styles.flecha}>
-          {activa ? (orden.asc ? '↑' : '↓') : '↕'}
-        </span>
-      </button>
-    </th>
+    <div className={styles.cabecera} role="row">
+      {columnas.map((col) => {
+        const activa = orden.clave === col.clave;
+        return (
+          <div
+            key={col.clave}
+            role="columnheader"
+            aria-sort={activa ? (orden.asc ? 'ascending' : 'descending') : 'none'}
+          >
+            <button type="button" className={styles.ordenar} onClick={() => onOrdenar(col.clave)}>
+              {col.titulo}
+              <span aria-hidden="true" className={styles.flecha}>
+                {activa ? (orden.asc ? '↑' : '↓') : '↕'}
+              </span>
+            </button>
+          </div>
+        );
+      })}
+      <div aria-hidden="true" />
+    </div>
   );
 }
 
@@ -136,19 +234,29 @@ interface PaginadorProps {
   pagina: number;
   totalPaginas: number;
   onPagina: (n: number) => void;
+  unidad: string;
   vacio: string;
 }
 
-function Paginador({ desde, mostradas, total, pagina, totalPaginas, onPagina, vacio }: PaginadorProps) {
+function Paginador({
+  desde,
+  mostradas,
+  total,
+  pagina,
+  totalPaginas,
+  onPagina,
+  unidad,
+  vacio,
+}: PaginadorProps) {
   return (
     <div className={styles.pie}>
       <p className={styles.conteo}>
-        {total === 0 ? vacio : `${desde + 1}–${desde + mostradas} de ${total}`}
+        {total === 0 ? vacio : `${desde + 1}–${desde + mostradas} de ${total} ${unidad}`}
       </p>
       <div className={styles.paginador}>
         <button
           type="button"
-          className="btn btn-secondary"
+          className={styles.botonPagina}
           onClick={() => onPagina(pagina - 1)}
           disabled={pagina <= 1}
         >
@@ -159,7 +267,7 @@ function Paginador({ desde, mostradas, total, pagina, totalPaginas, onPagina, va
         </span>
         <button
           type="button"
-          className="btn btn-secondary"
+          className={styles.botonPagina}
           onClick={() => onPagina(pagina + 1)}
           disabled={pagina >= totalPaginas}
         >
@@ -170,130 +278,95 @@ function Paginador({ desde, mostradas, total, pagina, totalPaginas, onPagina, va
   );
 }
 
+/* ── sesiones y temas ──────────────────────────────────────────────────── */
+
 /**
- * La tabla de temas: mismo trato que la de cuentas —orden, buscador y
- * paginación— porque con 25 sesiones el scroll se vuelve interminable.
+ * La lista de sesiones, cada una con su interruptor. Sustituye al botón
+ * "Apagar tema": encender y apagar es un estado, no una acción suelta.
  */
-function TemasDisponibles({
+function SesionesYTemas({
   run,
 }: {
   run: (accion: () => Promise<unknown>, exito?: string) => Promise<void>;
 }) {
   const { isAvailable, setEnabled } = useTopicVisibility();
   const [busqueda, setBusqueda] = useState('');
-  const [orden, setOrden] = useState<Orden<ColumnaTema>>({ clave: 'session', asc: true });
-  const [porPagina, setPorPagina] = useState(TAMANOS[0]);
-  const [pagina, setPagina] = useState(1);
 
-  const publicados = useMemo(() => topics.filter((tema) => tema.published), []);
-
+  const publicados = useMemo(() => topics.filter((t) => t.published), []);
   const filtrados = useMemo(() => {
     const texto = busqueda.trim().toLowerCase();
-    const base = texto
-      ? publicados.filter(
-          (tema) =>
-            tema.title.toLowerCase().includes(texto) || tema.module.toLowerCase().includes(texto),
-        )
-      : publicados;
-    const signo = orden.asc ? 1 : -1;
-    return [...base].sort((a, b) => {
-      if (orden.clave === 'title') return a.title.localeCompare(b.title, 'es') * signo;
-      if (orden.clave === 'estado') {
-        return (Number(isAvailable(a.slug)) - Number(isAvailable(b.slug))) * signo;
-      }
-      return (a.session - b.session) * signo;
-    });
-  }, [publicados, busqueda, orden, isAvailable]);
+    if (!texto) return publicados;
+    return publicados.filter(
+      (t) => t.title.toLowerCase().includes(texto) || t.module.toLowerCase().includes(texto),
+    );
+  }, [publicados, busqueda]);
 
-  const totalPaginas = Math.max(1, Math.ceil(filtrados.length / porPagina));
-  const paginaActual = Math.min(pagina, totalPaginas);
-  const desde = (paginaActual - 1) * porPagina;
-  const visibles = filtrados.slice(desde, desde + porPagina);
-
-  function ordenarPor(clave: ColumnaTema) {
-    setOrden((prev) => (prev.clave === clave ? { clave, asc: !prev.asc } : { clave, asc: true }));
-    setPagina(1);
-  }
+  const disponibles = publicados.filter((t) => isAvailable(t.slug)).length;
 
   return (
     <>
-      <Herramientas
-        busqueda={busqueda}
-        onBuscar={(texto) => {
-          setBusqueda(texto);
-          setPagina(1);
-        }}
-        porPagina={porPagina}
-        onPorPagina={(n) => {
-          setPorPagina(n);
-          setPagina(1);
-        }}
-        etiqueta="Buscar por tema o módulo"
-      />
-
-      <div className={styles.tableWrap}>
-        <table className={`table ${styles.table}`}>
-          <thead>
-            <tr>
-              {COLUMNAS_TEMA.map((col) => (
-                <ThOrden
-                  key={col.clave}
-                  clave={col.clave}
-                  titulo={col.titulo}
-                  orden={orden}
-                  onOrdenar={ordenarPor}
-                />
-              ))}
-              <th aria-label="Acciones" />
-            </tr>
-          </thead>
-          <tbody>
-            {visibles.map((tema) => {
-              const disponible = isAvailable(tema.slug);
-              return (
-                <tr key={tema.slug}>
-                  <td className={styles.num}>{topicKicker(tema)}</td>
-                  <td className={styles.name}>{tema.title}</td>
-                  <td>
-                    <Estado activo={disponible} textoOn="Disponible" textoOff="Apagado" />
-                  </td>
-                  <td>
-                    <div className={styles.actions}>
-                      <button
-                        type="button"
-                        className={`btn ${disponible ? styles.btnApagar : styles.btnActivar}`}
-                        onClick={() =>
-                          run(
-                            () => setEnabled(tema.slug, !disponible),
-                            disponible
-                              ? `${tema.title} quedó oculto`
-                              : `${tema.title} ya está disponible`,
-                          )
-                        }
-                      >
-                        {disponible ? 'Apagar tema' : 'Activar tema'}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div className={styles.encabezadoSeccion}>
+        <div>
+          <h2 className={styles.tituloSeccion}>Sesiones y temas</h2>
+          <p className={styles.subtituloSeccion}>
+            Apaga una sesión para que los estudiantes no puedan entrar todavía. El cambio se ve al
+            instante, sin deploy.
+          </p>
+        </div>
+        <span className={styles.conteoSeccion}>
+          {disponibles} de {publicados.length} disponibles
+        </span>
       </div>
 
-      <Paginador
-        desde={desde}
-        mostradas={visibles.length}
-        total={filtrados.length}
-        pagina={paginaActual}
-        totalPaginas={totalPaginas}
-        onPagina={setPagina}
-        vacio="Ningún tema coincide"
-      />
+      <div className={styles.herramientas}>
+        <div className={styles.campoBusqueda}>
+          <Lupa />
+          <input
+            type="search"
+            className={styles.buscar}
+            placeholder="Buscar por tema o módulo"
+            aria-label="Buscar por tema o módulo"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className={styles.tarjetaLista}>
+        {filtrados.length === 0 && <p className={styles.vacio}>Ningún tema coincide.</p>}
+        {filtrados.map((tema) => {
+          const disponible = isAvailable(tema.slug);
+          return (
+            <div
+              key={tema.slug}
+              className={`${styles.filaSesion} ${disponible ? '' : styles.filaApagada}`}
+            >
+              <span className={styles.sesionKicker}>{topicKicker(tema)}</span>
+              <span className={styles.sesionTitulo}>{tema.title}</span>
+              <span className={disponible ? styles.sesionOn : styles.sesionOff}>
+                {disponible ? 'Disponible' : 'Apagado'}
+              </span>
+              <Interruptor
+                encendido={disponible}
+                etiqueta={`${disponible ? 'Apagar' : 'Activar'} ${tema.title}`}
+                onCambiar={() =>
+                  run(
+                    () => setEnabled(tema.slug, !disponible),
+                    disponible ? `${tema.title} quedó oculto` : `${tema.title} ya está disponible`,
+                  )
+                }
+              />
+            </div>
+          );
+        })}
+      </div>
     </>
   );
 }
+
+/* ── el panel ──────────────────────────────────────────────────────────── */
+
+type Vista = 'estudiantes' | 'sesiones';
 
 export default function Admin() {
   const { user, loading: authLoading } = useAuth();
@@ -301,7 +374,9 @@ export default function Admin() {
   const [error, setError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [vista, setVista] = useState<Vista>('estudiantes');
   const [busqueda, setBusqueda] = useState('');
+  const [filtro, setFiltro] = useState<Filtro>('todas');
   const [orden, setOrden] = useState<Orden<Columna>>({ clave: 'name', asc: true });
   const [porPagina, setPorPagina] = useState(TAMANOS[0]);
   const [pagina, setPagina] = useState(1);
@@ -323,14 +398,16 @@ export default function Admin() {
 
   const filtradas = useMemo(() => {
     const texto = busqueda.trim().toLowerCase();
-    const base = texto
-      ? (users ?? []).filter(
-          (u) => u.name.toLowerCase().includes(texto) || u.username.toLowerCase().includes(texto),
-        )
-      : (users ?? []);
+    const base = (users ?? []).filter(
+      (u) =>
+        pasaFiltro(u, filtro) &&
+        (!texto ||
+          u.name.toLowerCase().includes(texto) ||
+          u.username.toLowerCase().includes(texto)),
+    );
     const signo = orden.asc ? 1 : -1;
     return [...base].sort((a, b) => comparar(a, b, orden.clave) * signo);
-  }, [users, busqueda, orden]);
+  }, [users, busqueda, filtro, orden]);
 
   const totalPaginas = Math.max(1, Math.ceil(filtradas.length / porPagina));
   // Se recorta aquí y no con un efecto: al filtrar, la página vieja puede ya no existir.
@@ -361,216 +438,253 @@ export default function Admin() {
     setPagina(1);
   }
 
+  function accionesDe(fila: AdminUser): Accion[] {
+    const lista: Accion[] = [
+      {
+        texto: expandedId === fila.id ? 'Ocultar progreso' : 'Ver progreso',
+        onElegir: () => setExpandedId(expandedId === fila.id ? null : fila.id),
+      },
+      {
+        texto: fila.role === 'admin' ? 'Quitar admin' : 'Hacer admin',
+        onElegir: () =>
+          run(
+            () =>
+              patch(`/admin/users/${fila.id}`, {
+                role: fila.role === 'admin' ? 'student' : 'admin',
+              }),
+            fila.role === 'admin' ? `${fila.name} ya no es admin` : `${fila.name} ahora es admin`,
+          ),
+      },
+      {
+        texto: fila.active ? 'Desactivar cuenta' : 'Activar cuenta',
+        onElegir: () =>
+          run(
+            () => patch(`/admin/users/${fila.id}`, { active: !fila.active }),
+            fila.active
+              ? `Cuenta de ${fila.name} desactivada`
+              : `Cuenta de ${fila.name} activada`,
+          ),
+      },
+      { texto: 'Cambiar contraseña', onElegir: () => setDialog({ kind: 'password', user: fila }) },
+    ];
+    // Nadie se borra a sí mismo: dejaría la instalación sin quien entre.
+    if (fila.id !== user!.id) {
+      lista.push({
+        texto: 'Borrar cuenta',
+        peligro: true,
+        onElegir: () => setDialog({ kind: 'delete', user: fila }),
+      });
+    }
+    return lista;
+  }
+
   const totalSolved = users?.reduce((sum, u) => sum + u.solvedTotal, 0) ?? 0;
   const publishedExercises = topics.reduce((s, t) => s + (t.published ? t.exercises : 0), 0);
   const students = users?.filter((u) => u.role === 'student') ?? [];
 
+  const cifras = [
+    { rotulo: 'Cuentas', valor: users?.length ?? '—' },
+    { rotulo: 'Estudiantes', valor: students.length },
+    { rotulo: 'Ejercicios resueltos', valor: totalSolved.toLocaleString('es-CO') },
+    { rotulo: 'Ejercicios disponibles', valor: publishedExercises },
+  ];
+
   return (
-    <div className="wrap">
-      <section className={styles.page}>
-        <div className={styles.pageHead}>
-          <div>
-            <span className="kicker">Administración</span>
-            <h1>Estudiantes y progreso</h1>
-          </div>
-          <button type="button" className="btn btn-primary" onClick={() => setDialog({ kind: 'create' })}>
-            Nueva cuenta
+    <div className={styles.marco}>
+      <aside className={styles.lateral}>
+        <Link to="/" className={styles.marca}>
+          <img src="/favicon.svg" alt="" width="18" height="18" />
+          <span>
+            <span className={styles.marcaNombre}>Jóvenes creaTIvos</span>
+            <span className={styles.marcaSub}>Panel del profe</span>
+          </span>
+        </Link>
+
+        <nav className={styles.menu} aria-label="Secciones del panel">
+          <button
+            type="button"
+            className={styles.itemMenu}
+            aria-current={vista === 'estudiantes' ? 'page' : undefined}
+            onClick={() => setVista('estudiantes')}
+          >
+            <IconoPersonas />
+            Estudiantes
           </button>
+          <button
+            type="button"
+            className={styles.itemMenu}
+            aria-current={vista === 'sesiones' ? 'page' : undefined}
+            onClick={() => setVista('sesiones')}
+          >
+            <IconoLista />
+            Sesiones y temas
+          </button>
+        </nav>
+
+        <div className={styles.pieLateral}>
+          <span className={styles.notaLateral}>
+            {topics.length} sesiones · {publishedExercises} ejercicios
+          </span>
+          <span className={styles.quien}>
+            <span className={styles.avatarLateral} aria-hidden="true">
+              {iniciales(user.name)}
+            </span>
+            <span className={styles.quienTexto}>
+              <span className={styles.quienNombre}>{user.name}</span>
+              <span className={styles.quienRol}>admin</span>
+            </span>
+          </span>
         </div>
+      </aside>
 
-        <div className={styles.summary}>
-          <div>
-            <p className={styles.summaryNum}>{users?.length ?? '—'}</p>
-            <p className={styles.summaryLabel}>Cuentas</p>
-          </div>
-          <div>
-            <p className={styles.summaryNum}>{students.length}</p>
-            <p className={styles.summaryLabel}>Estudiantes</p>
-          </div>
-          <div>
-            <p className={styles.summaryNum}>{totalSolved}</p>
-            <p className={styles.summaryLabel}>Ejercicios resueltos</p>
-          </div>
-          <div>
-            <p className={styles.summaryNum}>{publishedExercises}</p>
-            <p className={styles.summaryLabel}>Ejercicios disponibles</p>
-          </div>
-        </div>
+      <main className={styles.principal}>
+        {error && (
+          <p className={styles.error} role="alert">
+            {error}
+          </p>
+        )}
 
-        {error && <p className={styles.error} role="alert">{error}</p>}
-
-        {!users ? (
-          <div className={styles.loading}>
-            <ThinkingOrb state="searching" size={20} theme="dark" aria-label="Cargando" />
-            <p className="text-muted">Cargando…</p>
-          </div>
-        ) : (
+        {vista === 'estudiantes' ? (
           <>
-            <Herramientas
-              busqueda={busqueda}
-              onBuscar={(texto) => {
-                setBusqueda(texto);
-                setPagina(1);
-              }}
-              porPagina={porPagina}
-              onPorPagina={(n) => {
-                setPorPagina(n);
-                setPagina(1);
-              }}
-              etiqueta="Buscar por nombre o usuario"
-            />
-
-            <div className={styles.tableWrap}>
-              <table className={`table ${styles.table}`}>
-                <thead>
-                  <tr>
-                    {COLUMNAS.map((col) => (
-                      <ThOrden
-                        key={col.clave}
-                        clave={col.clave}
-                        titulo={col.titulo}
-                        orden={orden}
-                        onOrdenar={ordenarPor}
-                      />
-                    ))}
-                    <th aria-label="Acciones" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {visibles.map((row) => (
-                    <Fragment key={row.id}>
-                      <tr className={row.active ? undefined : styles.inactive}>
-                        <td className={styles.name}>{row.name}</td>
-                        <td className={styles.user}>{row.username}</td>
-                        <td>
-                          <span className={`tag ${row.role === 'admin' ? 'tag-accent' : 'tag-neutral'}`}>
-                            {row.role === 'admin' ? 'admin' : 'estudiante'}
-                          </span>
-                        </td>
-                        <td>
-                          <Estado activo={row.active} textoOn="Activa" textoOff="Desactivada" />
-                        </td>
-                        <td>
-                          <BarraProgreso resueltos={row.solvedTotal} total={publishedExercises} progreso={row.progress} />
-                        </td>
-                        <td className={styles.num}>
-                          {row.lastLoginAt
-                            ? new Date(row.lastLoginAt).toLocaleDateString('es-CO', {
-                                day: '2-digit',
-                                month: 'short',
-                              })
-                            : '—'}
-                        </td>
-                        <td>
-                          <div className={styles.actions}>
-                            <button
-                              type="button"
-                              className="btn btn-ghost"
-                              onClick={() => setExpandedId(expandedId === row.id ? null : row.id)}
-                            >
-                              {expandedId === row.id ? 'Ocultar' : 'Ver progreso'}
-                            </button>
-                            <button
-                              type="button"
-                              className="btn btn-ghost"
-                              onClick={() =>
-                                run(
-                                  () =>
-                                    patch(`/admin/users/${row.id}`, {
-                                      role: row.role === 'admin' ? 'student' : 'admin',
-                                    }),
-                                  row.role === 'admin'
-                                    ? `${row.name} ya no es admin`
-                                    : `${row.name} ahora es admin`,
-                                )
-                              }
-                            >
-                              {row.role === 'admin' ? 'Quitar admin' : 'Hacer admin'}
-                            </button>
-                            <button
-                              type="button"
-                              className={`btn ${row.active ? styles.btnApagar : styles.btnActivar}`}
-                              onClick={() =>
-                                run(
-                                  () => patch(`/admin/users/${row.id}`, { active: !row.active }),
-                                  row.active
-                                    ? `Cuenta de ${row.name} desactivada`
-                                    : `Cuenta de ${row.name} activada`,
-                                )
-                              }
-                            >
-                              {row.active ? 'Desactivar' : 'Activar'}
-                            </button>
-                            <button
-                              type="button"
-                              className="btn btn-ghost"
-                              onClick={() => setDialog({ kind: 'password', user: row })}
-                            >
-                              Contraseña
-                            </button>
-                            {row.id !== user.id && (
-                              <button
-                                type="button"
-                                className="btn btn-ghost"
-                                onClick={() => setDialog({ kind: 'delete', user: row })}
-                              >
-                                Borrar
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                      <AnimatePresence initial={false}>
-                        {expandedId === row.id && (
-                          <motion.tr
-                            exit={{ opacity: 0 }}
-                            transition={reduce ? { duration: 0 } : enter}
-                          >
-                            <td colSpan={7} className={styles.celdaDetalle}>
-                              {/* La altura es la excepcion sancionada: en un acordeon no hay
-                                  transform equivalente. Se anima la caja, no la fila. */}
-                              <motion.div
-                                className={styles.detalleCaja}
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={reduce ? { duration: 0 } : enter}
-                              >
-                                <StudentProgress user={row} />
-                              </motion.div>
-                            </td>
-                          </motion.tr>
-                        )}
-                      </AnimatePresence>
-                    </Fragment>
-                  ))}
-                </tbody>
-              </table>
+            <div className={styles.encabezadoSeccion}>
+              <div>
+                <span className={styles.kicker}>Administración</span>
+                <h1 className={styles.titulo}>Estudiantes y progreso</h1>
+              </div>
+              <button
+                type="button"
+                className={styles.botonPastilla}
+                onClick={() => setDialog({ kind: 'create' })}
+              >
+                Nueva cuenta
+              </button>
             </div>
 
-            <Paginador
-              desde={desde}
-              mostradas={visibles.length}
-              total={filtradas.length}
-              pagina={paginaActual}
-              totalPaginas={totalPaginas}
-              onPagina={setPagina}
-              vacio="Ninguna cuenta coincide"
-            />
+            <div className={styles.cifras}>
+              {cifras.map((c) => (
+                <div key={c.rotulo} className={styles.tarjetaCifra}>
+                  <p className={styles.cifraRotulo}>{c.rotulo}</p>
+                  <p className={styles.cifraValor}>{c.valor}</p>
+                </div>
+              ))}
+            </div>
+
+            {!users ? (
+              <div className={styles.cargando}>
+                <ThinkingOrb state="searching" size={20} theme="dark" aria-label="Cargando" />
+                <p className={styles.conteo}>Cargando…</p>
+              </div>
+            ) : (
+              <>
+                <Herramientas
+                  busqueda={busqueda}
+                  onBuscar={(t) => {
+                    setBusqueda(t);
+                    setPagina(1);
+                  }}
+                  porPagina={porPagina}
+                  onPorPagina={(n) => {
+                    setPorPagina(n);
+                    setPagina(1);
+                  }}
+                  etiqueta="Buscar por nombre o usuario"
+                >
+                  <Segmentado
+                    opciones={FILTROS}
+                    valor={filtro}
+                    etiqueta="Filtrar cuentas"
+                    onElegir={(f) => {
+                      setFiltro(f);
+                      setPagina(1);
+                    }}
+                  />
+                </Herramientas>
+
+                <div className={styles.lista} role="table" aria-label="Cuentas">
+                  <Cabecera columnas={COLUMNAS} orden={orden} onOrdenar={ordenarPor} />
+
+                  {visibles.length === 0 && (
+                    <p className={styles.vacio}>Ninguna cuenta coincide.</p>
+                  )}
+
+                  {visibles.map((fila) => {
+                    const abierta = expandedId === fila.id;
+                    return (
+                      <div
+                        key={fila.id}
+                        className={`${styles.grupoFila} ${abierta ? styles.grupoAbierto : ''}`}
+                      >
+                        <div className={styles.fila} role="row">
+                          <span className={styles.celdaNombre}>
+                            <span className={styles.avatar} aria-hidden="true">
+                              {iniciales(fila.name)}
+                            </span>
+                            <span className={styles.nombreTexto}>
+                              <span className={styles.nombre}>{fila.name}</span>
+                              <span className={styles.usuario}>{fila.username}</span>
+                            </span>
+                          </span>
+
+                          <span>
+                            <span className={styles.rol}>
+                              {fila.role === 'admin' ? 'admin' : 'estudiante'}
+                            </span>
+                          </span>
+
+                          <span>
+                            <Estado
+                              activo={fila.active}
+                              textoOn="Activa"
+                              textoOff="Desactivada"
+                            />
+                          </span>
+
+                          <BarraProgreso
+                            resueltos={fila.solvedTotal}
+                            total={publishedExercises}
+                            progreso={fila.progress}
+                          />
+
+                          <span className={styles.num}>{fechaCorta(fila.lastLoginAt)}</span>
+
+                          <MenuAcciones acciones={accionesDe(fila)} etiqueta={fila.name} />
+                        </div>
+
+                        <AnimatePresence initial={false}>
+                          {abierta && (
+                            <motion.div
+                              className={styles.detalleCaja}
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={reduce ? { duration: 0 } : enter}
+                            >
+                              <StudentProgress user={fila} />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })}
+
+                  <Paginador
+                    desde={desde}
+                    mostradas={visibles.length}
+                    total={filtradas.length}
+                    pagina={paginaActual}
+                    totalPaginas={totalPaginas}
+                    onPagina={setPagina}
+                    unidad="cuentas"
+                    vacio="Ninguna cuenta coincide"
+                  />
+                </div>
+              </>
+            )}
           </>
+        ) : (
+          <SesionesYTemas run={run} />
         )}
-      </section>
-
-      <section className={styles.page}>
-        <span className="kicker">Administración</span>
-        <h2>Temas disponibles</h2>
-        <p className="text-muted">
-          Apaga un tema para que los estudiantes no puedan entrar todavía, sin necesidad de un
-          deploy. Los cambios se ven al instante.
-        </p>
-
-        <TemasDisponibles run={run} />
-      </section>
+      </main>
 
       <AdminDialog
         dialog={dialog}
@@ -593,6 +707,47 @@ export default function Admin() {
         }
       />
     </div>
+  );
+}
+
+function IconoPersonas() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M16 19v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 17.5V19" />
+      <circle cx="10" cy="8" r="3.2" />
+      <path d="M20 19v-1.4a3.4 3.4 0 0 0-2.6-3.3M15.4 5.2a3.2 3.2 0 0 1 0 5.9" />
+    </svg>
+  );
+}
+
+function IconoLista() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9 6h11M9 12h11M9 18h11" />
+      <circle cx="4.5" cy="6" r="1.2" />
+      <circle cx="4.5" cy="12" r="1.2" />
+      <circle cx="4.5" cy="18" r="1.2" />
+    </svg>
   );
 }
 

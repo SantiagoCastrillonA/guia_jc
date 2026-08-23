@@ -27,6 +27,10 @@
   --color-track: #3a3a3c;
   /* Superficie de un control agrupado (segmentado, campo) sobre la tarjeta. */
   --color-inset: rgba(255, 255, 255, 0.1);
+  /* El panel de admin invierte las superficies respecto al resto del sitio. */
+  --color-panel: #1c1c1e;
+  --color-panel-inset: #2c2c2e;
+  --color-panel-hover: #323234;
 
   --color-accent: #0a84ff;
   --color-accent-2: #5eb0ff;
@@ -89,6 +93,9 @@
     --color-hairline: rgba(0, 0, 0, 0.06);
     --color-track: #e8e8ed;
     --color-inset: #f0f0f3;
+    --color-panel: #ffffff;
+    --color-panel-inset: #f5f5f7;
+    --color-panel-hover: #efeff2;
 
     --color-accent: #0071e3;
     --color-accent-2: #5e5ce6;
@@ -126,6 +133,9 @@
   --color-hairline: rgba(0, 0, 0, 0.06);
   --color-track: #e8e8ed;
   --color-inset: #f0f0f3;
+  --color-panel: #ffffff;
+  --color-panel-inset: #f5f5f7;
+  --color-panel-hover: #efeff2;
 
   --color-accent: #0071e3;
   --color-accent-2: #5e5ce6;
