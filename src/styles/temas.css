@@ -1,24 +1,78 @@
-/* Tema claro y tema oscuro.
+/* Tema claro y tema oscuro — paleta del rediseño.
 
-   nocturne.css es espejo del sistema de diseño remoto y define el tema oscuro
-   en `:root`. Este archivo no lo reemplaza: se carga después y añade encima el
-   tema claro del rediseño, más los tokens que ese diseño estrena y que el tema
-   oscuro tambien necesita.
+   Los valores salen del archivo de diseño "Panel de admin y modo oscuro"
+   (opciones 2a claro, 2b oscuro, 2c portada oscura), leídos del prototipo ya
+   renderizado, no a ojo.
 
-   Tres estados, el patron habitual:
-   - sin elegir nada, manda `prefers-color-scheme` del sistema
-   - `data-theme="light"` o `"dark"` en <html> manda sobre el sistema
-   La paleta clara aparece dos veces a proposito: CSS no deja compartir un
-   bloque entre una media query y un selector suelto. */
+   nocturne.css no se toca: sigue siendo espejo del sistema remoto y define su
+   propio :root. Este archivo se carga después y manda sobre él en los dos
+   temas — el rediseño reemplaza la paleta, tanto la clara como la oscura.
 
-/* — tokens que el diseño estrena, en su version oscura — */
+   Tres estados: sin elección propia manda `prefers-color-scheme` y no se
+   escribe nada en <html>; `data-theme` manda sobre el sistema. La paleta clara
+   aparece dos veces a propósito: CSS no deja compartir un bloque entre una
+   media query y un selector suelto. */
+
+/* — tema oscuro, el de partida — */
 :root {
   color-scheme: dark;
 
-  --color-text-2: color-mix(in srgb, var(--color-text) 62%, transparent);
-  --color-text-3: color-mix(in srgb, var(--color-text) 45%, transparent);
-  --color-hairline: color-mix(in srgb, var(--color-text) 8%, transparent);
-  --color-track: color-mix(in srgb, var(--color-text) 12%, transparent);
+  --color-bg: #1c1c1e;
+  --color-surface: #2c2c2e;
+  --color-text: #f5f5f7;
+  --color-text-2: #98989d;
+  --color-text-3: #8e8e93;
+  --color-divider: rgba(255, 255, 255, 0.14);
+  --color-hairline: rgba(255, 255, 255, 0.08);
+  --color-track: #3a3a3c;
+  /* Superficie de un control agrupado (segmentado, campo) sobre la tarjeta. */
+  --color-inset: rgba(255, 255, 255, 0.1);
+
+  --color-accent: #0a84ff;
+  --color-accent-2: #5eb0ff;
+
+  --color-ok: #30d158;
+  --color-ok-tint: color-mix(in srgb, var(--color-ok) 18%, transparent);
+  --color-off: #ff6961;
+  --color-off-tint: color-mix(in srgb, var(--color-off) 18%, transparent);
+
+  --color-neutral-100: #f5f5f7;
+  --color-neutral-200: #e5e5ea;
+  --color-neutral-300: #c7c7cc;
+  --color-neutral-400: #aeaeb2;
+  --color-neutral-500: #8e8e93;
+  --color-neutral-600: #636366;
+  --color-neutral-700: #48484a;
+  --color-neutral-800: #3a3a3c;
+  --color-neutral-900: #2c2c2e;
+
+  --shadow-sm: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --shadow-md: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 6px 18px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 22px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* La rampa de acento se deriva del acento en vez de repetir nueve hex: así
+   cambiarlo arrastra a los componentes que usan la rampa (.tag y compañía). */
+:root {
+  --color-accent-100: color-mix(in srgb, var(--color-accent) 12%, #fff);
+  --color-accent-200: color-mix(in srgb, var(--color-accent) 24%, #fff);
+  --color-accent-300: color-mix(in srgb, var(--color-accent) 40%, #fff);
+  --color-accent-400: color-mix(in srgb, var(--color-accent) 62%, #fff);
+  --color-accent-500: var(--color-accent);
+  --color-accent-600: color-mix(in srgb, var(--color-accent) 86%, #000);
+  --color-accent-700: color-mix(in srgb, var(--color-accent) 70%, #000);
+  --color-accent-800: color-mix(in srgb, var(--color-accent) 54%, #000);
+  --color-accent-900: color-mix(in srgb, var(--color-accent) 38%, #000);
+
+  --color-accent-2-100: color-mix(in srgb, var(--color-accent-2) 12%, #fff);
+  --color-accent-2-200: color-mix(in srgb, var(--color-accent-2) 24%, #fff);
+  --color-accent-2-300: color-mix(in srgb, var(--color-accent-2) 40%, #fff);
+  --color-accent-2-400: color-mix(in srgb, var(--color-accent-2) 62%, #fff);
+  --color-accent-2-500: var(--color-accent-2);
+  --color-accent-2-600: color-mix(in srgb, var(--color-accent-2) 86%, #000);
+  --color-accent-2-700: color-mix(in srgb, var(--color-accent-2) 70%, #000);
+  --color-accent-2-800: color-mix(in srgb, var(--color-accent-2) 54%, #000);
+  --color-accent-2-900: color-mix(in srgb, var(--color-accent-2) 38%, #000);
 }
 
 /* — tema claro — */
@@ -34,41 +88,25 @@
     --color-divider: rgba(0, 0, 0, 0.08);
     --color-hairline: rgba(0, 0, 0, 0.06);
     --color-track: #e8e8ed;
+    --color-inset: #f0f0f3;
 
     --color-accent: #0071e3;
     --color-accent-2: #5e5ce6;
 
-    /* La rampa se deriva del acento en vez de repetir nueve hex: asi cambiar
-       `--color-accent` arrastra a los componentes que usan la rampa (.tag). */
-    --color-accent-100: color-mix(in srgb, var(--color-accent) 10%, #fff);
-    --color-accent-200: color-mix(in srgb, var(--color-accent) 20%, #fff);
-    --color-accent-300: color-mix(in srgb, var(--color-accent) 35%, #fff);
-    --color-accent-400: color-mix(in srgb, var(--color-accent) 55%, #fff);
-    --color-accent-500: var(--color-accent);
-    --color-accent-600: color-mix(in srgb, var(--color-accent) 85%, #000);
-    --color-accent-700: color-mix(in srgb, var(--color-accent) 70%, #000);
-    --color-accent-800: color-mix(in srgb, var(--color-accent) 55%, #000);
-    --color-accent-900: color-mix(in srgb, var(--color-accent) 40%, #000);
-
-    --color-accent-2-100: color-mix(in srgb, var(--color-accent-2) 10%, #fff);
-    --color-accent-2-200: color-mix(in srgb, var(--color-accent-2) 20%, #fff);
-    --color-accent-2-300: color-mix(in srgb, var(--color-accent-2) 35%, #fff);
-    --color-accent-2-400: color-mix(in srgb, var(--color-accent-2) 55%, #fff);
-    --color-accent-2-500: var(--color-accent-2);
-    --color-accent-2-600: color-mix(in srgb, var(--color-accent-2) 85%, #000);
-    --color-accent-2-700: color-mix(in srgb, var(--color-accent-2) 70%, #000);
-    --color-accent-2-800: color-mix(in srgb, var(--color-accent-2) 55%, #000);
-    --color-accent-2-900: color-mix(in srgb, var(--color-accent-2) 40%, #000);
+    --color-ok: #1a7f43;
+    --color-ok-tint: #e6f7ec;
+    --color-off: #b3261e;
+    --color-off-tint: color-mix(in srgb, var(--color-off) 10%, #fff);
 
     --color-neutral-100: #1d1d1f;
     --color-neutral-200: #2c2c2e;
-    --color-neutral-300: #3a3a3c;
-    --color-neutral-400: #545456;
-    --color-neutral-500: #6e6e73;
-    --color-neutral-600: #86868b;
-    --color-neutral-700: #aeaeb2;
-    --color-neutral-800: #d2d2d7;
-    --color-neutral-900: #e8e8ed;
+    --color-neutral-300: #424245;
+    --color-neutral-400: #6e6e73;
+    --color-neutral-500: #86868b;
+    --color-neutral-600: #aeaeb2;
+    --color-neutral-700: #c7c7cc;
+    --color-neutral-800: #e8e8ed;
+    --color-neutral-900: #f0f0f3;
 
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 8px 28px rgba(0, 0, 0, 0.08);
@@ -87,55 +125,48 @@
   --color-divider: rgba(0, 0, 0, 0.08);
   --color-hairline: rgba(0, 0, 0, 0.06);
   --color-track: #e8e8ed;
+  --color-inset: #f0f0f3;
 
   --color-accent: #0071e3;
   --color-accent-2: #5e5ce6;
 
-  --color-accent-100: color-mix(in srgb, var(--color-accent) 10%, #fff);
-  --color-accent-200: color-mix(in srgb, var(--color-accent) 20%, #fff);
-  --color-accent-300: color-mix(in srgb, var(--color-accent) 35%, #fff);
-  --color-accent-400: color-mix(in srgb, var(--color-accent) 55%, #fff);
-  --color-accent-500: var(--color-accent);
-  --color-accent-600: color-mix(in srgb, var(--color-accent) 85%, #000);
-  --color-accent-700: color-mix(in srgb, var(--color-accent) 70%, #000);
-  --color-accent-800: color-mix(in srgb, var(--color-accent) 55%, #000);
-  --color-accent-900: color-mix(in srgb, var(--color-accent) 40%, #000);
-
-  --color-accent-2-100: color-mix(in srgb, var(--color-accent-2) 10%, #fff);
-  --color-accent-2-200: color-mix(in srgb, var(--color-accent-2) 20%, #fff);
-  --color-accent-2-300: color-mix(in srgb, var(--color-accent-2) 35%, #fff);
-  --color-accent-2-400: color-mix(in srgb, var(--color-accent-2) 55%, #fff);
-  --color-accent-2-500: var(--color-accent-2);
-  --color-accent-2-600: color-mix(in srgb, var(--color-accent-2) 85%, #000);
-  --color-accent-2-700: color-mix(in srgb, var(--color-accent-2) 70%, #000);
-  --color-accent-2-800: color-mix(in srgb, var(--color-accent-2) 55%, #000);
-  --color-accent-2-900: color-mix(in srgb, var(--color-accent-2) 40%, #000);
+  --color-ok: #1a7f43;
+  --color-ok-tint: #e6f7ec;
+  --color-off: #b3261e;
+  --color-off-tint: color-mix(in srgb, var(--color-off) 10%, #fff);
 
   --color-neutral-100: #1d1d1f;
   --color-neutral-200: #2c2c2e;
-  --color-neutral-300: #3a3a3c;
-  --color-neutral-400: #545456;
-  --color-neutral-500: #6e6e73;
-  --color-neutral-600: #86868b;
-  --color-neutral-700: #aeaeb2;
-  --color-neutral-800: #d2d2d7;
-  --color-neutral-900: #e8e8ed;
+  --color-neutral-300: #424245;
+  --color-neutral-400: #6e6e73;
+  --color-neutral-500: #86868b;
+  --color-neutral-600: #aeaeb2;
+  --color-neutral-700: #c7c7cc;
+  --color-neutral-800: #e8e8ed;
+  --color-neutral-900: #f0f0f3;
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 8px 28px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 22px 60px rgba(0, 0, 0, 0.18);
 }
 
-/* El suelo iluminado de layout.css es un gesto del tema oscuro: dos brillos
-   sobre negro. En claro estorba, asi que el fondo queda plano. */
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme='dark']) body { background: var(--color-bg); }
+/* El suelo iluminado de layout.css es un gesto del Nocturne viejo: dos brillos
+   de morado sobre negro azulado. El rediseño pide fondo plano en los dos
+   temas. */
+body {
+  background: var(--color-bg);
 }
-:root[data-theme='light'] body { background: var(--color-bg); }
 
-/* Cambiar de tema no debe ser un fogonazo: se funde el fondo y el texto.
-   Solo la raiz y el cuerpo — poner una transicion global sobre * cuesta caro
-   y ademas arrastraria a cada hover del sitio. */
+/* Radios y pastillas del rediseño. No dependen del tema. */
+:root {
+  --radius-card: 16px;
+  --radius-control: 10px;
+  --radius-pill: 980px;
+}
+
+/* Cambiar de tema no debe ser un fogonazo: se funde el fondo y el texto. Solo
+   la raíz y el cuerpo — una transición global sobre * cuesta caro y arrastraría
+   a cada hover del sitio. */
 :root,
 body {
   transition:
@@ -144,5 +175,7 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   :root,
-  body { transition: none; }
+  body {
+    transition: none;
+  }
 }
