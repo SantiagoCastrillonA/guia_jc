@@ -17,8 +17,11 @@
 :root {
   color-scheme: dark;
 
-  --color-bg: #1c1c1e;
-  --color-surface: #2c2c2e;
+  /* La portada de 2c va sobre negro puro; las tarjetas, sobre #1c1c1e.
+     El panel de admin no usa estos: tiene los suyos (--color-panel). */
+  --color-bg: #000000;
+  --color-surface: #1c1c1e;
+  --color-surface-2: #2c2c2e;
   --color-text: #f5f5f7;
   --color-text-2: #98989d;
   --color-text-3: #8e8e93;
@@ -86,6 +89,7 @@
 
     --color-bg: #f5f5f7;
     --color-surface: #ffffff;
+    --color-surface-2: #f5f5f7;
     --color-text: #1d1d1f;
     --color-text-2: #6e6e73;
     --color-text-3: #86868b;
@@ -126,6 +130,7 @@
 
   --color-bg: #f5f5f7;
   --color-surface: #ffffff;
+  --color-surface-2: #f5f5f7;
   --color-text: #1d1d1f;
   --color-text-2: #6e6e73;
   --color-text-3: #86868b;

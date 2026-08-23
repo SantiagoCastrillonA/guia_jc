@@ -11,6 +11,7 @@ import {
 import { api, del, post } from './api';
 import { useAuth } from './auth';
 import { avisar } from './avisos';
+import { registrarActividad } from './racha';
 import { topics } from '../data/topics';
 
 /**
@@ -113,6 +114,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
 
   const markSolved = useCallback(
     (topicSlug: string, exerciseId: string) => {
+      registrarActividad(); // para la racha de la portada
       setProgress((prev) => {
         if (prev[topicSlug]?.includes(exerciseId)) return prev;
         const next = { ...prev, [topicSlug]: [...(prev[topicSlug] ?? []), exerciseId] };
