@@ -15,6 +15,12 @@
   --dur-fast: 180ms;
   --dur-base: 240ms;
 
+  /* Cuánto se levanta algo al pasarle el puntero por encima. Dos valores y no
+     más: lo que va dentro de una lista se levanta menos que lo que está
+     suelto, o el vecino de arriba parece hundirse. */
+  --alza: 2px;
+  --alza-suave: 1px;
+
   /* Acento secundario: cian de instrumento. Solo en datos y detalles. */
   --color-tech: #57cfe0;
   --color-tech-tint: color-mix(in srgb, var(--color-tech) 14%, transparent);
@@ -105,6 +111,14 @@ code, pre, .mono {
   transition-duration: var(--dur-fast);
   transition-timing-function: var(--ease-out);
 }
+/* El puntero encima levanta; el dedo apretando hunde. Los dos gestos son el
+   mismo eje, así que se leen como una sola pieza: sube al acercarte, baja al
+   pulsar. Solo con puntero fino: con dedo no hay «encima». */
+@media (hover: hover) and (pointer: fine) {
+  .btn:not(:disabled):hover {
+    transform: translateY(calc(-1 * var(--alza)));
+  }
+}
 .btn:not(:disabled):active {
   transform: scale(0.97);
   transition-duration: var(--dur-press);
@@ -123,7 +137,8 @@ code, pre, .mono {
 @media (prefers-reduced-motion: reduce) {
   /* Se conserva el fundido de color, que ayuda a entender; se va el
      desplazamiento, que es lo vestibular. */
-  .btn:not(:disabled):active { transform: none; }
+  .btn:not(:disabled):active,
+  .btn:not(:disabled):hover { transform: none; }
 }
 
 /* Con dedo no hay hover de verdad: el navegador lo deja pegado despues del
@@ -134,6 +149,26 @@ code, pre, .mono {
 @media (hover: none) {
   .btn:hover { background: transparent; }
   .nav a:hover:not([aria-current='page']) { color: inherit; }
+}
+
+/* — texto secundario legible en los dos temas —
+
+   nocturne apaga el texto secundario mezclando --color-text con transparente:
+   `color-mix(in srgb, var(--color-text) 55%, transparent)`. En el tema oscuro
+   eso es blanco al 55% sobre casi negro y se lee bien; en el claro es casi
+   negro al 55% sobre blanco, o sea un gris de 3.4:1 — por debajo de AA, y
+   justo en el texto de 11 px: encabezados de tabla, pies de figura, la ficha
+   de una tarjeta.
+
+   La cuenta: mezclado sobre blanco, el porcentaje tiene que llegar al 62%
+   para alcanzar 4.5:1. Todo lo que nocturne deja por debajo se re-apunta aqui
+   a --color-text-2, que ya esta definido por tema y cumple en los dos.
+   El arreglo de fondo va en el sistema remoto. */
+figcaption,
+.text-muted,
+.card-meta,
+.table th {
+  color: var(--color-text-2);
 }
 
 /* nocturne.css pinta los enlaces con --color-accent, que como TEXTO no llega

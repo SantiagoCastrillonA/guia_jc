@@ -75,6 +75,8 @@
   .option:hover:not(:disabled) {
     border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
     background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+    /* Alza corta: son opciones apiladas, y dos píxeles ya rompen la columna. */
+    transform: translateY(calc(-1 * var(--alza-suave)));
   }
 }
 .option:active:not(:disabled) { transform: scale(0.99); }
@@ -234,6 +236,7 @@
   .chip:hover:not(:disabled) {
     border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
     background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+    transform: translateY(calc(-1 * var(--alza)));
   }
 }
 .chip:active:not(:disabled) { transform: scale(0.96); }
@@ -270,6 +273,7 @@
 @media (hover: hover) and (pointer: fine) {
   .pairItem:hover:not(:disabled) {
     border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+    transform: translateY(calc(-1 * var(--alza-suave)));
   }
 }
 .pairItem:active:not(:disabled) { transform: scale(0.99); }
@@ -299,3 +303,16 @@
 .shell > * { min-width: 0; }
 .options > * { min-width: 0; }
 .option { overflow-wrap: anywhere; }
+
+/* El alza del puntero es orientación, no información: se va con
+   prefers-reduced-motion. El cambio de color y de borde se queda. */
+@media (prefers-reduced-motion: reduce) {
+  .option:hover:not(:disabled),
+  .option:active:not(:disabled),
+  .chip:hover:not(:disabled),
+  .chip:active:not(:disabled),
+  .pairItem:hover:not(:disabled),
+  .pairItem:active:not(:disabled) {
+    transform: none;
+  }
+}
