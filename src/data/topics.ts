@@ -129,9 +129,10 @@ export const topics: Topic[] = [
     session: 10,
     module: 'JavaScript',
     title: 'DOM, eventos, APIs y Node.js',
-    summary: 'Que el código controle lo que el usuario ve: seleccionar elementos, escuchar eventos y traer datos.',
+    summary:
+      'Que el código controle lo que el usuario ve: buscar elementos, cambiarlos, crearlos y borrarlos, escuchar eventos, leer un error y traer datos con fetch.',
     level: 'intermedio',
-    exercises: 20,
+    exercises: 30,
     published: true,
     Page: lazy(() => import('../topics/dom-eventos-apis')),
   },
