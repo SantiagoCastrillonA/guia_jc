@@ -32,6 +32,10 @@ export function SiteNav() {
         Inicio
       </NavLink>
 
+      <NavLink to="/recursos" className={styles.link}>
+        Recursos
+      </NavLink>
+
       <BotonTema />
 
       {!loading &&
