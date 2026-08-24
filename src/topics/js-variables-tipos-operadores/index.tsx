@@ -101,7 +101,7 @@ export default function JsVariablesTiposOperadores() {
                 >
                   {v}
                 </text>
-                <text x="330" y={y + 24} fontSize="12.5" fill="var(--color-text)" opacity="0.55">
+                <text x="330" y={y + 24} fontSize="12.5" fill="var(--color-text-2)">
                   {d}
                 </text>
               </g>
@@ -174,7 +174,7 @@ export default function JsVariablesTiposOperadores() {
                 >
                   {r}
                 </text>
-                <text x="300" y={y + 20} fontSize="13" fill="var(--color-text)" opacity="0.6">
+                <text x="300" y={y + 20} fontSize="13" fill="var(--color-text-2)">
                   {tipo}
                 </text>
               </g>

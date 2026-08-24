@@ -66,7 +66,7 @@ export default function GitYTrabajoEnEquipo() {
                 <text x={x + 14} y="70" fill="var(--color-text)" fontSize="14">
                   {t}
                 </text>
-                <text x={x + 14} y="90" fill="var(--color-text)" fontSize="11" opacity="0.55">
+                <text x={x + 14} y="90" fill="var(--color-text-2)" fontSize="11">
                   {s}
                 </text>
               </g>
@@ -105,9 +105,8 @@ export default function GitYTrabajoEnEquipo() {
             <text
               x="320"
               y="180"
-              fill="var(--color-text)"
+              fill="var(--color-text-2)"
               fontSize="11"
-              opacity="0.5"
               textAnchor="middle"
               fontFamily="ui-monospace, monospace"
             >
@@ -219,7 +218,7 @@ export default function GitYTrabajoEnEquipo() {
         >
           <svg viewBox="0 0 640 150" xmlns="http://www.w3.org/2000/svg">
             <line x1="20" y1="105" x2="620" y2="105" stroke="var(--color-text)" strokeWidth="1.5" opacity="0.35" />
-            <text x="20" y="132" fill="var(--color-text)" fontSize="11" opacity="0.55">
+            <text x="20" y="132" fill="var(--color-text-2)" fontSize="11">
               main
             </text>
             <path
@@ -244,7 +243,7 @@ export default function GitYTrabajoEnEquipo() {
             {[300, 380, 440].map((x) => (
               <circle key={x} cx={x} cy="45" r="6" fill="var(--color-accent)" />
             ))}
-            <text x="486" y="132" fill="var(--color-text)" fontSize="11" opacity="0.55">
+            <text x="486" y="132" fill="var(--color-text-2)" fontSize="11">
               merge
             </text>
           </svg>

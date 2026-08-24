@@ -40,7 +40,7 @@ export default function RepasoHtmlCssGit() {
                 <text x="20" y={y + 28} fontSize="16" fill="var(--color-text)">
                   {t}
                 </text>
-                <text x="120" y={y + 28} fontSize="13" fill="var(--color-text)" opacity="0.65">
+                <text x="120" y={y + 28} fontSize="13" fill="var(--color-text-2)">
                   {s}
                 </text>
                 <text
@@ -55,7 +55,7 @@ export default function RepasoHtmlCssGit() {
                 </text>
               </g>
             ))}
-            <text x="0" y="242" fontSize="12" fill="var(--color-text)" opacity="0.5">
+            <text x="0" y="242" fontSize="12" fill="var(--color-text-2)">
               próxima capa → JavaScript: la página empieza a responder
             </text>
           </svg>

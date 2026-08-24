@@ -45,7 +45,7 @@ export default function ProyectoBackend() {
                 <text x={i * 18 + 16} y={y + 24} fontSize="14" fill="var(--color-text)">
                   {t}
                 </text>
-                <text x={i * 18 + 120} y={y + 24} fontSize="12.5" fill="var(--color-text)" opacity="0.6">
+                <text x={i * 18 + 120} y={y + 24} fontSize="12.5" fill="var(--color-text-2)">
                   {d}
                 </text>
               </g>

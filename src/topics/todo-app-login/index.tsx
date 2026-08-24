@@ -73,7 +73,7 @@ export default function TodoAppLogin() {
             <text x="225" y="136" fontSize="13" fontFamily="ui-monospace, monospace" fill="var(--color-text)" opacity="0.8">
               ¿coincide con el hash guardado?
             </text>
-            <text x="0" y="176" fontSize="12" fill="var(--color-text)" opacity="0.5">
+            <text x="0" y="176" fontSize="12" fill="var(--color-text-2)">
               El hash no se puede revertir: de $2b$12$K9x…qP no se saca "MiClave123".
             </text>
           </svg>

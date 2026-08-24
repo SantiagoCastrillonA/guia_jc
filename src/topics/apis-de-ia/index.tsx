@@ -37,7 +37,7 @@ export default function ApisDeIa() {
             <text x="75" y="80" fontSize="13" textAnchor="middle" fill="var(--color-text)">
               Navegador
             </text>
-            <text x="75" y="100" fontSize="11" textAnchor="middle" fill="var(--color-text)" opacity="0.5">
+            <text x="75" y="100" fontSize="11" textAnchor="middle" fill="var(--color-text-2)">
               sin claves
             </text>
 
@@ -51,7 +51,7 @@ export default function ApisDeIa() {
             <text x="320" y="80" fontSize="13" textAnchor="middle" fill="var(--color-text)">
               Tu backend
             </text>
-            <text x="320" y="100" fontSize="11" textAnchor="middle" fill="var(--color-text)" opacity="0.6">
+            <text x="320" y="100" fontSize="11" textAnchor="middle" fill="var(--color-text-2)">
               aquí vive la clave
             </text>
 
@@ -66,10 +66,10 @@ export default function ApisDeIa() {
               API de IA
             </text>
 
-            <text x="0" y="170" fontSize="12" fill="var(--color-text)" opacity="0.5">
+            <text x="0" y="170" fontSize="12" fill="var(--color-text-2)">
               Si el navegador llamara directo a la IA, la clave viajaría al cliente y cualquiera podría verla
             </text>
-            <text x="0" y="192" fontSize="12" fill="var(--color-text)" opacity="0.5">
+            <text x="0" y="192" fontSize="12" fill="var(--color-text-2)">
               en la pestaña Network — y gastarla a tu nombre.
             </text>
           </svg>

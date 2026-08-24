@@ -102,12 +102,12 @@ export default function ExpressRutasMiddleware() {
                 <text x="92" y={y + 22} fontSize="14" fontFamily="ui-monospace, monospace" fill="var(--color-text)">
                   {u}
                 </text>
-                <text x="290" y={y + 22} fontSize="13" fill="var(--color-text)" opacity="0.6">
+                <text x="290" y={y + 22} fontSize="13" fill="var(--color-text-2)">
                   {d}
                 </text>
               </g>
             ))}
-            <text x="0" y="202" fontSize="12" fill="var(--color-text)" opacity="0.5" fontFamily="ui-monospace, monospace">
+            <text x="0" y="202" fontSize="12" fill="var(--color-text-2)" fontFamily="ui-monospace, monospace">
               DELETE /productos/7 → borrar el 7
             </text>
           </svg>

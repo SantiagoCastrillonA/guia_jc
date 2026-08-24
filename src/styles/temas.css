@@ -43,6 +43,16 @@
      #5eb0ff es el azul que 2c usa para el numero de la sesion en curso. */
   --color-accent-text: #5eb0ff;
   --color-accent-2: #5eb0ff;
+  /* El acento como RELLENO con texto blanco encima. #0a84ff es el systemBlue
+     oscuro de Apple y con blanco se queda en 3.65:1 — Apple mismo no cumple AA
+     ahi. Un 16% de negro lo baja a 4.95:1 y a simple vista es el mismo azul.
+     En el tema claro no hace falta: #0071e3 con blanco ya da 4.70:1. */
+  --color-accent-fill: color-mix(in srgb, var(--color-accent) 84%, #000);
+  /* El comentario dentro de un bloque de codigo va sobre una superficie propia
+     (la del terminal), asi que no le sirve ninguno de los grises de texto: uno
+     se queda corto en claro y el otro en oscuro. Token propio, medido en los
+     dos: 5.7:1 aqui y 6.5:1 en el tema claro. */
+  --color-code-comment: #a1a1a6;
 
   --color-ok: #30d158;
   --color-ok-tint: color-mix(in srgb, var(--color-ok) 18%, transparent);
@@ -88,7 +98,13 @@
   --color-accent-2-900: color-mix(in srgb, var(--color-accent-2) 38%, #000);
 }
 
-/* — tema claro — */
+/* — tema claro —
+
+   Los grises secundarios son mas oscuros que los del prototipo (#6e6e73 y
+   #86868b). Medido sobre #f5f5f7, ese #86868b se queda en 3.4:1 y arrastraba
+   a AA a los encabezados de tabla, los pies de figura y los rotulos de las
+   demos: texto de 11 px que hay que leer en clase. Los de aqui dan 5.6 y 4.7,
+   y conservan la jerarquia entre los dos niveles. */
 @media (prefers-color-scheme: light) {
   :root:not([data-theme='dark']) {
     color-scheme: light;
@@ -97,8 +113,8 @@
     --color-surface: #ffffff;
     --color-surface-2: #f5f5f7;
     --color-text: #1d1d1f;
-    --color-text-2: #6e6e73;
-    --color-text-3: #86868b;
+    --color-text-2: #5c5c61;
+    --color-text-3: #6e6e73;
     --color-divider: rgba(0, 0, 0, 0.08);
     --color-hairline: rgba(0, 0, 0, 0.06);
     --color-track: #e8e8ed;
@@ -109,6 +125,8 @@
 
     --color-accent: #0071e3;
     --color-accent-text: #005bb5;
+    --color-accent-fill: var(--color-accent);
+    --color-code-comment: #57575c;
     --color-accent-2: #5e5ce6;
 
     --color-ok: #1a7f43;
@@ -139,8 +157,8 @@
   --color-surface: #ffffff;
   --color-surface-2: #f5f5f7;
   --color-text: #1d1d1f;
-  --color-text-2: #6e6e73;
-  --color-text-3: #86868b;
+  --color-text-2: #5c5c61;
+  --color-text-3: #6e6e73;
   --color-divider: rgba(0, 0, 0, 0.08);
   --color-hairline: rgba(0, 0, 0, 0.06);
   --color-track: #e8e8ed;
@@ -151,6 +169,8 @@
 
   --color-accent: #0071e3;
   --color-accent-text: #005bb5;
+  --color-accent-fill: var(--color-accent);
+  --color-code-comment: #57575c;
   --color-accent-2: #5e5ce6;
 
   --color-ok: #1a7f43;

@@ -32,7 +32,7 @@ export default function RetoTodoAppReact() {
               FRONTEND · React
             </text>
             {['Componentes y estado', 'Rutas y navegación', 'Formularios y validación visual'].map((t, i) => (
-              <text key={t} x="16" y={80 + i * 22} fontSize="12.5" fill="var(--color-text)" opacity="0.7">
+              <text key={t} x="16" y={80 + i * 22} fontSize="12.5" fill="var(--color-text-2)">
                 {t}
               </text>
             ))}
@@ -44,7 +44,7 @@ export default function RetoTodoAppReact() {
             </text>
             <line x1="354" y1="104" x2="290" y2="104" stroke="var(--color-text)" strokeWidth="1.2" opacity="0.4" />
             <path d="M283 104 l8 -4.5 l0 9 z" fill="var(--color-text)" opacity="0.5" />
-            <text x="292" y="122" fontSize="11" fill="var(--color-text)" opacity="0.5" fontFamily="ui-monospace, monospace">
+            <text x="292" y="122" fontSize="11" fill="var(--color-text-2)" fontFamily="ui-monospace, monospace">
               JSON
             </text>
 
@@ -53,11 +53,11 @@ export default function RetoTodoAppReact() {
               BACKEND · Express + Mongo
             </text>
             {['Rutas y middleware', 'Autenticación y permisos', 'Validación y base de datos'].map((t, i) => (
-              <text key={t} x="386" y={80 + i * 22} fontSize="12.5" fill="var(--color-text)" opacity="0.7">
+              <text key={t} x="386" y={80 + i * 22} fontSize="12.5" fill="var(--color-text-2)">
                 {t}
               </text>
             ))}
-            <text x="0" y="186" fontSize="12" fill="var(--color-text)" opacity="0.5">
+            <text x="0" y="186" fontSize="12" fill="var(--color-text-2)">
               La validación se hace en los dos lados: en el frontend para avisar, en el backend para proteger.
             </text>
           </svg>

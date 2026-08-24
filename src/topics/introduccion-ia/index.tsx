@@ -90,9 +90,8 @@ export default function IntroduccionIA() {
                 <text
                   x="546"
                   y={y + 2}
-                  fill="var(--color-text)"
+                  fill="var(--color-text-2)"
                   fontSize="12"
-                  opacity="0.55"
                   fontFamily="ui-monospace, monospace"
                 >
                   {Math.round(p * 100)}%

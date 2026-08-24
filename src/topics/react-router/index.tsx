@@ -112,10 +112,10 @@ export default function ReactRouterTopic() {
             <text x="32" y="86" fontSize="12" fill="var(--color-accent-text)" fontFamily="ui-monospace, monospace">
               &lt;Outlet /&gt;
             </text>
-            <text x="32" y="112" fontSize="12.5" fill="var(--color-text)" opacity="0.65">
+            <text x="32" y="112" fontSize="12.5" fill="var(--color-text-2)">
               / → Inicio · /productos → Productos · /productos/7 → Detalle
             </text>
-            <text x="32" y="134" fontSize="12" fill="var(--color-text)" opacity="0.45">
+            <text x="32" y="134" fontSize="12" fill="var(--color-text-2)">
               esta parte se reemplaza al navegar
             </text>
             <rect x="16" y="164" width="608" height="24" rx="6" fill="var(--color-accent)" opacity="0.18" />

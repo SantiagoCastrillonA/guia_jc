@@ -17,7 +17,7 @@
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  color: var(--color-text-2);
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 .row { display: flex; gap: var(--space-2); flex-wrap: wrap; }
@@ -116,7 +116,7 @@
   left: 6px;
   font-size: 10px;
   letter-spacing: 0.06em;
-  color: color-mix(in srgb, var(--color-text) 45%, transparent);
+  color: var(--color-text-2);
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 .slider { width: 150px; accent-color: var(--color-accent-text); }

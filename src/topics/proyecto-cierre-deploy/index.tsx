@@ -36,7 +36,7 @@ export default function ProyectoCierreDeploy() {
                 <text x={x + 16} y="60" fontSize="14" fill="var(--color-text)">
                   {t}
                 </text>
-                <text x={x + 16} y="84" fontSize="12" fill="var(--color-text)" opacity="0.6">
+                <text x={x + 16} y="84" fontSize="12" fill="var(--color-text-2)">
                   {d}
                 </text>
                 <text x={x + 16} y="112" fontSize="11.5" fill="var(--color-accent-text)" opacity="0.9">
@@ -44,7 +44,7 @@ export default function ProyectoCierreDeploy() {
                 </text>
               </g>
             ))}
-            <text x="0" y="172" fontSize="12" fill="var(--color-text)" opacity="0.5">
+            <text x="0" y="172" fontSize="12" fill="var(--color-text-2)">
               Cada pieza necesita saber dónde está la siguiente: variables de entorno, no direcciones fijas en el código.
             </text>
           </svg>

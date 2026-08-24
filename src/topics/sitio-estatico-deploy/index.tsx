@@ -50,7 +50,7 @@ export default function SitioEstaticoDeploy() {
             <text x="0" y="42" fontSize="14" fontFamily="ui-monospace, monospace" fill="var(--color-text)">
               href="styles.css"
             </text>
-            <text x="0" y="66" fontSize="12" fill="var(--color-text)" opacity="0.6">
+            <text x="0" y="66" fontSize="12" fill="var(--color-text-2)">
               busca junto al index.html → funciona en local y publicado
             </text>
             <rect x="0" y="78" width="620" height="2" rx="1" fill="var(--color-accent)" opacity="0.5" />
@@ -61,7 +61,7 @@ export default function SitioEstaticoDeploy() {
             <text x="0" y="144" fontSize="14" fontFamily="ui-monospace, monospace" fill="var(--color-text)">
               href="/styles.css"
             </text>
-            <text x="0" y="168" fontSize="12" fill="var(--color-text)" opacity="0.6">
+            <text x="0" y="168" fontSize="12" fill="var(--color-text-2)">
               busca en la raíz del dominio → en local sirve, en GitHub Pages da 404
             </text>
             <text x="0" y="196" fontSize="12" fontFamily="ui-monospace, monospace" fill="var(--color-neutral-400)">

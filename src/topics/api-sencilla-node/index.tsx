@@ -32,7 +32,7 @@ export default function ApiSencillaNode() {
             <text x="85" y="92" fontSize="14" textAnchor="middle" fill="var(--color-text)">
               Navegador
             </text>
-            <text x="85" y="112" fontSize="11" textAnchor="middle" fill="var(--color-text)" opacity="0.5">
+            <text x="85" y="112" fontSize="11" textAnchor="middle" fill="var(--color-text-2)">
               el cliente
             </text>
 
@@ -40,7 +40,7 @@ export default function ApiSencillaNode() {
             <text x="555" y="92" fontSize="14" textAnchor="middle" fill="var(--color-text)">
               Node.js
             </text>
-            <text x="555" y="112" fontSize="11" textAnchor="middle" fill="var(--color-text)" opacity="0.5">
+            <text x="555" y="112" fontSize="11" textAnchor="middle" fill="var(--color-text-2)">
               tu servidor
             </text>
 
@@ -52,11 +52,11 @@ export default function ApiSencillaNode() {
 
             <line x1="455" y1="112" x2="185" y2="112" stroke="var(--color-text)" strokeWidth="1.3" opacity="0.45" />
             <path d="M178 112 l8 -4.5 l0 9 z" fill="var(--color-text)" opacity="0.6" />
-            <text x="318" y="132" fontSize="12" textAnchor="middle" fill="var(--color-text)" opacity="0.6" fontFamily="ui-monospace, monospace">
+            <text x="318" y="132" fontSize="12" textAnchor="middle" fill="var(--color-text-2)" fontFamily="ui-monospace, monospace">
               200 · &lt;h1&gt;Acerca de nosotros&lt;/h1&gt;
             </text>
 
-            <text x="0" y="180" fontSize="12" fill="var(--color-text)" opacity="0.5">
+            <text x="0" y="180" fontSize="12" fill="var(--color-text-2)">
               Un servidor es un mesero: recibe el pedido (la URL) y trae el plato (la respuesta).
             </text>
           </svg>

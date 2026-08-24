@@ -126,12 +126,12 @@ export default function DefensaDeProyectos() {
                 <text x={x + 16} y="62" fontSize="14" fill="var(--color-text)">
                   {t}
                 </text>
-                <text x={x + 16} y="86" fontSize="12" fill="var(--color-text)" opacity="0.65">
+                <text x={x + 16} y="86" fontSize="12" fill="var(--color-text-2)">
                   {d}
                 </text>
               </g>
             ))}
-            <text x="0" y="146" fontSize="12" fill="var(--color-text)" opacity="0.5">
+            <text x="0" y="146" fontSize="12" fill="var(--color-text-2)">
               Lo que más pesa en una entrevista es poder mostrar algo que hiciste y explicarlo.
             </text>
           </svg>

@@ -58,15 +58,14 @@ export default function LogicaScratch2() {
             ].map(({ v, y }, i) => (
               <g key={v}>
                 <rect x="120" y={y - 12} width="22" height="22" rx="4" fill="var(--color-accent)" opacity="0.75" />
-                <text x="0" y={y + 4} fill="var(--color-text)" fontSize="12" opacity="0.7">
+                <text x="0" y={y + 4} fill="var(--color-text-2)" fontSize="12">
                   vuelta {i + 1}
                 </text>
                 <text
                   x="164"
                   y={y + 4}
-                  fill="var(--color-text)"
+                  fill="var(--color-text-2)"
                   fontSize="12"
-                  opacity="0.6"
                   fontFamily="ui-monospace, monospace"
                 >
                   velocidadY = {v}
@@ -82,7 +81,7 @@ export default function LogicaScratch2() {
               strokeWidth="1.5"
               opacity="0.8"
             />
-            <text x="0" y="238" fill="var(--color-text)" fontSize="11" opacity="0.5">
+            <text x="0" y="238" fill="var(--color-text-2)" fontSize="11">
               suelo
             </text>
           </svg>
@@ -153,13 +152,13 @@ export default function LogicaScratch2() {
             <text x="16" y="60" fill="var(--color-accent-text)" fontSize="12">
               molde
             </text>
-            <text x="16" y="80" fill="var(--color-text)" fontSize="11" opacity="0.6">
+            <text x="16" y="80" fill="var(--color-text-2)" fontSize="11">
               (escondido)
             </text>
             {[210, 330, 450].map((x, i) => (
               <g key={x} opacity={1 - i * 0.22}>
                 <rect x={x} y="48" width="34" height="34" rx="5" fill="var(--color-accent)" opacity="0.7" />
-                <text x={x + 2} y="100" fill="var(--color-text)" fontSize="10" opacity="0.55">
+                <text x={x + 2} y="100" fill="var(--color-text-2)" fontSize="10">
                   clon {i + 1}
                 </text>
               </g>
@@ -174,7 +173,7 @@ export default function LogicaScratch2() {
               markerEnd=""
             />
             <path d="M196 65 l-8 -4 l0 8 z" fill="var(--color-accent)" />
-            <text x="500" y="70" fill="var(--color-text)" fontSize="12" opacity="0.6">
+            <text x="500" y="70" fill="var(--color-text-2)" fontSize="12">
               ← se mueven
             </text>
             <line
@@ -186,10 +185,10 @@ export default function LogicaScratch2() {
               strokeWidth="1"
               opacity="0.2"
             />
-            <text x="0" y="152" fill="var(--color-text)" fontSize="11" opacity="0.5">
+            <text x="0" y="152" fill="var(--color-text-2)" fontSize="11">
               x = -240 · aquí se elimina el clon
             </text>
-            <text x="540" y="152" fill="var(--color-text)" fontSize="11" opacity="0.5">
+            <text x="540" y="152" fill="var(--color-text-2)" fontSize="11">
               x = 240 · aparece
             </text>
           </svg>

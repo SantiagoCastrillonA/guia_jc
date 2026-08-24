@@ -66,7 +66,7 @@ export default function LogicaScratch1() {
                 )}
               </g>
             ))}
-            <text x="0" y="128" fill="var(--color-text)" fontSize="12" opacity="0.6">
+            <text x="0" y="128" fill="var(--color-text-2)" fontSize="12">
               un paso tras otro
             </text>
 
@@ -96,7 +96,7 @@ export default function LogicaScratch1() {
             >
               "rojo"
             </text>
-            <text x="170" y="128" fill="var(--color-text)" fontSize="12" opacity="0.6">
+            <text x="170" y="128" fill="var(--color-text-2)" fontSize="12">
               una caja con etiqueta
             </text>
 
@@ -121,7 +121,7 @@ export default function LogicaScratch1() {
             <text x="418" y="104" fill="var(--color-text)" fontSize="11" opacity="0.75">
               si no
             </text>
-            <text x="360" y="128" fill="var(--color-text)" fontSize="12" opacity="0.6">
+            <text x="360" y="128" fill="var(--color-text-2)" fontSize="12">
               el camino se parte en dos
             </text>
 
@@ -148,7 +148,7 @@ export default function LogicaScratch1() {
               strokeWidth="1.4"
             />
             <path d="M166 205 l2 8 l-8 -1 z" fill="var(--color-accent)" />
-            <text x="0" y="278" fill="var(--color-text)" fontSize="12" opacity="0.6">
+            <text x="0" y="278" fill="var(--color-text-2)" fontSize="12">
               lo mismo, muchas veces
             </text>
           </svg>

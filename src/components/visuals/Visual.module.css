@@ -14,7 +14,7 @@
 .caption {
   font-size: 12.5px;
   line-height: 20px;
-  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  color: var(--color-text-2);
   margin: var(--space-4) 0 0;
 }
 
@@ -135,7 +135,7 @@
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+  color: var(--color-text-2);
 }
 .terminalBody {
   margin: 0;
@@ -145,7 +145,9 @@
   overflow-x: auto;
 }
 .prompt { color: var(--color-accent-text); user-select: none; }
-.comment { color: color-mix(in srgb, var(--color-text) 45%, transparent); }
+/* Token propio y no uno de los grises de texto: el comentario va sobre la
+   superficie del terminal, donde --color-text-2 se queda en 4.46:1. */
+.comment { color: var(--color-code-comment); }
 
 /* Misma razón que en TopicPage: sin esto, un paso con un bloque de código
    ancho desborda la pantalla del celular. */

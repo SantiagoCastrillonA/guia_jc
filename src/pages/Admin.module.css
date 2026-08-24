@@ -116,7 +116,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--color-accent);
+  background: var(--color-accent-fill);
   color: #fff;
   font-size: 12px;
   font-weight: 600;
@@ -195,7 +195,7 @@
   padding: 10px 20px;
   border: 0;
   border-radius: var(--radius-pill);
-  background: var(--color-accent);
+  background: var(--color-accent-fill);
   color: #fff;
   font: inherit;
   font-size: 14.5px;
@@ -504,7 +504,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--color-accent);
+  background: var(--color-accent-fill);
   transform-origin: left;
 }
 .barraCompleta .barraFill { background: var(--color-ok); }
