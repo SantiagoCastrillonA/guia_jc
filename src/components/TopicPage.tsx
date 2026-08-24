@@ -121,8 +121,12 @@ export function TopicBlock({ children, className }: BlockProps) {
     <motion.div
       className={className}
       variants={{
-        hidden: { opacity: 0, transform: reduce ? 'none' : 'translateY(10px)' },
-        shown: { opacity: 1, transform: 'translateY(0px)', transition: enter },
+        // La entrada mueve, no desvanece. Si el navegador congela la animación
+        // —pestaña en segundo plano, motor detenido— se queda en su primer
+        // fotograma; con `opacity: 0` eso deja el bloque invisible hasta un F5,
+        // y en `translateY` no se nota.
+        hidden: { transform: reduce ? 'none' : 'translateY(10px)' },
+        shown: { transform: 'translateY(0px)', transition: enter },
       }}
     >
       {children}

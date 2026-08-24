@@ -8,14 +8,18 @@ import styles from './Visual.module.css';
  *
  * Todas entran al hacer scroll con un desplazamiento corto y una sola vez
  * (`once`), nunca en bucle: el movimiento sirve para guiar la lectura, no
- * para adornar. Con `prefers-reduced-motion` queda solo el fundido.
+ * para adornar. Con `prefers-reduced-motion` no se mueven.
+ *
+ * La entrada desplaza y nunca desvanece: un estado inicial `opacity: 0` deja
+ * la figura invisible si el navegador congela la animación antes del primer
+ * fotograma, y de eso no se sale sin recargar.
  */
 
 function useReveal() {
   const reduce = useReducedMotion();
   return {
-    initial: { opacity: 0, transform: reduce ? 'none' : 'translateY(10px)' },
-    whileInView: { opacity: 1, transform: 'translateY(0px)' },
+    initial: { transform: reduce ? 'none' : 'translateY(10px)' },
+    whileInView: { transform: 'translateY(0px)' },
     viewport: { once: true, amount: 0.25 },
     transition: enter,
   } as const;
@@ -60,8 +64,8 @@ export function Step({ title, children }: { title: string; children: ReactNode }
     <motion.li
       className={styles.step}
       variants={{
-        hidden: { opacity: 0, transform: reduce ? 'none' : 'translateY(8px)' },
-        shown: { opacity: 1, transform: 'translateY(0px)', transition: enter },
+        hidden: { transform: reduce ? 'none' : 'translateY(8px)' },
+        shown: { transform: 'translateY(0px)', transition: enter },
       }}
     >
       <h4 className={styles.stepTitle}>{title}</h4>

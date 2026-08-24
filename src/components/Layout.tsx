@@ -1,10 +1,8 @@
 import { Suspense, useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigation } from 'react-router-dom';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { ThinkingOrb } from 'thinking-orbs';
 import { SiteNav } from './SiteNav';
 import { useAuth } from '../lib/auth';
-import { enter } from '../lib/motion';
 import styles from './Layout.module.css';
 
 /** Routes land at the top; an in-page hash still wins. */
@@ -38,7 +36,6 @@ export function Layout() {
   const { pathname } = useLocation();
   const { user, loading } = useAuth();
   const navigation = useNavigation();
-  const reduce = useReducedMotion();
   // navigation.state cambia apenas se hace clic — a diferencia de Suspense
   // dentro de una transición, no se queda pegado mostrando la página vieja.
   const showLoading = useDelayedFlag(navigation.state !== 'idle', 150);
@@ -61,26 +58,27 @@ export function Layout() {
         </div>
       )}
       <main className={styles.main}>
-        {/* Route change: a short cross-fade that lifts in. Reduced motion keeps
-            the fade and drops the travel. */}
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            className={styles.mainInner}
-            key={showLoading ? 'loading' : pathname}
-            initial={{ opacity: 0, transform: reduce ? 'none' : 'translateY(8px)' }}
-            animate={{ opacity: 1, transform: 'translateY(0px)' }}
-            exit={{ opacity: 0, transform: reduce ? 'none' : 'translateY(-4px)' }}
-            transition={enter}
-          >
-            {showLoading ? (
-              <PageFallback />
-            ) : (
-              <Suspense fallback={<PageFallback />}>
-                <Outlet />
-              </Suspense>
-            )}
-          </motion.div>
-        </AnimatePresence>
+        {/* Mientras el router baja el módulo, una barra fina arriba. El
+            contenido de la página NO se reemplaza: sustituir el árbol por un
+            spinner obligaba a desmontarlo y volver a montarlo, y ese ir y
+            venir era justo lo que dejaba la sesión en blanco. */}
+        {showLoading && (
+          <span className={styles.barraRuta} role="status" aria-label="Cargando la sesión" />
+        )}
+        {/* Cambio de ruta: solo entrada, nunca una salida que la anteceda.
+            `AnimatePresence mode="wait"` retenía el montaje de la página nueva
+            hasta que la vieja terminara de salir; si esa salida se interrumpía
+            —pestaña en segundo plano, animación cortada, dos cambios de clave
+            encimados— no se montaba nada, y solo un F5 lo arreglaba.
+
+            La entrada va en CSS y no en la librería de movimiento a propósito:
+            lo que se ve no puede depender de que un motor de animación llegue
+            a su último cuadro. `key` la reinicia en cada ruta. */}
+        <div className={styles.mainInner} key={pathname}>
+          <Suspense fallback={<PageFallback />}>
+            <Outlet />
+          </Suspense>
+        </div>
       </main>
       {/* El panel de admin es un armazon a sangre con su propio pie en la
           barra lateral: el pie del sitio le dejaba una franja del fondo debajo. */}

@@ -102,6 +102,7 @@ export default function Home() {
                 className={styles.pastilla}
                 onMouseEnter={() => preloadTopic(actual.slug)}
                 onFocus={() => preloadTopic(actual.slug)}
+                onPointerDown={() => preloadTopic(actual.slug)}
               >
                 {(progress[actual.slug]?.length ?? 0) > 0 ? 'Continuar' : 'Empezar'} sesión{' '}
                 {String(actual.session).padStart(2, '0')}
@@ -145,6 +146,7 @@ export default function Home() {
                     className={styles.semanaTema}
                     onMouseEnter={() => preloadTopic(tema.slug)}
                     onFocus={() => preloadTopic(tema.slug)}
+                    onPointerDown={() => preloadTopic(tema.slug)}
                   >
                     {contenido}
                   </Link>
@@ -303,9 +305,12 @@ function FilaSesion({ tema, hechos, disponible, esActual, reduce }: FilaProps) {
   const completa = tema.exercises > 0 && hechos >= tema.exercises;
   const fraccion = tema.exercises > 0 ? Math.min(hechos / tema.exercises, 1) : 0;
 
+  // Desplaza, no desvanece: congelada en su primer fotograma —lo que hace el
+  // navegador con una pestaña en segundo plano— una entrada desde `opacity: 0`
+  // deja la fila invisible hasta recargar.
   const variantes = {
-    oculto: { opacity: 0, transform: reduce ? 'none' : 'translateY(8px)' },
-    visible: { opacity: 1, transform: 'translateY(0px)' },
+    oculto: { transform: reduce ? 'none' : 'translateY(8px)' },
+    visible: { transform: 'translateY(0px)' },
   };
 
   const cuerpo = (
@@ -370,6 +375,7 @@ function FilaSesion({ tema, hechos, disponible, esActual, reduce }: FilaProps) {
         className={clases}
         onMouseEnter={() => preloadTopic(tema.slug)}
         onFocus={() => preloadTopic(tema.slug)}
+        onPointerDown={() => preloadTopic(tema.slug)}
       >
         {cuerpo}
       </Link>

@@ -1,7 +1,25 @@
 /* El contenido se estira hasta el pie: asi una pagina que trae su propio
    armazon a sangre (el panel de admin) no deja una franja del fondo debajo. */
 .main { flex: 1; display: flex; flex-direction: column; }
-.mainInner { flex: 1; display: flex; flex-direction: column; }
+.mainInner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  /* La entrada mueve, no desvanece, y no lleva `fill-mode`.
+     Las dos cosas por la misma razon: la pagina tiene que ser legible aunque
+     la animacion no avance ni un fotograma. Un navegador que congela la
+     pestana deja la animacion en `currentTime: 0` indefinidamente — si ese
+     primer fotograma fuera `opacity: 0`, la sesion quedaria en blanco hasta
+     un F5. Congelada en `translateY(8px)` no se nota. */
+  animation: entradaRuta var(--dur-base) var(--ease-out);
+}
+@keyframes entradaRuta {
+  from { transform: translateY(8px); }
+  to { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mainInner { animation: none; }
+}
 
 .fallback {
   display: flex;
@@ -47,7 +65,7 @@
   margin-top: calc(2 * var(--leading));
   font-size: 13px;
   line-height: var(--leading);
-  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  color: var(--color-text-2);
   display: flex;
   gap: var(--space-4);
   flex-wrap: wrap;
@@ -64,4 +82,31 @@
   gap: var(--space-3);
   flex-wrap: wrap;
   margin-top: var(--space-6);
+}
+
+/* — barra de carga de ruta —
+   Dos segundos y pico de avance que nunca llega al final: la termina el
+   montaje de la página nueva, que la desmonta. Es CSS puro a propósito — el
+   aviso de "estoy cargando" no debe depender de lo mismo que gobierna cuándo
+   se monta el contenido. */
+.barraRuta {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 20;
+  height: 2px;
+  background: var(--color-accent-fill);
+  transform-origin: 0 50%;
+  animation: avanceRuta 2.4s var(--ease-out) forwards;
+}
+@keyframes avanceRuta {
+  from { transform: scaleX(0.02); }
+  to { transform: scaleX(0.92); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .barraRuta {
+    animation: none;
+    transform: scaleX(1);
+    opacity: 0.6;
+  }
 }
