@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 import { enter } from '../../lib/motion';
 import styles from './Snippets.module.css';
@@ -73,21 +73,7 @@ export function Snippets({ grupos, nota }: SnippetsProps) {
           </h4>
           <div className={styles.lista}>
             {grupo.fragmentos.map((fragmento) => (
-              <motion.article
-                key={fragmento.nombre}
-                className={styles.tarjeta}
-                initial={reduce ? false : { transform: 'translateY(6px)' }}
-                animate={{ transform: 'translateY(0px)' }}
-                transition={enter}
-              >
-                <header className={styles.cabeza}>
-                  <code className={styles.nombre}>{fragmento.nombre}</code>
-                  <BotonCopiar codigo={fragmento.codigo} nombre={fragmento.nombre} />
-                </header>
-                <pre className={styles.codigo}>
-                  <code>{pintar(fragmento.codigo)}</code>
-                </pre>
-              </motion.article>
+              <Tarjeta key={fragmento.nombre} fragmento={fragmento} reduce={!!reduce} />
             ))}
           </div>
         </section>
@@ -100,35 +86,68 @@ export function Snippets({ grupos, nota }: SnippetsProps) {
 
 type EstadoCopia = 'listo' | 'copiado' | 'falla';
 
-function BotonCopiar({ codigo, nombre }: { codigo: string; nombre: string }) {
+function Tarjeta({ fragmento, reduce }: { fragmento: Fragmento; reduce: boolean }) {
+  const codigoRef = useRef<HTMLPreElement>(null);
   const [estado, setEstado] = useState<EstadoCopia>('listo');
 
   async function copiar() {
     try {
-      await escribirEnPortapapeles(codigo);
+      await escribirEnPortapapeles(fragmento.codigo);
       setEstado('copiado');
       window.setTimeout(() => setEstado('listo'), 1400);
     } catch {
-      // Sin permiso de portapapeles (o sin HTTPS): se dice qué hacer en vez de
-      // fallar en silencio.
+      // El portapapeles se le niega a quien no venga de un gesto del usuario, y
+      // algunos navegadores lo bloquean del todo. En vez de dejar el mensaje
+      // como un reproche, se deja el código ya seleccionado: al estudiante solo
+      // le queda apretar Ctrl+C.
+      seleccionar(codigoRef.current);
       setEstado('falla');
+      window.setTimeout(() => setEstado('listo'), 4000);
     }
   }
 
   const rotulo =
-    estado === 'copiado' ? '¡Copiado!' : estado === 'falla' ? 'Selecciónalo y cópialo' : 'Copiar';
+    estado === 'copiado' ? '¡Copiado!' : estado === 'falla' ? 'Ya quedó marcado' : 'Copiar';
+  const explicacion =
+    estado === 'falla'
+      ? `No se pudo copiar solo. El código de ${fragmento.nombre} quedó seleccionado: cópialo con Ctrl+C.`
+      : `${rotulo} — ${fragmento.nombre}`;
 
   return (
-    <button
-      type="button"
-      className={`${styles.copiar} ${estado === 'copiado' ? styles.copiado : ''}`}
-      onClick={copiar}
-      aria-label={`${rotulo} — ${nombre}`}
-      aria-live="polite"
+    <motion.article
+      className={styles.tarjeta}
+      initial={reduce ? false : { transform: 'translateY(6px)' }}
+      animate={{ transform: 'translateY(0px)' }}
+      transition={enter}
     >
-      {rotulo}
-    </button>
+      <header className={styles.cabeza}>
+        <code className={styles.nombre}>{fragmento.nombre}</code>
+        <button
+          type="button"
+          className={`${styles.copiar} ${estado === 'copiado' ? styles.copiado : ''}`}
+          onClick={copiar}
+          aria-label={explicacion}
+          aria-live="polite"
+        >
+          {rotulo}
+        </button>
+      </header>
+      <pre className={styles.codigo} ref={codigoRef}>
+        <code>{pintar(fragmento.codigo)}</code>
+      </pre>
+    </motion.article>
   );
+}
+
+/** Deja el bloque marcado, como si el estudiante lo hubiera arrastrado. */
+function seleccionar(nodo: HTMLElement | null) {
+  if (!nodo) return;
+  const seleccion = window.getSelection();
+  if (!seleccion) return;
+  const rango = document.createRange();
+  rango.selectNodeContents(nodo);
+  seleccion.removeAllRanges();
+  seleccion.addRange(rango);
 }
 
 /** El portapapeles moderno, con la salida de emergencia de siempre. */
