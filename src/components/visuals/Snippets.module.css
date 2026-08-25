@@ -1,0 +1,174 @@
+/* Recetario de fragmentos para copiar. Misma gramática que el resto del
+   material gráfico: superficies de nocturne, el acento como línea, y el código
+   sobre la superficie del terminal. Ni un hex suelto. */
+
+.recetario {
+  margin: var(--leading) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ── filtros ───────────────────────────────────────────────────────────── */
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.filtro {
+  padding: 5px 13px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text-2);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .filtro:hover {
+    color: var(--color-text);
+    border-color: var(--color-divider);
+    transform: translateY(calc(-1 * var(--alza)));
+  }
+}
+.filtro:active { transform: none; }
+.filtroOn {
+  background: var(--color-accent-fill);
+  border-color: transparent;
+  color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .filtro:hover { transform: none; }
+}
+
+/* ── grupo ─────────────────────────────────────────────────────────────── */
+
+.grupo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.grupoTitulo {
+  margin: var(--space-2) 0 0;
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* ── tarjeta ───────────────────────────────────────────────────────────── */
+
+.tarjeta {
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-surface);
+  min-width: 0;
+}
+
+.cabeza {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--color-hairline);
+}
+.nombre {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-accent-text);
+  overflow-wrap: anywhere;
+}
+
+.copiar {
+  flex: none;
+  padding: 4px 10px;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-2);
+  font: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .copiar:hover {
+    color: var(--color-text);
+    border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+    transform: translateY(calc(-1 * var(--alza)));
+  }
+}
+.copiar:active { transform: scale(0.97); }
+/* Copiado no deja huella en la pantalla: el único acuse es este. Por eso
+   cambia de color y no solo de texto. */
+.copiado {
+  background: var(--color-accent-fill);
+  border-color: transparent;
+  color: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  .copiar:hover,
+  .copiar:active { transform: none; }
+}
+@media (pointer: coarse) {
+  .copiar { padding: 8px 14px; }
+}
+
+/* ── código ────────────────────────────────────────────────────────────── */
+
+.codigo {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: color-mix(in srgb, var(--color-neutral-900) 75%, transparent);
+  overflow-x: auto;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 21px;
+  tab-size: 2;
+  white-space: pre;
+}
+.comentario {
+  color: var(--color-code-comment);
+  font-style: italic;
+}
+/* --color-accent-text y no --color-accent-2: el violeta del tema claro se
+   queda en 3.93:1 sobre la superficie del código. Este token es el acento en
+   su versión legible, medida en los dos temas. */
+.cadena { color: var(--color-accent-text); }
+
+.nota {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-text) 5%, transparent);
+  font-size: 13.5px;
+  line-height: 21px;
+  color: var(--color-text-2);
+}
+.nota code {
+  font-size: 12.5px;
+  color: var(--color-text);
+}

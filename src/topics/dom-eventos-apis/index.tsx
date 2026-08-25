@@ -8,8 +8,18 @@ import {
   Quiz,
   TrueFalse,
 } from '../../components/exercises';
-import { Callout, Compare, Figure, RefTable, Step, Steps, Terminal } from '../../components/visuals';
+import {
+  Callout,
+  Compare,
+  Figure,
+  RefTable,
+  Snippets,
+  Step,
+  Steps,
+  Terminal,
+} from '../../components/visuals';
 import { CazadorDeSelectores, MiradorDeEventos, TallerDom } from './Demos';
+import { REFERENCIA } from './referencia';
 
 const SLUG = 'dom-eventos-apis';
 
@@ -29,6 +39,12 @@ export default function DomEventosApis() {
           puedes tocar con código. Cada etiqueta del HTML se vuelve un objeto con propiedades que se
           leen y se cambian, igual que cambiabas una variable en Scratch.
         </p>
+        <Callout mark="↓">
+          Mientras programas, lo que vas a querer tener abierto es la{' '}
+          <a href="#referencia">referencia del final</a>: los veinticuatro métodos de la sesión, con
+          su explicación y un botón para copiar cada uno. Esta lección es para entenderlos; esa
+          sección es para trabajar.
+        </Callout>
 
         <Figure
           label="Diagrama: el HTML convertido en árbol del DOM"
@@ -787,28 +803,29 @@ export default function DomEventosApis() {
         />
       </Lesson>
 
-      <Lesson title="10. Chuleta de la sesión">
+      <Lesson title="10. Referencia: los métodos, para copiar y pegar">
+        <span id="referencia" />
         <p>
-          Todo lo de hoy en una tabla. Si en el proyecto no te acuerdas de algo, empieza por aquí
-          antes de buscar en internet.
+          Aquí está todo lo de la sesión, método por método, con la explicación dentro del propio
+          código. Las pestañas de arriba filtran por grupo, y el botón <em>Copiar</em> se lo lleva
+          al editor sin que tengas que seleccionarlo a mano. Los comentarios se copian con él: una
+          vez pegado en tu archivo, el fragmento sigue explicándose solo.
         </p>
-        <RefTable
-          cabeceras={['Qué quieres hacer', 'Cómo se escribe']}
-          filas={[
-            ['Agarrar un elemento', <code key="a">document.querySelector('#id')</code>],
-            ['Agarrarlos todos', <code key="b">document.querySelectorAll('.clase')</code>],
-            ['Cambiar su texto', <code key="c">elemento.textContent = 'Hola'</code>],
-            ['Leer lo que escribió el usuario', <code key="d">input.value</code>],
-            ['Poner o quitar una clase', <code key="e">elemento.classList.toggle('activo')</code>],
-            ['Crear un elemento nuevo', <code key="f">document.createElement('li')</code>],
-            ['Meterlo en la página', <code key="g">lista.appendChild(item)</code>],
-            ['Sacarlo de la página', <code key="h">elemento.remove()</code>],
-            ['Reaccionar a un clic', <code key="i">elemento.addEventListener('click', fn)</code>],
-            ['Evitar que el form recargue', <code key="j">e.preventDefault()</code>],
-            ['Saber qué se tocó', <code key="k">e.target</code>],
-            ['Pedir datos', <code key="l">const r = await fetch(url)</code>],
-            ['Convertir la respuesta', <code key="m">const datos = await r.json()</code>],
-          ]}
+        <p>
+          Todos los ejemplos corren sobre la misma tarjeta de producto que armamos en clase. Es a
+          propósito: veinticuatro ejemplos con veinticuatro contextos distintos no se acumulan en
+          la cabeza; con uno solo, cada método nuevo se entiende contra el anterior.
+        </p>
+
+        <Snippets
+          grupos={REFERENCIA}
+          nota={
+            <>
+              Los atributos (<code>class</code>, <code>src</code>, <code>data-id</code>…) son
+              propiedades del nodo elemento, no nodos hijos aparte. Lo único que se vuelve un nodo
+              independiente es el texto entre etiquetas, y ese nodo se llama <code>#text</code>.
+            </>
+          }
         />
       </Lesson>
 
@@ -1193,9 +1210,35 @@ export default function DomEventosApis() {
           explanation="Los dos fabrican copias mientras el programa corre. En Scratch eran obstáculos; aquí son elementos de una lista."
         />
 
+        <Quiz
+          id="navegar-arbol"
+          index={30}
+          title="Del botón a la tarjeta"
+          prompt="Dentro del listener tienes el botón que se tocó, y necesitas la tarjeta .producto que lo contiene para borrarla entera."
+          options={[
+            { id: 'a', label: 'e.target.parentElement' },
+            { id: 'b', label: 'e.target.children' },
+            { id: 'c', label: 'e.target.firstElementChild' },
+            { id: 'd', label: 'e.target.nextElementSibling' },
+          ]}
+          answer="a"
+          explanation="parentElement sube al padre directo. children y firstElementChild bajan a los hijos, y nextElementSibling se mueve de lado, al hermano siguiente."
+        />
+
+        <FillBlank
+          id="set-attribute"
+          index={31}
+          title="Cambiar la imagen"
+          prompt="Quieres que la foto del producto cambie al pasar el mouse."
+          code={"img.___('src', 'tenis1-hover.jpg');"}
+          options={['setAttribute', 'getAttribute', 'setSrc', 'attribute']}
+          answer="setAttribute"
+          explanation="setAttribute recibe el nombre del atributo y el valor nuevo, y lo crea si no existía. getAttribute es el que lee."
+        />
+
         <MultiSelect
           id="tarea-s10"
-          index={30}
+          index={32}
           title="Tarea para la próxima sesión"
           prompt="Marca lo que debes tener listo para la sesión 11."
           options={[

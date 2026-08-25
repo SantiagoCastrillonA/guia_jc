@@ -3,6 +3,10 @@ import { motion, useReducedMotion } from 'motion/react';
 import { STAGGER, enter } from '../../lib/motion';
 import styles from './Visual.module.css';
 
+/** El recetario vive en su propio archivo: trae estado y portapapeles. */
+export { Snippets } from './Snippets';
+export type { Fragmento, GrupoFragmentos } from './Snippets';
+
 /**
  * Piezas visuales para las lecciones: figuras, pasos, notas y comparaciones.
  *

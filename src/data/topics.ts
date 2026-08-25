@@ -132,7 +132,7 @@ export const topics: Topic[] = [
     summary:
       'Que el código controle lo que el usuario ve: buscar elementos, cambiarlos, crearlos y borrarlos, escuchar eventos, leer un error y traer datos con fetch.',
     level: 'intermedio',
-    exercises: 30,
+    exercises: 32,
     published: true,
     Page: lazy(() => import('../topics/dom-eventos-apis')),
   },
