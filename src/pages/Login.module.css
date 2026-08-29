@@ -32,3 +32,34 @@
   color: var(--color-text-2);
   margin: 0;
 }
+
+/* ── mostrar/ocultar contraseña ────────────────────────────────────────── */
+
+.campoClave { position: relative; }
+.campoClave :global(.input) { padding-right: 38px; }
+
+.botonVerClave {
+  position: absolute;
+  top: 50%;
+  right: 3px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-2);
+  cursor: pointer;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .botonVerClave:hover { color: var(--color-text); background: var(--color-inset); }
+}
+.botonVerClave:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

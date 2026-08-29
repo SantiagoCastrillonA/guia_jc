@@ -7,7 +7,7 @@ import type { Topic } from '../types';
 import { useAllProgress } from '../lib/progress';
 import { useTopicVisibility } from '../lib/topicVisibility';
 import { calcularRacha } from '../lib/racha';
-import { lunesDeLaSemana, temasDeLaSemana, rangoLegible } from '../lib/semanas';
+import { lunesDeLaSemana, temasDeLaSemana, finDe, rangoLegible } from '../lib/semanas';
 import { STAGGER, enter, settle } from '../lib/motion';
 import styles from './Home.module.css';
 
@@ -23,7 +23,7 @@ function normalizar(texto: string) {
 
 export default function Home() {
   const progress = useAllProgress();
-  const { isAvailable, semanas } = useTopicVisibility();
+  const { isAvailable, semanas, fines } = useTopicVisibility();
   const reduce = useReducedMotion();
   const navigate = useNavigate();
   const [busqueda, setBusqueda] = useState('');
@@ -120,7 +120,9 @@ export default function Home() {
               <span className={styles.semanaRotulo}>
                 {deLaSemana.length === 1 ? 'Tema de la semana' : 'Temas de la semana'}
               </span>
-              <span className={styles.semanaFechas}>{rangoLegible(lunes)}</span>
+              <span className={styles.semanaFechas}>
+                {rangoLegible(lunes, finDe(deLaSemana[0], semanas, fines))}
+              </span>
             </div>
             <div className={styles.semanaTemas}>
               {deLaSemana.map((tema) => {

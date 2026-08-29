@@ -9,7 +9,7 @@ import { ApiError, api, del, patch, post } from '../lib/api';
 import { useAuth, type AuthUser } from '../lib/auth';
 import { topics, topicKicker, topicsByModule } from '../data/topics';
 import { useTopicVisibility } from '../lib/topicVisibility';
-import { semanaDe, semanaPorDefecto, rangoLegible } from '../lib/semanas';
+import { semanaDe, semanaPorDefecto, finDe, finPorDefecto, rangoLegible } from '../lib/semanas';
 import { enter, settle } from '../lib/motion';
 import { avisar } from '../lib/avisos';
 import styles from './Admin.module.css';
@@ -290,7 +290,7 @@ function SesionesYTemas({
 }: {
   run: (accion: () => Promise<unknown>, exito?: string) => Promise<void>;
 }) {
-  const { isAvailable, setEnabled, semanas, setSemana } = useTopicVisibility();
+  const { isAvailable, setEnabled, semanas, setSemana, fines, setFin } = useTopicVisibility();
   const [busqueda, setBusqueda] = useState('');
 
   const publicados = useMemo(() => topics.filter((t) => t.published), []);
@@ -344,35 +344,71 @@ function SesionesYTemas({
             >
               <span className={styles.sesionKicker}>{topicKicker(tema)}</span>
               <span className={styles.sesionTitulo}>{tema.title}</span>
-              <label className={styles.campoSemana}>
-                <span className={styles.rotuloSemana}>Semana del</span>
-                <input
-                  type="date"
-                  className={styles.fechaSemana}
-                  value={semanaDe(tema, semanas)}
-                  aria-label={`Semana en que se dicta ${tema.title}`}
-                  onChange={(e) =>
-                    run(
-                      () => setSemana(tema.slug, e.target.value || null),
-                      `${tema.title} queda en la semana del ${rangoLegible(e.target.value)}`,
-                    )
-                  }
-                />
-                {semanas[tema.slug] && semanas[tema.slug] !== semanaPorDefecto(tema.session) && (
-                  <button
-                    type="button"
-                    className={styles.limpiarSemana}
-                    onClick={() =>
+              <div className={styles.rangoFechas}>
+                <label className={styles.campoSemana}>
+                  <span className={styles.rotuloSemana}>Empieza el</span>
+                  <input
+                    type="date"
+                    className={styles.fechaSemana}
+                    value={semanaDe(tema, semanas)}
+                    aria-label={`Fecha de inicio de ${tema.title}`}
+                    onChange={(e) => {
+                      if (!e.target.value) return;
+                      const finVigente = fines[tema.slug] ?? finPorDefecto(e.target.value);
                       run(
-                        () => setSemana(tema.slug, null),
-                        `${tema.title} vuelve a su semana por defecto`,
+                        () => setSemana(tema.slug, e.target.value),
+                        `${tema.title} empieza el ${rangoLegible(e.target.value, finVigente)}`,
+                      );
+                    }}
+                  />
+                  {semanas[tema.slug] && semanas[tema.slug] !== semanaPorDefecto(tema.session) && (
+                    <button
+                      type="button"
+                      className={styles.limpiarSemana}
+                      onClick={() =>
+                        run(
+                          () => setSemana(tema.slug, null),
+                          `${tema.title} vuelve a su fecha de inicio por defecto`,
+                        )
+                      }
+                    >
+                      Restablecer
+                    </button>
+                  )}
+                </label>
+                <label className={styles.campoSemana}>
+                  <span className={styles.rotuloSemana}>Termina el</span>
+                  <input
+                    type="date"
+                    className={styles.fechaSemana}
+                    value={finDe(tema, semanas, fines)}
+                    min={semanaDe(tema, semanas)}
+                    aria-label={`Fecha de fin de ${tema.title}`}
+                    onChange={(e) =>
+                      e.target.value &&
+                      run(
+                        () => setFin(tema.slug, e.target.value),
+                        `${tema.title} termina el ${fechaCorta(e.target.value)}`,
                       )
                     }
-                  >
-                    Restablecer
-                  </button>
-                )}
-              </label>
+                  />
+                  {fines[tema.slug] &&
+                    fines[tema.slug] !== finPorDefecto(semanaDe(tema, semanas)) && (
+                      <button
+                        type="button"
+                        className={styles.limpiarSemana}
+                        onClick={() =>
+                          run(
+                            () => setFin(tema.slug, null),
+                            `${tema.title} vuelve a su fecha de fin por defecto`,
+                          )
+                        }
+                      >
+                        Restablecer
+                      </button>
+                    )}
+                </label>
+              </div>
               <span className={disponible ? styles.sesionOn : styles.sesionOff}>
                 {disponible ? 'Disponible' : 'Apagado'}
               </span>
@@ -398,6 +434,16 @@ function SesionesYTemas({
 
 type Vista = 'estudiantes' | 'sesiones';
 
+const CLAVE_COLAPSADO = 'jc:admin-lateral-colapsado';
+
+function leerColapsado() {
+  try {
+    return localStorage.getItem(CLAVE_COLAPSADO) === '1';
+  } catch {
+    return false; // modo privado o sin almacenamiento: se abre siempre
+  }
+}
+
 export default function Admin() {
   const { user, loading: authLoading } = useAuth();
   const [users, setUsers] = useState<AdminUser[] | null>(null);
@@ -410,11 +456,20 @@ export default function Admin() {
   const [orden, setOrden] = useState<Orden<Columna>>({ clave: 'name', asc: true });
   const [porPagina, setPorPagina] = useState(TAMANOS[0]);
   const [pagina, setPagina] = useState(1);
+  const [colapsado, setColapsado] = useState(leerColapsado);
   const reduce = useReducedMotion();
 
   useEffect(() => {
     document.title = 'Panel de admin — Jóvenes creaTIvos';
   }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CLAVE_COLAPSADO, colapsado ? '1' : '0');
+    } catch {
+      // sin almacenamiento: no se guarda la preferencia, pero nada se rompe
+    }
+  }, [colapsado]);
 
   const load = useCallback(() => {
     api<{ users: AdminUser[] }>('/admin/users')
@@ -469,11 +524,15 @@ export default function Admin() {
   }
 
   function accionesDe(fila: AdminUser): Accion[] {
-    const lista: Accion[] = [
-      {
+    const lista: Accion[] = [];
+    // Los admins no resuelven ejercicios: no hay progreso que mostrarles.
+    if (fila.role === 'student') {
+      lista.push({
         texto: expandedId === fila.id ? 'Ocultar progreso' : 'Ver progreso',
         onElegir: () => setExpandedId(expandedId === fila.id ? null : fila.id),
-      },
+      });
+    }
+    lista.push(
       {
         texto: fila.role === 'admin' ? 'Quitar admin' : 'Hacer admin',
         onElegir: () =>
@@ -496,7 +555,7 @@ export default function Admin() {
           ),
       },
       { texto: 'Cambiar contraseña', onElegir: () => setDialog({ kind: 'password', user: fila }) },
-    ];
+    );
     // Nadie se borra a sí mismo: dejaría la instalación sin quien entre.
     if (fila.id !== user!.id) {
       lista.push({
@@ -508,9 +567,10 @@ export default function Admin() {
     return lista;
   }
 
-  const totalSolved = users?.reduce((sum, u) => sum + u.solvedTotal, 0) ?? 0;
   const publishedExercises = topics.reduce((s, t) => s + (t.published ? t.exercises : 0), 0);
   const students = users?.filter((u) => u.role === 'student') ?? [];
+  // Solo los estudiantes resuelven ejercicios: un admin no aporta a esta cuenta.
+  const totalSolved = students.reduce((sum, u) => sum + u.solvedTotal, 0);
 
   const cifras = [
     { rotulo: 'Cuentas', valor: users?.length ?? '—' },
@@ -520,11 +580,22 @@ export default function Admin() {
   ];
 
   return (
-    <div className={styles.marco}>
+    <div className={`${styles.marco} ${colapsado ? styles.marcoColapsado : ''}`}>
       <aside className={styles.lateral}>
+        <button
+          type="button"
+          className={styles.colapsarBtn}
+          aria-pressed={colapsado}
+          aria-label={colapsado ? 'Expandir el menú' : 'Colapsar el menú'}
+          title={colapsado ? 'Expandir el menú' : 'Colapsar el menú'}
+          onClick={() => setColapsado((prev) => !prev)}
+        >
+          <IconoHamburguesa />
+        </button>
+
         <Link to="/" className={styles.marca}>
           <img src="/favicon.svg" alt="" width="18" height="18" />
-          <span>
+          <span className={styles.marcaTexto}>
             <span className={styles.marcaNombre}>Jóvenes creaTIvos</span>
             <span className={styles.marcaSub}>Panel del profe</span>
           </span>
@@ -535,19 +606,23 @@ export default function Admin() {
             type="button"
             className={styles.itemMenu}
             aria-current={vista === 'estudiantes' ? 'page' : undefined}
+            aria-label={colapsado ? 'Estudiantes' : undefined}
+            title={colapsado ? 'Estudiantes' : undefined}
             onClick={() => setVista('estudiantes')}
           >
             <IconoPersonas />
-            Estudiantes
+            <span className={styles.itemTexto}>Estudiantes</span>
           </button>
           <button
             type="button"
             className={styles.itemMenu}
             aria-current={vista === 'sesiones' ? 'page' : undefined}
+            aria-label={colapsado ? 'Sesiones y temas' : undefined}
+            title={colapsado ? 'Sesiones y temas' : undefined}
             onClick={() => setVista('sesiones')}
           >
             <IconoLista />
-            Sesiones y temas
+            <span className={styles.itemTexto}>Sesiones y temas</span>
           </button>
         </nav>
 
@@ -669,11 +744,15 @@ export default function Admin() {
                             />
                           </span>
 
-                          <BarraProgreso
-                            resueltos={fila.solvedTotal}
-                            total={publishedExercises}
-                            progreso={fila.progress}
-                          />
+                          {fila.role === 'student' ? (
+                            <BarraProgreso
+                              resueltos={fila.solvedTotal}
+                              total={publishedExercises}
+                              progreso={fila.progress}
+                            />
+                          ) : (
+                            <span className={styles.sinProgreso}>No aplica</span>
+                          )}
 
                           <span className={styles.num}>{fechaCorta(fila.lastLoginAt)}</span>
 
@@ -681,7 +760,7 @@ export default function Admin() {
                         </div>
 
                         <AnimatePresence initial={false}>
-                          {abierta && (
+                          {abierta && fila.role === 'student' && (
                             <motion.div
                               className={styles.detalleCaja}
                               initial={{ height: 0, opacity: 0 }}
@@ -777,6 +856,24 @@ function IconoLista() {
       <circle cx="4.5" cy="6" r="1.2" />
       <circle cx="4.5" cy="12" r="1.2" />
       <circle cx="4.5" cy="18" r="1.2" />
+    </svg>
+  );
+}
+
+function IconoHamburguesa() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M4 6h16M4 12h16M4 18h16" />
     </svg>
   );
 }

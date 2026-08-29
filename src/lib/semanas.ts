@@ -65,6 +65,24 @@ export function semanaDe(tema: Topic, guardadas: Record<string, string>) {
   return guardadas[tema.slug] ?? semanaPorDefecto(tema.session);
 }
 
+/** El sábado de la semana que empieza en `inicio`, si nadie lo movió a mano. */
+export function finPorDefecto(inicio: string) {
+  return sumarDias(inicio, 5); // lunes a sábado
+}
+
+/**
+ * El fin de una sesión: el guardado si existe, si no el sábado de la semana
+ * en que empieza. Depende del inicio ya resuelto —no de un sábado fijo— para
+ * que una sesión atrasada a otra semana siga durando lo mismo.
+ */
+export function finDe(
+  tema: Topic,
+  inicios: Record<string, string>,
+  fines: Record<string, string>,
+) {
+  return fines[tema.slug] ?? finPorDefecto(semanaDe(tema, inicios));
+}
+
 /** Los temas que se dictan en una semana dada, en orden de sesión. */
 export function temasDeLaSemana(lunes: string, guardadas: Record<string, string>) {
   return topics
@@ -73,9 +91,9 @@ export function temasDeLaSemana(lunes: string, guardadas: Record<string, string>
 }
 
 /** «18 al 23 de agosto», para el banner. */
-export function rangoLegible(lunes: string) {
-  const inicio = deISO(lunes);
-  const fin = deISO(sumarDias(lunes, 5)); // lunes a sábado
+export function rangoLegible(inicioISO: string, finISO: string) {
+  const inicio = deISO(inicioISO);
+  const fin = deISO(finISO);
   const mesInicio = inicio.toLocaleDateString('es-CO', { month: 'long' });
   const mesFin = fin.toLocaleDateString('es-CO', { month: 'long' });
   return mesInicio === mesFin

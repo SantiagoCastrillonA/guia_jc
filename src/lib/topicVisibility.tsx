@@ -22,6 +22,9 @@ interface VisibilityValue {
   /** slug -> lunes de su semana, solo los que el profe movio a mano. */
   semanas: Record<string, string>;
   setSemana: (slug: string, lunes: string | null) => Promise<void>;
+  /** slug -> fin de su semana, solo los que el profe movio a mano. */
+  fines: Record<string, string>;
+  setFin: (slug: string, fecha: string | null) => Promise<void>;
   isAvailable: (slug: string) => boolean;
   setEnabled: (slug: string, enabled: boolean) => Promise<void>;
   disabled: Set<string>;
@@ -77,16 +80,20 @@ function avisarDeTemasNuevos(apagados: Set<string>) {
 export function TopicVisibilityProvider({ children }: { children: ReactNode }) {
   const [disabled, setDisabled] = useState<Set<string>>(new Set());
   const [semanas, setSemanas] = useState<Record<string, string>>({});
+  const [fines, setFines] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    api<{ disabled: string[]; semanas?: Record<string, string> }>('/topics/visibility')
+    api<{ disabled: string[]; semanas?: Record<string, string>; fines?: Record<string, string> }>(
+      '/topics/visibility',
+    )
       .then((data) => {
         if (cancelled) return;
         const apagados = new Set(data.disabled);
         setDisabled(apagados);
         setSemanas(data.semanas ?? {});
+        setFines(data.fines ?? {});
         avisarDeTemasNuevos(apagados);
       })
       .catch(() => {
@@ -122,9 +129,19 @@ export function TopicVisibilityProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const setFin = useCallback(async (slug: string, fecha: string | null) => {
+    await patch(`/admin/topics/${slug}`, { weekEnd: fecha });
+    setFines((prev) => {
+      const next = { ...prev };
+      if (fecha) next[slug] = fecha;
+      else delete next[slug]; // vuelve a la fecha calculada
+      return next;
+    });
+  }, []);
+
   const value = useMemo(
-    () => ({ loading, isAvailable, setEnabled, disabled, semanas, setSemana }),
-    [loading, isAvailable, setEnabled, disabled, semanas, setSemana],
+    () => ({ loading, isAvailable, setEnabled, disabled, semanas, setSemana, fines, setFin }),
+    [loading, isAvailable, setEnabled, disabled, semanas, setSemana, fines, setFin],
   );
 
   return <VisibilityContext.Provider value={value}>{children}</VisibilityContext.Provider>;

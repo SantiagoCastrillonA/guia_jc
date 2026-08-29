@@ -79,13 +79,15 @@ const topicSettingSchema = new Schema(
     slug: { type: String, required: true, unique: true, trim: true },
     enabled: { type: Boolean, default: true },
     /**
-     * El lunes de la semana en que se dicta, como 'YYYY-MM-DD'. Se guarda
-     * como texto y no como Date a proposito: es un dia del calendario del
-     * salon, no un instante, y un Date lo correria de dia segun la zona
-     * horaria del servidor. Vacio = vale la fecha por defecto que calcula
-     * el frontend a partir del numero de sesion.
+     * Inicio y fin de la semana en que se dicta, como 'YYYY-MM-DD'. Se
+     * guardan como texto y no como Date a proposito: son dias del calendario
+     * del salon, no un instante, y un Date los correria de dia segun la zona
+     * horaria del servidor. Vacio = vale la fecha por defecto que calcula el
+     * frontend (weekStart a partir del numero de sesion; weekEnd, sabado de
+     * esa misma semana).
      */
-    weekStart: { type: String, default: null, match: /^d{4}-d{2}-d{2}$/ },
+    weekStart: { type: String, default: null, match: /^\d{4}-\d{2}-\d{2}$/ },
+    weekEnd: { type: String, default: null, match: /^\d{4}-\d{2}-\d{2}$/ },
   },
   { timestamps: true },
 );

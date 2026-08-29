@@ -18,6 +18,7 @@ export default function Login() {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [verClave, setVerClave] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -111,16 +112,27 @@ export default function Login() {
 
             <div className="field">
               <label htmlFor={ids.pass}>Contraseña</label>
-              <input
-                id={ids.pass}
-                className="input"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                required
-                minLength={8}
-              />
+              <div className={styles.campoClave}>
+                <input
+                  id={ids.pass}
+                  className="input"
+                  type={verClave ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                  required
+                  minLength={8}
+                />
+                <button
+                  type="button"
+                  className={styles.botonVerClave}
+                  aria-pressed={verClave}
+                  aria-label={verClave ? 'Ocultar la contraseña' : 'Mostrar la contraseña'}
+                  onClick={() => setVerClave((v) => !v)}
+                >
+                  {verClave ? <IconoOjoTachado /> : <IconoOjo />}
+                </button>
+              </div>
               {mode === 'register' && <p className={styles.hint}>Mínimo 8 caracteres.</p>}
             </div>
 
@@ -146,5 +158,44 @@ export default function Login() {
         </div>
       </section>
     </div>
+  );
+}
+
+function IconoOjo() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="17"
+      height="17"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function IconoOjoTachado() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="17"
+      height="17"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9.9 5.1A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-3.2 4.2M6.5 6.6C3.7 8.4 2 12 2 12s3.6 7 10 7c1.5 0 2.9-.3 4.1-.9" />
+      <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+      <path d="M3 3l18 18" />
+    </svg>
   );
 }
