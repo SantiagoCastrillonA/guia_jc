@@ -83,43 +83,65 @@ export default function ApisDeIa() {
       </Lesson>
 
       <Lesson title="3. La petición, pieza por pieza">
+        <p>
+          El proveedor que usa el curso es <strong>NVIDIA</strong>: te registras gratis en{' '}
+          <a href="https://build.nvidia.com" target="_blank" rel="noopener noreferrer">
+            build.nvidia.com
+          </a>{' '}
+          (sin tarjeta), generas tu clave — empieza por <code>nvapi-</code> — y la copias de
+          inmediato: <strong>solo se muestra una vez</strong>. Va directo al <code>.env</code>, que ya
+          sabes que está en el <code>.gitignore</code>.
+        </p>
+        <Terminal lineas={['$ npm install openai']} />
+        <Callout>
+          Sí, el paquete se llama <code>openai</code>, pero lo apuntamos a NVIDIA: su API es{' '}
+          <strong>compatible con OpenAI</strong>, así que la misma librería sirve para varios
+          proveedores — solo cambia el <code>baseURL</code> y la clave.
+        </Callout>
         <Terminal
-          titulo="rutas/chat.js"
+          titulo="rutas/ia.js"
           lineas={[
+            "import OpenAI from 'openai';",
+            '',
+            'const cliente = new OpenAI({',
+            "  baseURL: 'https://integrate.api.nvidia.com/v1',",
+            '  apiKey: process.env.NVIDIA_API_KEY,',
+            '});',
+            '',
             "app.post('/api/chat', requireAuth, async (req, res) => {",
             '  const { mensaje } = req.body;',
             "  if (!mensaje) return res.status(400).json({ error: 'Falta el mensaje' });",
             '',
             '  try {',
-            '    const respuesta = await fetch(URL_DEL_PROVEEDOR, {',
-            "      method: 'POST',",
-            '      headers: {',
-            "        'Content-Type': 'application/json',",
-            '        Authorization: `Bearer ${process.env.IA_API_KEY}`,',
-            '      },',
-            '      body: JSON.stringify({',
-            '        model: MODELO,',
-            '        messages: [',
-            "          { role: 'system', content: 'Eres el asistente de una cafetería...' },",
-            "          { role: 'user', content: mensaje },",
-            '        ],',
-            '        max_tokens: 300,',
-            '      }),',
+            '    const respuesta = await cliente.chat.completions.create({',
+            "      model: 'meta/llama-3.3-70b-instruct',",
+            '      messages: [',
+            "        { role: 'system', content: 'Eres el asistente de una cafetería...' },",
+            "        { role: 'user', content: mensaje },",
+            '      ],',
+            '      max_tokens: 300,',
             '    });',
             '',
-            '    const datos = await respuesta.json();',
-            '    res.json({ texto: datos.choices[0].message.content });',
-            '  } catch (error) {',
+            '    res.json({ texto: respuesta.choices[0].message.content });',
+            '  } catch (err) {',
+            "    if (err.status === 402) return res.status(402).json({ error: 'Se acabaron los créditos de IA' });",
+            "    if (err.status === 429) return res.status(429).json({ error: 'Demasiadas peticiones, espera un momento' });",
             "    res.status(502).json({ error: 'El servicio de IA no respondió' });",
             '  }',
             '});',
           ]}
         />
+        <Callout tipo="ojo">
+          El nombre del modelo lleva el <strong>prefijo del proveedor</strong>:{' '}
+          <code>meta/llama-3.3-70b-instruct</code>. Si escribes solo{' '}
+          <code>llama-3.3-70b-instruct</code>, sin el <code>meta/</code>, la API responde 404 — no
+          porque el modelo no exista, sino porque así lo identifica NVIDIA.
+        </Callout>
         <RefTable
           cabeceras={['Pieza', 'Qué es']}
           filas={[
-            [<code key="a">Authorization: Bearer …</code>, 'La cabecera con tu clave: es lo que te identifica'],
-            [<code key="b">model</code>, 'Qué modelo quieres usar'],
+            [<code key="a">apiKey</code>, 'Tu clave, leída de process.env — nunca escrita a mano'],
+            [<code key="b">model</code>, 'Qué modelo quieres usar, con el prefijo del proveedor'],
             [<code key="c">role: "system"</code>, 'Las instrucciones fijas: quién es el asistente y qué puede hacer'],
             [<code key="d">role: "user"</code>, 'Lo que escribió la persona'],
             [<code key="e">max_tokens</code>, 'El techo de la respuesta: controla el costo'],
@@ -211,7 +233,7 @@ export default function ApisDeIa() {
           id="header-auth"
           index={3}
           title="La cabecera de autenticación"
-          code={"headers: {\n  Authorization: `___ ${process.env.IA_API_KEY}`,\n}"}
+          code={"headers: {\n  Authorization: `___ ${process.env.NVIDIA_API_KEY}`,\n}"}
           options={['Bearer', 'Basic', 'Token', 'Key']}
           answer="Bearer"
           explanation="Bearer es el esquema estándar para tokens de acceso. La mayoría de las APIs de IA lo usan."
@@ -394,7 +416,7 @@ export default function ApisDeIa() {
           id="env-key"
           index={16}
           title="Leer la clave"
-          code={'Authorization: `Bearer ${___.IA_API_KEY}`'}
+          code={'Authorization: `Bearer ${___.NVIDIA_API_KEY}`'}
           options={['process.env', 'window', 'localStorage', 'document']}
           answer="process.env"
           explanation="process.env lee las variables de entorno en Node. window y localStorage son del navegador: si aparecen en tu backend, algo está mal."

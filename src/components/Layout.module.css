@@ -71,6 +71,11 @@
   flex-wrap: wrap;
   justify-content: space-between;
 }
+.footerLink {
+  color: var(--color-accent-text);
+  text-decoration: none;
+}
+.footerLink:hover { text-decoration: underline; }
 
 /* — error de ruta — lo que se ve si un módulo no carga o una página se rompe */
 .routeError {

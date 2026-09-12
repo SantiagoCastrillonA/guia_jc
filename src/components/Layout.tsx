@@ -89,6 +89,18 @@ export function Layout() {
           <span>
             {user ? 'Tu progreso se guarda en tu cuenta.' : 'Tu progreso se guarda en este navegador.'}
           </span>
+          <span>
+            Creado por Santiago Castrillón A. ❤️ ·{' '}
+            <a
+              href="https://github.com/SantiagoCastrillonA"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.footerLink}
+            >
+              GitHub: SantiagoCastrillonA
+            </a>
+          </span>
+          <span>v{__APP_VERSION__}</span>
         </footer>
       </div>
       )}

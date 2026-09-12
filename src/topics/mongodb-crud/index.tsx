@@ -164,10 +164,27 @@ export default function MongodbCrud() {
       </Lesson>
 
       <Lesson title="5. Conectar Mongo con tu API, paso a paso">
+        <Callout>
+          Este curso usa <strong>MongoDB Atlas</strong> (capa gratuita M0: en la nube, gratis para
+          siempre, sin tarjeta de crédito, 512 MB) y no Mongo instalado en el computador. En equipos
+          de colegio con permisos limitados, instalar y mantener corriendo un servidor de base de
+          datos local suele dar más problemas de los que resuelve.
+        </Callout>
         <Steps>
-          <Step title="Ten Mongo corriendo">
-            Instalado en tu máquina, o una base gratuita en MongoDB Atlas. En los dos casos vas a
-            terminar con una <strong>cadena de conexión</strong>.
+          <Step title="Crea tu clúster en Atlas">
+            En <code>cloud.mongodb.com</code>: cuenta, clúster con el plan <strong>M0 (Free)</strong>,
+            un usuario de base de datos (anota usuario y contraseña), y en <strong>Network Access</strong>{' '}
+            agrega tu dirección IP. Al final copias tu cadena de conexión:
+            <Terminal
+              lineas={['mongodb+srv://usuario:<password>@cluster.xxxxx.mongodb.net/mi_negocio']}
+            />
+          </Step>
+          <Step title="Guárdala en .env, nunca en el código">
+            <Terminal
+              titulo=".env"
+              lineas={['MONGODB_URI=mongodb+srv://usuario:tuclave@cluster.xxxxx.mongodb.net/mi_negocio']}
+            />
+            <Terminal titulo=".gitignore" lineas={['.env', 'node_modules']} />
           </Step>
           <Step title="Instala el driver">
             <Terminal lineas={['$ npm install mongodb']} />
@@ -175,13 +192,16 @@ export default function MongodbCrud() {
           <Step title="Conéctate una sola vez, al arrancar">
             <Terminal
               lineas={[
-                "const { MongoClient } = require('mongodb');",
-                "const cliente = new MongoClient('mongodb://127.0.0.1:27017');",
+                "import { MongoClient } from 'mongodb';",
+                'const cliente = new MongoClient(process.env.MONGODB_URI);',
                 'await cliente.connect();',
                 "const db = cliente.db('mi_negocio');",
               ]}
             />
-            Conectarse en cada petición es lento y termina agotando las conexiones.
+            Conectarse en cada petición es lento y termina agotando las conexiones. Enciende el
+            servidor con <code>node --env-file=.env servidor.js</code> para que{' '}
+            <code>process.env.MONGODB_URI</code> exista — Node ya sabe leer <code>.env</code> solo,
+            no hace falta instalar <code>dotenv</code>.
           </Step>
           <Step title="Usa la colección en tus rutas">
             <Terminal
@@ -194,10 +214,6 @@ export default function MongodbCrud() {
             />
             Todo lo de la base de datos es asíncrono: <code>async</code> y <code>await</code>, como
             en la sesión 10.
-          </Step>
-          <Step title="La cadena de conexión nunca va al repositorio">
-            Va en un archivo <code>.env</code> que está en el <code>.gitignore</code>. Si sube al
-            repo, cualquiera entra a tu base de datos.
           </Step>
         </Steps>
       </Lesson>

@@ -81,7 +81,7 @@ export default function TodoAppLogin() {
 
         <Terminal
           lineas={[
-            "const bcrypt = require('bcryptjs');",
+            "import bcrypt from 'bcryptjs';",
             '',
             '// al registrar',
             'const hash = await bcrypt.hash(password, 12);',
@@ -105,7 +105,7 @@ export default function TodoAppLogin() {
         </p>
         <Terminal
           lineas={[
-            "const jwt = require('jsonwebtoken');",
+            "import jwt from 'jsonwebtoken';",
             '',
             '// al iniciar sesión, después de comprobar la contraseña',
             "const token = jwt.sign({ sub: usuario._id }, process.env.JWT_SECRET, { expiresIn: '7d' });",

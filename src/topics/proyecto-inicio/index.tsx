@@ -155,6 +155,11 @@ export default function ProyectoInicio() {
           Antes del primer commit de esta etapa, verifica el <code>.gitignore</code>. Una clave
           subida por accidente queda en el historial para siempre, aunque borres el archivo después.
         </Callout>
+        <p>
+          Junto al <code>.env</code> (que no se sube), agrega un <code>.env.example</code> con los{' '}
+          <strong>nombres</strong> de las variables y sin sus valores — así quien clone tu repo sabe
+          qué necesita configurar, sin que quede ni una credencial real en GitHub.
+        </p>
       </Lesson>
 
       <Lesson title="5. Trabajar en equipo sin chocar">

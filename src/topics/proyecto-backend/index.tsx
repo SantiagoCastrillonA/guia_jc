@@ -329,7 +329,7 @@ export default function ProyectoBackend() {
           id="helmet"
           index={13}
           title="Cabeceras de seguridad"
-          code={"const helmet = require('helmet');\napp.use(___());"}
+          code={"import helmet from 'helmet';\napp.use(___());"}
           options={['helmet', 'cors', 'express.json', 'morgan']}
           answer="helmet"
           explanation="helmet agrega un conjunto de cabeceras de seguridad razonables. Es una línea y sube el piso de protección sin configurar nada."

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import 'dotenv/config';
 import express from 'express';
 import 'express-async-errors'; // los errores de los handlers async llegan al middleware de error
@@ -10,6 +11,9 @@ import { deployRouter } from './src/deploy.js';
 
 const PORT = Number(process.env.PORT ?? 3000);
 const MONGO_URL = process.env.MONGO_URL ?? 'mongodb://127.0.0.1:27017/guia_jc';
+// Confirma qué build quedó realmente arriba tras un autodeploy: debe
+// coincidir con la version del frontend (las dos se suben juntas).
+const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8'));
 
 const app = express();
 
@@ -30,7 +34,7 @@ app.use(
 app.use(cookieParser());
 app.use(loadUser);
 
-app.get('/api/health', (_req, res) => res.json({ ok: true }));
+app.get('/api/health', (_req, res) => res.json({ ok: true, version }));
 app.use('/api', deployRouter); // webhook de GitHub: autentica por firma, no por sesión
 app.use('/api', router);
 

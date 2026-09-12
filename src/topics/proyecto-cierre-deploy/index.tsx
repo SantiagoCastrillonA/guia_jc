@@ -49,6 +49,21 @@ export default function ProyectoCierreDeploy() {
             </text>
           </svg>
         </Figure>
+
+        <RefTable
+          cabeceras={['Pieza', 'Dónde va', 'Nota']}
+          filas={[
+            ['Base de datos', 'MongoDB Atlas M0', 'Ya la tienes desde la sesión 13'],
+            ['Backend', 'Render (plan free)', '750 horas al mes'],
+            ['Frontend', 'GitHub Pages o sitio estático en Render', 'Ya usaste GitHub Pages en la sesión 7'],
+          ]}
+        />
+        <Callout tipo="ojo">
+          En el plan gratuito de Render, <strong>tu backend se duerme</strong> si nadie lo usa por 15
+          minutos, y la siguiente persona que entre espera cerca de un minuto mientras despierta. Es
+          normal, no un bug — pero significa algo muy concreto para la sesión 25:{' '}
+          <strong>entra a tu app unos minutos antes de presentar</strong>, para que ya esté despierta.
+        </Callout>
       </Lesson>
 
       <Lesson title="2. Variables de entorno: nada de direcciones fijas">
@@ -81,13 +96,19 @@ export default function ProyectoCierreDeploy() {
             '# backend: .env en el servidor',
             'MONGO_URL=...',
             'JWT_SECRET=...',
-            'IA_API_KEY=...',
+            'NVIDIA_API_KEY=...',
             'COOKIE_SECURE=true',
             '',
             '# frontend: variable de build (Vite)',
             'VITE_API_URL=https://api.mi-negocio.com',
           ]}
         />
+        <p>
+          Tu <code>.env</code> no se sube — está en el <code>.gitignore</code>. Esas variables del
+          backend se escriben <strong>a mano en el panel de Render</strong>, en su sección{' '}
+          <em>Environment</em>. Es el error número uno al desplegar: la app funciona en local y falla
+          en producción porque ahí nunca se configuraron.
+        </p>
         <Callout tipo="ojo">
           En el frontend, las variables se <strong>incrustan en el build</strong>: cualquiera las
           puede leer en el navegador. Sirven para la URL de la API, nunca para una clave. Los

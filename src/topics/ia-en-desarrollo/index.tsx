@@ -164,6 +164,14 @@ export default function IaEnDesarrollo() {
             con intereses en la defensa del proyecto.
           </Step>
         </Steps>
+        <Callout>
+          Antes de la próxima sesión, crea tu cuenta gratis en{' '}
+          <a href="https://build.nvidia.com" target="_blank" rel="noopener noreferrer">
+            build.nvidia.com
+          </a>{' '}
+          (no pide tarjeta) y genera tu clave — se muestra <strong>una sola vez</strong>, guárdala
+          en un lugar seguro. La sesión 21 conecta esa IA de verdad a tu emprendimiento.
+        </Callout>
       </Lesson>
 
       <Exercises>

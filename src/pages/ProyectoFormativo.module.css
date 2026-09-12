@@ -1,0 +1,67 @@
+/* Página de referencia del proyecto formativo. Misma gramática que Recursos:
+   ancho medido, jerarquía con .kicker global, cuerpo con las primitivas de
+   visuals/ (ya traen su propio movimiento y respetan prefers-reduced-motion). */
+
+.pagina {
+  flex: 1;
+  padding-bottom: calc(3 * var(--leading));
+}
+.ancho {
+  width: min(860px, 100% - 2 * var(--edge));
+  margin-inline: auto;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-block: calc(2 * var(--leading)) var(--leading);
+}
+.volver {
+  align-self: flex-start;
+  font-size: 14px;
+  color: var(--color-text-2);
+  text-decoration: none;
+  margin-bottom: var(--space-2);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .volver:hover { color: var(--color-text); }
+}
+.titular {
+  margin: 0;
+  font-size: clamp(28px, 4.5vw, 40px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.entrada {
+  margin: 0;
+  max-width: var(--measure);
+  font-size: 17px;
+  line-height: var(--leading);
+  color: var(--color-text-2);
+}
+
+.seccion { padding-block: var(--leading); }
+.seccion h2 { margin: 0 0 var(--space-4); font-size: 22px; letter-spacing: -0.01em; }
+
+.detalle {
+  margin-top: calc(2 * var(--leading));
+  padding: var(--space-6) var(--space-8);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+}
+.detalleTitulo { margin: 0 0 var(--space-2); font-size: 17px; }
+.detalle p { margin: 0 0 var(--space-4); font-size: 14.5px; line-height: 23px; color: var(--color-text-2); }
+.detalleLista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.detalleEnlace {
+  color: var(--color-accent-text);
+  font-size: 14.5px;
+  text-decoration: none;
+}
+.detalleEnlace:hover { text-decoration: underline; }

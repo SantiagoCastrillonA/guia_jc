@@ -61,20 +61,36 @@ export default function ApiSencillaNode() {
             </text>
           </svg>
         </Figure>
+
+        <Callout>
+          Si en una clase anterior viste <code>require('http')</code>, tranquilo: las dos formas
+          funcionan en Node. De aquí en adelante el curso usa <code>import</code> — es la sintaxis
+          moderna (ESM) y la misma que vas a usar en React más adelante, así todo el curso queda con
+          una sola forma de traer un módulo.
+        </Callout>
       </Lesson>
 
       <Lesson title="2. Tu primer servidor, línea por línea">
+        <Steps>
+          <Step title="Crea el proyecto">
+            <Terminal lineas={['$ npm init -y']} />
+            Genera el <code>package.json</code>. Ábrelo y agrega esta línea, para poder usar{' '}
+            <code>import</code>:
+            <Terminal titulo="package.json" lineas={['{', '  "type": "module",', '  ...', '}']} />
+          </Step>
+        </Steps>
+
         <Terminal
           titulo="servidor.js"
           lineas={[
-            "const http = require('http');",
+            "import { createServer } from 'node:http';",
             '',
-            'const servidor = http.createServer(function (peticion, respuesta) {',
+            'const servidor = createServer((peticion, respuesta) => {',
             "  respuesta.writeHead(200, { 'Content-Type': 'text/html' });",
             "  respuesta.end('<h1>Hola desde mi servidor Node.js</h1>');",
             '});',
             '',
-            'servidor.listen(3000, function () {',
+            'servidor.listen(3000, () => {',
             "  console.log('Servidor corriendo en http://localhost:3000');",
             '});',
           ]}
@@ -82,7 +98,10 @@ export default function ApiSencillaNode() {
         <RefTable
           cabeceras={['Línea', 'Qué hace']}
           filas={[
-            [<code key="a">require('http')</code>, 'Trae el módulo de Node que sabe hablar HTTP'],
+            [
+              <code key="a">import {'{ createServer }'} from 'node:http'</code>,
+              'Trae del propio Node la función que sabe hablar HTTP',
+            ],
             [<code key="b">createServer(fn)</code>, 'Define qué hacer con cada petición que llegue'],
             [<code key="c">peticion</code>, 'Lo que pidió el cliente: la URL, el método, los datos'],
             [<code key="d">respuesta</code>, 'Lo que le vas a devolver'],
@@ -91,10 +110,16 @@ export default function ApiSencillaNode() {
             [<code key="g">listen(3000)</code>, 'Queda escuchando en el puerto 3000'],
           ]}
         />
-        <Terminal lineas={['$ node servidor.js', '# Servidor corriendo en http://localhost:3000']} />
+        <Terminal
+          lineas={[
+            '$ node --watch servidor.js',
+            '# Servidor corriendo en http://localhost:3000',
+          ]}
+        />
         <Callout tipo="ojo">
           Mientras el servidor corre, esa terminal queda ocupada — no te la devuelve el prompt. Es
-          normal: está esperando peticiones. Para detenerlo, <kbd>Ctrl</kbd> + <kbd>C</kbd>.
+          normal: está esperando peticiones. <code>--watch</code> lo reinicia solo cada vez que
+          guardas un cambio; para apagarlo del todo, <kbd>Ctrl</kbd> + <kbd>C</kbd>.
         </Callout>
       </Lesson>
 
@@ -106,7 +131,7 @@ export default function ApiSencillaNode() {
         </p>
         <Terminal
           lineas={[
-            'const servidor = http.createServer(function (peticion, respuesta) {',
+            'const servidor = createServer((peticion, respuesta) => {',
             "  respuesta.writeHead(200, { 'Content-Type': 'text/html' });",
             '',
             "  if (peticion.url === '/') {",
@@ -148,10 +173,11 @@ export default function ApiSencillaNode() {
 
       <Lesson title="5. npm y package.json">
         <Steps>
-          <Step title="Inicializa el proyecto">
-            <Terminal lineas={['$ npm init -y']} />
-            Crea el <code>package.json</code>: la cédula del proyecto — nombre, versión, y la lista
-            de librerías que necesita.
+          <Step title="Crea tu script de arranque">
+            Dentro de <code>package.json</code>:
+            <Terminal titulo="package.json" lineas={['"scripts": {', '  "dev": "node --watch servidor.js"', '}']} />
+            Desde ahora enciendes el servidor con <code>npm run dev</code>, sin acordarte del nombre
+            del archivo ni de <code>--watch</code>.
           </Step>
           <Step title="Instala librerías cuando las necesites">
             <Terminal lineas={['$ npm install express']} />
@@ -186,10 +212,10 @@ export default function ApiSencillaNode() {
           index={2}
           title="Trae el módulo"
           prompt="Primera línea de tu servidor."
-          code={"const http = ___('http');"}
-          options={['require', 'import', 'fetch', 'install']}
-          answer="require"
-          explanation="require es la forma clásica de Node para traer un módulo. Más adelante verás import, que hace lo mismo con sintaxis moderna."
+          code={"___ { createServer } from 'node:http';"}
+          options={['import', 'require', 'export', 'fetch']}
+          answer="import"
+          explanation="import es la sintaxis moderna (ESM) y la que usa el curso de aquí en adelante, incluido React. require (CommonJS) sigue existiendo y hace lo mismo, pero no la vas a necesitar más en estas sesiones."
         />
 
         <Quiz
@@ -290,21 +316,21 @@ export default function ApiSencillaNode() {
           index={10}
           title="Ordena tu primer servidor"
           steps={[
-            { id: 'require', text: "const http = require('http');" },
-            { id: 'create', text: 'const servidor = http.createServer(function (peticion, respuesta) {' },
+            { id: 'import', text: "import { createServer } from 'node:http';" },
+            { id: 'create', text: 'const servidor = createServer((peticion, respuesta) => {' },
             { id: 'head', text: "  respuesta.writeHead(200, { 'Content-Type': 'text/html' });" },
             { id: 'end', text: "  respuesta.end('<h1>Hola</h1>');" },
             { id: 'cierra', text: '});' },
             { id: 'listen', text: 'servidor.listen(3000);' },
           ]}
-          explanation="Traer el módulo, definir qué hacer con cada petición, y ponerse a escuchar. Sin el listen, el servidor está definido pero no atiende a nadie."
+          explanation="Traer la función, definir qué hacer con cada petición, y ponerse a escuchar. Sin el listen, el servidor está definido pero no atiende a nadie."
         />
 
         <FillBlank
           id="listen-puerto"
           index={11}
           title="Ponlo a escuchar"
-          code={'servidor.___(3000, function () {\n  console.log("corriendo");\n});'}
+          code={'servidor.___(3000, () => {\n  console.log("corriendo");\n});'}
           options={['listen', 'start', 'run', 'open']}
           answer="listen"
           explanation="listen(puerto, callback) deja el servidor esperando. El callback se ejecuta una vez, cuando ya está listo."
@@ -383,7 +409,7 @@ export default function ApiSencillaNode() {
           id="detener-servidor"
           index={17}
           title="Detener el servidor"
-          prompt="La terminal quedó ocupada mostrando «Servidor corriendo». ¿Cómo lo paras?"
+          prompt="La terminal quedó ocupada mostrando «Servidor corriendo». ¿Cómo lo paras del todo?"
           options={[
             { id: 'a', label: 'Ctrl + C en esa terminal' },
             { id: 'b', label: 'Cerrando el navegador' },
@@ -391,16 +417,16 @@ export default function ApiSencillaNode() {
             { id: 'd', label: 'Esperando a que se detenga solo' },
           ]}
           answer="a"
-          explanation="Ctrl + C corta el proceso. Cerrar el navegador no hace nada: el servidor sigue escuchando aunque nadie le pida nada."
+          explanation="Ctrl + C corta el proceso. Cerrar el navegador no hace nada: el servidor sigue escuchando aunque nadie le pida nada — ni siquiera --watch lo apaga solo."
         />
 
         <TrueFalse
           id="cambios-reinicio"
           index={18}
-          title="Cambié el código y no pasa nada"
-          statement="Si editas servidor.js mientras corre, los cambios se aplican solos al recargar el navegador."
-          answer={false}
-          explanation="Falso. Node ya cargó el archivo en memoria: hay que detener con Ctrl+C y volver a ejecutar. Existen herramientas que lo reinician solas, pero eso llega después."
+          title="Guardaste un cambio"
+          statement="Si corriste el servidor con node --watch servidor.js, guardar un cambio en el archivo lo reinicia solo."
+          answer={true}
+          explanation="Verdadero. --watch viene incluido en Node: ya no hace falta instalar nodemon para esto. Sin --watch, tocaría Ctrl+C y volver a ejecutar cada vez."
         />
 
         <Quiz

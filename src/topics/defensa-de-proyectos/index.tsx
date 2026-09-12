@@ -22,15 +22,33 @@ export default function DefensaDeProyectos() {
           contratable.
         </p>
         <RefTable
-          cabeceras={['Se evalúa', 'Cómo se nota']}
+          cabeceras={['Criterio', 'Puntos', 'Qué se mira']}
           filas={[
-            ['Que funcione', 'La demo corre en vivo, en la URL pública, sin caerse'],
-            ['Que lo entiendas', 'Respondes por qué está hecho así, no solo qué hace'],
-            ['Que esté cuidado', 'Código organizado, commits con sentido, README completo'],
-            ['Que lo sepas contar', 'Cinco minutos claros, sin perderse en detalles'],
-            ['Que sepas qué falta', 'Reconoces las limitaciones y qué harías después'],
+            ['Funcionalidad', '30', 'Catálogo, contacto, login e IA funcionando. Publicado y accesible'],
+            [
+              'Código limpio y buenos hábitos',
+              '20',
+              'Archivos separados, nombres claros, sin secretos en el repo, commits ordenados',
+            ],
+            ['UX y diseño responsive', '15', 'Se ve bien en móvil y escritorio; marca coherente'],
+            [
+              'Presentación / defensa',
+              '15',
+              'Claridad, demo, dominio del «por qué», manejo de preguntas',
+            ],
+            [
+              'Seguridad básica',
+              '10',
+              'Contraseñas hasheadas, llave de IA en el backend, .env fuera de Git',
+            ],
+            ['Integración full stack', '10', 'Frontend, backend y base de datos bien conectados'],
           ]}
         />
+        <Callout>
+          Funcionalidad pesa el triple que la presentación: una demo elocuente no salva un proyecto
+          que no hace lo que promete. Pero con dos proyectos igual de funcionales, el que se explica
+          mejor saca los puntos que el otro deja sobre la mesa.
+        </Callout>
       </Lesson>
 
       <Lesson title="2. La estructura de la presentación">
@@ -66,6 +84,7 @@ export default function DefensaDeProyectos() {
           bien={{
             titulo: 'Demo preparada',
             items: [
+              'Backend despierto: si quedó en Render, entraste unos minutos antes para que ya no esté dormido',
               'Pestañas abiertas antes de empezar',
               'Datos de prueba cargados y con sentido',
               'Recorrido ensayado, sin improvisar',

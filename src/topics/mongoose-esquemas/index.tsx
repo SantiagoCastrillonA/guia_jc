@@ -39,7 +39,7 @@ export default function MongooseEsquemas() {
         <Terminal
           titulo="modelos/Producto.js"
           lineas={[
-            "const mongoose = require('mongoose');",
+            "import mongoose from 'mongoose';",
             '',
             'const productoSchema = new mongoose.Schema({',
             '  nombre:  { type: String, required: true, trim: true, maxlength: 80 },',
@@ -49,7 +49,7 @@ export default function MongooseEsquemas() {
             '  activo:  { type: Boolean, default: true },',
             '}, { timestamps: true });',
             '',
-            "module.exports = mongoose.model('Producto', productoSchema);",
+            "export default mongoose.model('Producto', productoSchema);",
           ]}
         />
         <RefTable
@@ -215,8 +215,16 @@ export default function MongooseEsquemas() {
           </Step>
           <Step title="Conecta una vez, al arrancar">
             <Terminal lineas={['await mongoose.connect(process.env.MONGO_URL);']} />
+            Enciende con <code>node --env-file=.env servidor.js</code> para que{' '}
+            <code>process.env.MONGO_URL</code> exista — no hace falta instalar <code>dotenv</code>.
           </Step>
         </Steps>
+        <Callout>
+          Para tu proyecto, la <code>MONGO_URL</code> más simple es la de un cluster{' '}
+          <strong>MongoDB Atlas</strong> (capa gratuita M0): no instalas nada en tu computador, no
+          pide tarjeta, y la cadena de conexión (<code>mongodb+srv://…</code>) es la que copias tal
+          cual a tu <code>.env</code>.
+        </Callout>
       </Lesson>
 
       <Exercises>
@@ -317,7 +325,7 @@ export default function MongooseEsquemas() {
           id="crear-modelo"
           index={8}
           title="Exporta el modelo"
-          code={"module.exports = mongoose.___('Producto', productoSchema);"}
+          code={"export default mongoose.___('Producto', productoSchema);"}
           options={['model', 'schema', 'create', 'collection']}
           answer="model"
           explanation="mongoose.model(nombre, esquema) crea el modelo. Mongo va a guardar en la colección «productos»: en plural y minúscula, lo hace solo."
@@ -386,10 +394,10 @@ export default function MongooseEsquemas() {
           index={14}
           title="Ordena la creación de un modelo"
           steps={[
-            { id: 'require', text: "const mongoose = require('mongoose');" },
+            { id: 'import', text: "import mongoose from 'mongoose';" },
             { id: 'schema', text: 'Definir el Schema con sus campos y validaciones' },
             { id: 'model', text: "Crear el modelo con mongoose.model('Producto', schema)" },
-            { id: 'export', text: 'Exportarlo con module.exports' },
+            { id: 'export', text: 'Exportarlo con export default' },
             { id: 'usar', text: 'Importarlo en las rutas y usar Producto.create(...)' },
           ]}
           explanation="Un archivo por modelo, dentro de modelos/. Cuando el proyecto crezca vas a agradecer esa separación."

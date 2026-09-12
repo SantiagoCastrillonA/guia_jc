@@ -49,17 +49,17 @@ export default function ExpressRutasMiddleware() {
         <Terminal
           titulo="servidor.js"
           lineas={[
-            "const express = require('express');",
+            "import express from 'express';",
             'const app = express();',
             '',
             '// middleware: entiende los cuerpos en JSON que llegan',
             'app.use(express.json());',
             '',
-            "app.get('/', function (req, res) {",
+            "app.get('/', (req, res) => {",
             "  res.json({ mensaje: 'API de mi negocio' });",
             '});',
             '',
-            'app.listen(3000, function () {',
+            'app.listen(3000, () => {',
             "  console.log('http://localhost:3000');",
             '});',
           ]}
@@ -173,7 +173,35 @@ export default function ExpressRutasMiddleware() {
         </Callout>
       </Lesson>
 
-      <Lesson title="5. Probar la API sin frontend">
+      <Lesson title="5. CORS: el error que vas a ver sí o sí">
+        <p>
+          Apenas conectes un frontend (puerto 5173) con este backend (puerto 3000), el navegador va
+          a bloquear la petición. Son dos puertos, o sea dos <strong>orígenes</strong> distintos, y
+          el navegador protege al usuario de eso por defecto.
+        </p>
+        <Terminal
+          titulo="Consola del navegador"
+          lineas={[
+            "Access to fetch at 'http://localhost:3000/productos' from origin",
+            "'http://localhost:5173' has been blocked by CORS policy",
+          ]}
+        />
+        <Terminal
+          lineas={[
+            '$ npm install cors',
+            '',
+            "import cors from 'cors';",
+            "app.use(cors({ origin: 'http://localhost:5173' }));",
+          ]}
+        />
+        <Callout tipo="ojo">
+          Se arregla en el <strong>backend</strong>, nunca en el navegador. No existe una
+          configuración del lado del cliente que lo evite — y no debería existir: es justo la
+          protección que el navegador te está dando.
+        </Callout>
+      </Lesson>
+
+      <Lesson title="6. Probar la API sin frontend">
         <Steps>
           <Step title="Instala Thunder Client o Postman">
             Thunder Client es una extensión de VS Code: no tienes que salir del editor.
@@ -343,7 +371,7 @@ export default function ExpressRutasMiddleware() {
           index={12}
           title="Ordena el archivo del servidor"
           steps={[
-            { id: 'require', text: "const express = require('express');" },
+            { id: 'import', text: "import express from 'express';" },
             { id: 'app', text: 'const app = express();' },
             { id: 'mw', text: 'app.use(express.json());' },
             { id: 'rutas', text: "app.get('/productos', ...) y las demás rutas" },
@@ -431,18 +459,18 @@ export default function ExpressRutasMiddleware() {
         />
 
         <Quiz
-          id="orden-rutas"
+          id="cors-fix"
           index={19}
-          title="El orden de las rutas importa"
-          prompt="Tienes app.get('/productos/:id') antes de app.get('/productos/destacados'). ¿Qué pasa al pedir /productos/destacados?"
+          title="El error de CORS"
+          prompt="Tu frontend (5173) llama a tu backend (3000) y el navegador bloquea la petición con «blocked by CORS policy». ¿Dónde se arregla?"
           options={[
-            { id: 'a', label: 'Entra por la primera, con id = "destacados"' },
-            { id: 'b', label: 'Entra por la segunda, que es más específica' },
-            { id: 'c', label: 'Responde 404' },
-            { id: 'd', label: 'Express lanza un error al arrancar' },
+            { id: 'a', label: 'En el backend: instalando y configurando el paquete cors' },
+            { id: 'b', label: 'Cambiando la configuración del navegador' },
+            { id: 'c', label: 'Poniendo el frontend y el backend en el mismo puerto siempre' },
+            { id: 'd', label: 'No tiene arreglo mientras sean dos proyectos separados' },
           ]}
           answer="a"
-          explanation="Express prueba en orden y se queda con la primera que coincida. Las rutas específicas van antes que las que tienen parámetros."
+          explanation="CORS lo exige el navegador para proteger al usuario; se autoriza el origen desde el servidor con app.use(cors({ origin: '...' })). Tocar el navegador no es una opción real."
         />
 
         <MultiSelect

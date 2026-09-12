@@ -111,6 +111,9 @@ export default function Home() {
             <a href="#cronograma" className={styles.enlaceAccion}>
               Ver el cronograma ›
             </a>
+            <Link to="/proyecto" className={styles.enlaceAccion}>
+              Qué debe llevar tu proyecto ›
+            </Link>
           </div>
         </section>
 

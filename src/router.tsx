@@ -38,6 +38,12 @@ export const router = createBrowserRouter([
         HydrateFallback: PageFallback,
         errorElement: <RouteError />,
       },
+      {
+        path: 'proyecto',
+        lazy: rutaLazy(() => import('./pages/ProyectoFormativo')),
+        HydrateFallback: PageFallback,
+        errorElement: <RouteError />,
+      },
       // Solo los temas con página tienen ruta; el resto son tarjetas
       // "próximamente" en la home.
       ...publishedTopics().map((topic) => ({
