@@ -182,7 +182,7 @@ export default function MongodbCrud() {
           <Step title="Guárdala en .env, nunca en el código">
             <Terminal
               titulo=".env"
-              lineas={['MONGODB_URI=mongodb+srv://usuario:tuclave@cluster.xxxxx.mongodb.net/mi_negocio']}
+              lineas={['MONGO_URL=mongodb+srv://usuario:<password>@cluster.xxxxx.mongodb.net/mi_negocio']}
             />
             <Terminal titulo=".gitignore" lineas={['.env', 'node_modules']} />
           </Step>
@@ -193,14 +193,14 @@ export default function MongodbCrud() {
             <Terminal
               lineas={[
                 "import { MongoClient } from 'mongodb';",
-                'const cliente = new MongoClient(process.env.MONGODB_URI);',
+                'const cliente = new MongoClient(process.env.MONGO_URL);',
                 'await cliente.connect();',
                 "const db = cliente.db('mi_negocio');",
               ]}
             />
             Conectarse en cada petición es lento y termina agotando las conexiones. Enciende el
             servidor con <code>node --env-file=.env servidor.js</code> para que{' '}
-            <code>process.env.MONGODB_URI</code> exista — Node ya sabe leer <code>.env</code> solo,
+            <code>process.env.MONGO_URL</code> exista — Node ya sabe leer <code>.env</code> solo,
             no hace falta instalar <code>dotenv</code>.
           </Step>
           <Step title="Usa la colección en tus rutas">
