@@ -1,68 +1,162 @@
-/* Portada — opción 1a del rediseño (2c en oscuro).
+/* Portada — lenguaje visual "Dala" sobre el sistema Nocturne.
 
-   El cronograma como un camino: la banda de cifras dice dónde vas, el buscador
-   sirve para saltar a un tema concreto, y la ruta lista cada sesión con su
-   resumen. Medidas del prototipo. */
+   Dala es un escenario oscuro: negro puro, un solo violeta saturado para la
+   acción, ámbar para los rótulos, y tipografía monolítica —peso 400 a tamaños
+   enormes con tracking muy negativo— en vez de negritas. Nada de tarjetas:
+   los bloques flotan sobre el fondo, sin bordes ni sombras.
+
+   Dos decisiones que lo adaptan a este sitio y no a la referencia literal:
+
+   1. El sitio tiene tema claro y oscuro (`styles/temas.css`). Dala es solo
+      oscuro, así que aquí se declara la paleta dos veces: en oscuro es Dala
+      literal —el fondo ya es #000 en temas.css—, y en claro su equivalente
+      legible. El ámbar #ffb829 se queda en 1.7:1 sobre el fondo claro: ahí va
+      un ámbar quemado que sí pasa AA.
+   2. Los hex viven solo en este bloque de tokens, como hace temas.css. De ahí
+      para abajo todo es `var(--dala-*)`. */
 
 .pagina {
-  padding-bottom: 60px;
+  /* Paleta Dala — tema oscuro (el de partida). */
+  --dala-iris: #8052ff;          /* violeta de acción: relleno del botón */
+  --dala-iris-texto: #a78bff;    /* el mismo violeta, aclarado para leerse */
+  --dala-spark: #ffb829;         /* ámbar: rótulos y énfasis */
+  --dala-verdant: #15846e;
+  --dala-magenta: #e05fc4;
+  --dala-azul: #4d8dff;
+  /* Con blanco encima, #8052ff se queda en 4.3:1 — igual que le pasa al azul
+     del sistema en temas.css. Un 12% de negro lo sube a AA sin cambiar el
+     color a la vista. */
+  --dala-iris-fill: color-mix(in srgb, var(--dala-iris) 88%, #000);
+
+  padding-bottom: var(--dala-hueco-lg);
+
+  /* Ritmo: Dala respira de 60 a 120px entre secciones. */
+  --dala-hueco: 60px;
+  --dala-hueco-lg: 120px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) .pagina {
+    --dala-iris-texto: #5b2fd6;
+    --dala-spark: #8a5a00;
+    --dala-magenta: #a3277f;
+    --dala-azul: #1f5fd0;
+  }
+}
+:root[data-theme='light'] .pagina {
+  --dala-iris-texto: #5b2fd6;
+  --dala-spark: #8a5a00;
+  --dala-magenta: #a3277f;
+  --dala-azul: #1f5fd0;
 }
 
 .ancho {
-  max-width: 1100px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 30px;
 }
 
+/* — rótulo de sección: 14px, versalitas, ámbar. El único adorno tipográfico
+     que se repite en toda la página. — */
+.rotuloSeccion {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  color: var(--dala-spark);
+  font-feature-settings: 'tnum' 1;
+}
+
 /* ── hero ──────────────────────────────────────────────────────────────── */
 
+/* El cerebro va DETRÁS del titular, no en una segunda columna.
+
+   En dos columnas, al llegar a móvil la constelación se iba debajo del texto
+   y empujaba media pantalla de contenido hacia abajo: quien entrara desde el
+   teléfono —la mayoría de los estudiantes— veía un hueco enorme antes de lo
+   importante. Como capa de fondo ocupa cero altura propia en cualquier
+   tamaño, y de paso es la composición de la referencia. */
 .hero {
-  padding: 88px 0 56px;
-  text-align: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: clamp(520px, 76vh, 780px);
+  padding: 72px 0 var(--dala-hueco);
 }
 
+.heroVisual {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  /* No intercepta el puntero: debajo hay enlaces y el botón. */
+  pointer-events: none;
+  opacity: 0.95;
+}
+
+.heroTexto {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  /* El texto no cruza toda la caja: deja respirar el lado derecho del
+     cerebro, igual que en la referencia. */
+  max-width: 62%;
+}
+
+/* Peso 400 a 113px: la jerarquía la da la escala y el tracking, nunca la
+   negrita. Eso es lo que hace que se lea como Dala y no como otra portada. */
 .titular {
   margin: 0;
-  font-size: clamp(38px, 6vw, 66px);
+  font-size: clamp(44px, 7.4vw, 113px);
   line-height: 1.04;
-  letter-spacing: -0.028em;
-  font-weight: 600;
+  letter-spacing: -0.04em;
+  font-weight: 400;
 }
-.titularLinea { display: block; }
 .titularApagado { color: var(--color-text-2); }
 
+/* Peso 200 en el cuerpo: la firma de Dala. No subirlo a 400 — con 400 la
+   página se vuelve una landing cualquiera. */
 .entrada {
-  max-width: 680px;
-  margin: var(--space-6) auto 0;
-  font-size: 19px;
-  line-height: 1.45;
-  color: var(--color-text-2);
+  margin: 0;
+  max-width: 34em;
+  font-size: 18px;
+  font-weight: 200;
+  line-height: 1.5;
+  color: var(--color-text);
 }
 
 .acciones {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-6);
+  gap: 30px;
   flex-wrap: wrap;
-  margin-top: var(--space-8);
+  margin-top: 6px;
 }
 
+/* La única superficie rellena de la página. Dala permite un solo botón
+   violeta por vista: todo lo demás son enlaces de texto. */
 .pastilla {
-  padding: 12px 24px;
+  padding: 15px 26px;
   border-radius: var(--radius-pill);
-  background: var(--color-accent-fill);
+  background: var(--dala-iris-fill);
   color: #fff;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
   text-decoration: none;
+  white-space: nowrap;
   transition:
     filter var(--dur-fast) var(--ease-out),
     transform var(--dur-press) var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
   .pastilla:hover {
-    filter: brightness(1.08);
+    filter: brightness(1.12);
     transform: translateY(calc(-1 * var(--alza)));
   }
 }
@@ -73,54 +167,118 @@
 }
 
 .enlaceAccion {
-  color: var(--color-accent-text);
-  font-size: 16px;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
   text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
-  .enlaceAccion:hover { text-decoration: underline; }
+  .enlaceAccion:hover { color: var(--dala-spark); }
 }
 
-/* ── banda de cifras ───────────────────────────────────────────────────── */
+/* ── constelación ──────────────────────────────────────────────────────── */
 
+/* El lienzo se dibuja en JS (ver `Constelacion` en Home.tsx) y llena su capa.
+   El componente calcula la escala contra el lienzo de diseño de 620 × 560, así
+   que funciona con cualquier proporción de caja. */
+.constelacion {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── entrada del hero ──────────────────────────────────────────────────── */
+
+/* El titular sube desde debajo de su propia línea, tapado por la máscara.
+   Es el gesto de entrada de la referencia.
+
+   Este es el único sitio de la portada donde algo empieza invisible, y va
+   contra la regla del proyecto (las entradas desplazan, nunca desvanecen,
+   porque un estado inicial invisible congelado deja el bloque en blanco
+   hasta un F5). Se acepta aquí con dos condiciones que acotan el riesgo:
+   el `backwards` solo tapa durante el retraso —y ningún retraso pasa de
+   0.3 s—, y el reposo del `span` es `translateY(0)`, así que en cuanto la
+   animación termina, o si nunca llega a correr, el texto queda a la vista.
+   No copiar este patrón a bloques que entren con scroll. */
+/* El `padding` compensado evita que la máscara le corte la cola a la "p" de
+   "programando": `overflow: hidden` recorta justo en la línea base. */
+.linea {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.lineaTexto {
+  display: block;
+  animation: subirLinea 0.9s var(--ease-out) backwards;
+  animation-delay: var(--retraso, 0s);
+}
+@keyframes subirLinea {
+  from { transform: translateY(105%); }
+  to { transform: translateY(0); }
+}
+
+/* El resto del hero entra desplazándose, sin máscara: nunca hay un estado
+   en el que el texto no se pueda leer. */
+.entraDespues {
+  animation: entrarHero 0.7s var(--ease-out) backwards;
+  animation-delay: var(--retraso, 0s);
+}
+@keyframes entrarHero {
+  from { transform: translateY(14px); }
+  to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lineaTexto,
+  .entraDespues { animation: none; }
+}
+
+/* ── cifras ────────────────────────────────────────────────────────────── */
+
+/* Sin tarjeta, sin bordes, sin divisorias: tres bloques tipográficos
+   separados solo por aire. */
 .banda {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
-  padding: 26px 30px;
-  border-radius: 20px;
-  background: var(--color-surface);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--dala-hueco);
+  padding-block: var(--dala-hueco);
 }
-.celdaBanda + .celdaBanda {
-  padding-left: 30px;
-  border-left: 1px solid var(--color-hairline);
+.celdaBanda {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .cifra {
   margin: 0;
-  font-size: 34px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  font-size: clamp(42px, 5.2vw, 78px);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1;
   font-feature-settings: 'tnum' 1;
 }
-/* El total va apagado: lo que importa es el número de la izquierda. */
-.cifraDe { color: var(--color-text-3); }
+.cifraDe,
 .cifraUnidad {
-  font-size: 17px;
-  font-weight: 400;
+  font-size: 0.34em;
+  font-weight: 200;
+  letter-spacing: -0.01em;
   color: var(--color-text-2);
 }
 
 .rotulo {
-  margin: 2px 0 10px;
-  font-size: 13px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 200;
   color: var(--color-text-2);
 }
 
 .pista {
   display: block;
-  height: 4px;
-  border-radius: 2px;
+  height: 2px;
   background: var(--color-track);
   overflow: hidden;
 }
@@ -128,26 +286,25 @@
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: inherit;
-  background: var(--color-accent-fill);
+  background: var(--dala-iris);
   transform-origin: left;
 }
 
 .semana {
   display: flex;
-  gap: 6px;
+  gap: 8px;
 }
 .dia {
-  width: 20px;
-  height: 20px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--color-track);
 }
-.diaActivo { background: var(--color-accent-fill); }
+.diaActivo { background: var(--dala-iris); }
 /* Hoy se marca aunque todavía no cuente: es una invitación, no un reproche. */
 .diaHoy:not(.diaActivo) {
   background: transparent;
-  border: 1px dashed var(--color-text-3);
+  box-shadow: inset 0 0 0 1px var(--dala-spark);
 }
 
 .segmentos {
@@ -156,360 +313,59 @@
 }
 .seg {
   flex: 1;
-  height: 6px;
-  border-radius: 1px;
+  height: 2px;
   background: var(--color-track);
 }
-.segHecho { background: var(--color-accent-fill); }
-.segCurso { background: color-mix(in srgb, var(--color-accent) 45%, var(--color-track)); }
+.segHecho { background: var(--dala-iris); }
+.segCurso { background: var(--dala-spark); }
 
-@media (max-width: 860px) {
-  .banda { grid-template-columns: 1fr; gap: var(--space-6); }
-  .celdaBanda + .celdaBanda {
-    padding-left: 0;
-    padding-top: var(--space-6);
-    border-left: 0;
-    border-top: 1px solid var(--color-hairline);
-  }
-}
-
-/* ── buscador ──────────────────────────────────────────────────────────── */
-
-.zonaBuscador {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  padding: 44px 0 0;
-}
-
-.buscador {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  max-width: 620px;
-  padding: 12px 20px;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  border: 1px solid var(--color-hairline);
-  color: var(--color-text-3);
-  transition: box-shadow var(--dur-fast) var(--ease-out);
-}
-.buscador:focus-within { box-shadow: 0 0 0 2px var(--color-accent); }
-.lupa { flex: none; }
-.entradaBusqueda {
-  flex: 1 1 auto;
-  min-width: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  font-size: 15px;
-  color: var(--color-text);
-}
-.entradaBusqueda::placeholder { color: var(--color-text-3); }
-.entradaBusqueda:focus { outline: none; }
-
-.sugerencias {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.sugerencia {
-  padding: 5px 13px;
-  border: 1px solid var(--color-hairline);
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  color: var(--color-text-2);
-  font: inherit;
-  font-size: 12.5px;
-  cursor: pointer;
-  transition:
-    color var(--dur-fast) var(--ease-out),
-    border-color var(--dur-fast) var(--ease-out),
-    transform var(--dur-fast) var(--ease-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .sugerencia:hover {
-    color: var(--color-text);
-    border-color: var(--color-divider);
-    transform: translateY(calc(-1 * var(--alza)));
-  }
-}
-.sugerencia:active { color: var(--color-accent-text); transform: none; }
-@media (prefers-reduced-motion: reduce) {
-  .sugerencia:hover { transform: none; }
-}
-
-.resultado {
-  margin: 0;
-  font-size: 13px;
-  color: var(--color-text-2);
-  text-align: center;
-}
-
-/* ── ruta por módulos ──────────────────────────────────────────────────── */
-
-.ruta {
-  max-width: 1040px;
-  margin: 0 auto;
-  padding: 56px 0 0;
-}
-.kicker {
-  display: block;
-  font-size: 13px;
-  color: var(--color-text-2);
-}
-.tituloRuta {
-  margin: 6px 0 0;
-  font-size: clamp(28px, 4vw, 40px);
-  line-height: 1.1;
-  letter-spacing: -0.022em;
-  font-weight: 600;
-}
-
-.modulo { margin-top: var(--space-8); }
-
-.cabeceraModulo {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin-bottom: 10px;
-  padding: 0 2px;
-}
-.iconoModulo { color: var(--color-accent-text); flex: none; }
-.nombreModulo {
-  font-size: 13px;
-  font-weight: 600;
-}
-.cuentaModulo {
-  font-size: 13px;
-  color: var(--color-text-2);
-  margin-left: auto;
-}
-
-.tarjetaModulo {
-  border-radius: 18px;
-  background: var(--color-surface);
-  overflow: hidden;
-}
-
-.fila {
-  display: grid;
-  grid-template-columns: 38px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 18px;
-  padding: 18px 22px;
-  text-decoration: none;
-  color: inherit;
-  /* `relative` para que la fila levantada pase por encima de la línea
-     divisoria de la de abajo en vez de quedar cortada por ella. */
-  position: relative;
-  transition:
-    background-color var(--dur-fast) var(--ease-out),
-    box-shadow var(--dur-fast) var(--ease-out),
-    transform var(--dur-fast) var(--ease-out);
-}
-.tarjetaModulo > * + * .fila,
-.tarjetaModulo > * + * > .fila { box-shadow: inset 0 1px 0 var(--color-hairline); }
-
-@media (hover: hover) and (pointer: fine) {
-  .fila:hover {
-    background: var(--color-surface-2);
-    /* Menos alza que un botón suelto: dentro de una lista, dos píxeles ya
-       hacen que las vecinas parezcan hundirse. */
-    transform: translateY(calc(-1 * var(--alza-suave)));
-    box-shadow: var(--shadow-md);
-    z-index: 1;
-  }
-}
-.fila:active {
-  background: var(--color-surface-2);
-  transform: none;
-  box-shadow: none;
-}
-@media (prefers-reduced-motion: reduce) {
-  .fila:hover { transform: none; box-shadow: none; }
-}
-.fila:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: -2px;
-}
-
-/* 12% de tinte dejaba el resumen en 4.3:1; con 7% vuelve a pasar AA. */
-.filaActual { background: color-mix(in srgb, var(--color-accent) 7%, var(--color-surface)); }
-.filaApagada { opacity: 0.55; cursor: default; }
-
-.marca {
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: var(--color-surface-2);
-  color: var(--color-text-2);
-  font-size: 13px;
-  font-weight: 600;
-  font-feature-settings: 'tnum' 1;
-}
-.marcaHecha {
-  background: var(--color-accent-fill);
-  color: #fff;
-}
-.marcaActual {
-  background: transparent;
-  border: 2px solid var(--color-accent);
-  color: var(--color-accent-text);
-}
-
-.textoFila {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  min-width: 0;
-}
-.tituloFila {
-  font-size: 19px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.25;
-}
-.resumenFila {
-  font-size: 14.5px;
-  line-height: 1.45;
-  color: var(--color-text-2);
-  max-width: 66ch;
-}
-
-.avanceFila {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 4px;
-}
-.pistaCorta {
-  display: block;
-  width: 120px;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--color-track);
-  overflow: hidden;
-}
-.vasAqui {
-  font-size: 12.5px;
-  color: var(--color-accent-text);
-}
-
-.finFila {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: none;
-  color: var(--color-text-2);
-}
-.cuentaFila {
-  font-size: 13px;
-  color: var(--color-text-2);
-  white-space: nowrap;
-  font-feature-settings: 'tnum' 1;
-}
-.chevron { flex: none; }
-
-.pastillaChica {
-  padding: 8px 16px;
-  border-radius: var(--radius-pill);
-  background: var(--color-accent-fill);
-  color: #fff;
-  font-size: 13.5px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.proximamente {
-  font-size: 12.5px;
-  color: var(--color-text-2);
-  white-space: nowrap;
-}
-
-@media (max-width: 700px) {
-  .ancho { padding: 0 var(--space-6); }
-  .hero { padding: 56px 0 40px; }
-  .entrada { font-size: 17px; }
-  .fila {
-    grid-template-columns: 30px minmax(0, 1fr);
-    row-gap: 10px;
-    padding: 16px;
-  }
-  .finFila { grid-column: 2; }
-  .tituloFila { font-size: 17px; }
-}
-
-/* ── banner del tema de la semana ──────────────────────────────────────── */
+/* ── semana en curso ───────────────────────────────────────────────────── */
 
 .bannerSemana {
-  margin-bottom: 18px;
-  padding: 18px 22px;
-  border-radius: 20px;
-  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface));
-  border: 1px solid color-mix(in srgb, var(--color-accent) 28%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-block: var(--dala-hueco) 0;
 }
 .semanaEncabezado {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: var(--space-4);
+  gap: 18px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-.semanaRotulo {
-  font-size: 12.5px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-accent-text);
 }
 .semanaFechas {
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 200;
   color: var(--color-text-2);
   font-feature-settings: 'tnum' 1;
 }
 
 .semanaTemas {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 36px;
 }
 .semanaTema {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: var(--color-surface);
+  gap: 6px;
   color: inherit;
   text-decoration: none;
-  transition:
-    background-color var(--dur-fast) var(--ease-out),
-    transform var(--dur-press) var(--ease-out);
+  transition: transform var(--dur-fast) var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
-  a.semanaTema:hover {
-    background: var(--color-surface-2);
-    transform: translateY(calc(-1 * var(--alza)));
-    box-shadow: var(--shadow-md);
-  }
+  a.semanaTema:hover { transform: translateX(6px); }
+  a.semanaTema:hover .semanaTitulo { color: var(--dala-iris-texto); }
 }
-a.semanaTema:active { transform: scale(0.99); box-shadow: none; }
 @media (prefers-reduced-motion: reduce) {
-  a.semanaTema:hover,
-  a.semanaTema:active { transform: none; box-shadow: none; }
+  a.semanaTema:hover { transform: none; }
 }
 a.semanaTema:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: 2px solid var(--dala-iris);
+  outline-offset: 6px;
 }
-.semanaApagado { opacity: 0.6; }
+.semanaApagado { opacity: 0.5; }
 
 .semanaSesion {
   font-size: 12px;
@@ -517,18 +373,281 @@ a.semanaTema:focus-visible {
   font-feature-settings: 'tnum' 1;
 }
 .semanaTitulo {
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
+  font-size: 27px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  transition: color var(--dur-fast) var(--ease-out);
 }
 .semanaCuenta {
-  font-size: 12.5px;
+  font-size: 14px;
+  font-weight: 200;
   color: var(--color-text-2);
   font-feature-settings: 'tnum' 1;
 }
 
-@media (max-width: 560px) {
-  .bannerSemana { padding: 14px 16px; border-radius: 16px; }
-  .semanaTemas { grid-template-columns: 1fr; }
+/* ── buscador ──────────────────────────────────────────────────────────── */
+
+/* Sin pastilla ni relleno: una línea bajo el campo y ya. El contenedor
+   desaparece; queda el texto. */
+.zonaBuscador {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  padding-block: var(--dala-hueco);
+}
+
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 620px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-divider);
+  color: var(--color-text-2);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.buscador:focus-within { border-color: var(--dala-iris); }
+.lupa { flex: none; }
+.entradaBusqueda {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 24px;
+  font-weight: 200;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+.entradaBusqueda::placeholder { color: var(--color-text-3); }
+.entradaBusqueda:focus { outline: none; }
+
+.sugerencias {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.sugerencia {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-text-2);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .sugerencia:hover { color: var(--dala-spark); }
+}
+.sugerencia:active { color: var(--dala-iris-texto); }
+
+.resultado {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 200;
+  color: var(--color-text-2);
+}
+
+/* ── cronograma ────────────────────────────────────────────────────────── */
+
+.ruta { padding-block: var(--dala-hueco) 0; }
+
+.tituloRuta {
+  margin: 12px 0 0;
+  font-size: clamp(32px, 4.4vw, 78px);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  font-weight: 400;
+}
+
+.modulo { margin-top: var(--dala-hueco); }
+
+.cabeceraModulo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 18px;
+}
+.iconoModulo { color: var(--dala-iris-texto); flex: none; }
+.nombreModulo {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+.cuentaModulo {
+  font-size: 12px;
+  color: var(--color-text-3);
+  margin-left: auto;
+  font-feature-settings: 'tnum' 1;
+}
+
+.tarjetaModulo { display: block; }
+
+/* La fila ya no es una tarjeta: una línea la separa de la anterior y el
+   hover la corre a la derecha en vez de levantarla. */
+.fila {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 24px;
+  padding: 24px 0;
+  border-top: 1px solid var(--color-hairline);
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .fila:hover {
+    transform: translateX(8px);
+    border-color: var(--dala-iris);
+  }
+  .fila:hover .tituloFila { color: var(--dala-iris-texto); }
+  .fila:hover .chevron { transform: translateX(4px); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fila:hover { transform: none; }
+  .fila:hover .chevron { transform: none; }
+}
+.fila:focus-visible {
+  outline: 2px solid var(--dala-iris);
+  outline-offset: 4px;
+}
+.filaActual { border-color: var(--dala-spark); }
+.filaApagada { opacity: 0.4; cursor: default; }
+
+/* El número de sesión, sin círculo ni relleno: cifra tabular y ya. */
+.marca {
+  font-size: 24px;
+  font-weight: 200;
+  letter-spacing: -0.02em;
+  color: var(--color-text-3);
+  font-feature-settings: 'tnum' 1;
+}
+.marcaHecha { color: var(--dala-iris-texto); }
+.marcaActual { color: var(--dala-spark); }
+
+.textoFila {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.tituloFila {
+  font-size: clamp(20px, 2.2vw, 27px);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.resumenFila {
+  font-size: 15px;
+  font-weight: 200;
+  line-height: 1.5;
+  color: var(--color-text-2);
+  max-width: 62ch;
+}
+
+.avanceFila {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+}
+.pistaCorta {
+  display: block;
+  width: 140px;
+  height: 2px;
+  background: var(--color-track);
+  overflow: hidden;
+}
+.vasAqui {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  color: var(--dala-spark);
+}
+
+.finFila {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: none;
+  color: var(--color-text-3);
+}
+.cuentaFila {
+  font-size: 12px;
+  white-space: nowrap;
+  font-feature-settings: 'tnum' 1;
+}
+.chevron {
+  flex: none;
+  opacity: 0.4;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out);
+}
+
+/* Ni siquiera "Continuar" lleva relleno aquí: el violeta relleno está
+   reservado al botón del hero. */
+.pastillaChica {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  color: var(--dala-iris-texto);
+  white-space: nowrap;
+}
+
+.proximamente {
+  font-size: 12px;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  color: var(--color-text-3);
+  white-space: nowrap;
+}
+
+/* ── responsive ────────────────────────────────────────────────────────── */
+
+@media (max-width: 1000px) {
+  .pagina {
+    --dala-hueco: 48px;
+    --dala-hueco-lg: 80px;
+  }
+  .hero {
+    min-height: clamp(460px, 68vh, 620px);
+    padding-top: 48px;
+  }
+  /* Sin dos columnas que repartir, el texto vuelve a ancho completo — y ahí
+     el cerebro le pasa por encima al párrafo. Se ancla arriba, a la altura
+     del titular, y se atenúa: detrás de un texto de 15 px en un teléfono,
+     a plena intensidad no se lee nada. */
+  .heroTexto { max-width: 100%; }
+  .heroVisual {
+    inset: 0 0 auto;
+    height: 58%;
+    opacity: 0.45;
+  }
+  .banda { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px; }
+}
+
+@media (max-width: 700px) {
+  .ancho { padding: 0 20px; }
+  .banda { grid-template-columns: minmax(0, 1fr); gap: 36px; }
+  .entradaBusqueda { font-size: 18px; }
+  .sugerencias { gap: 16px; }
+  .fila {
+    grid-template-columns: 40px minmax(0, 1fr);
+    row-gap: 12px;
+    padding: 20px 0;
+  }
+  .finFila { grid-column: 2; }
+  .semanaTemas { grid-template-columns: minmax(0, 1fr); gap: 28px; }
 }
