@@ -113,7 +113,7 @@
 .filtroOn {
   background: var(--color-accent-fill);
   border-color: transparent;
-  color: #fff;
+  color: var(--color-on-accent);
 }
 
 .cuenta {

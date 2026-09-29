@@ -90,8 +90,10 @@ export default function Home() {
       <div className={styles.ancho}>
         <section className={styles.hero}>
           <div className={styles.heroTexto}>
-            <span className={`${styles.rotuloSeccion} ${styles.entraDespues}`}>
-              Curso de Desarrollo Web · {topics.length} sesiones · {total} ejercicios
+            <span
+              className={`${styles.rotuloSeccion} ${styles.rotuloPrompt} ${styles.entraDespues}`}
+            >
+              desarrollo-web --sesiones {topics.length} --ejercicios {total}
             </span>
             <h1 className={styles.titular}>
               <span className={styles.linea}>
@@ -102,6 +104,7 @@ export default function Home() {
               <span className={`${styles.linea} ${styles.titularApagado}`}>
                 <span className={styles.lineaTexto} style={retraso('0.15s')}>
                   Un ejercicio a la vez.
+                  <span className={styles.cursorTerminal} aria-hidden="true" />
                 </span>
               </span>
             </h1>
@@ -141,7 +144,7 @@ export default function Home() {
           <section className={styles.bannerSemana} aria-label="Tema de la semana">
             <div className={styles.semanaEncabezado}>
               <span className={styles.rotuloSeccion}>
-                {deLaSemana.length === 1 ? 'Tema de la semana' : 'Temas de la semana'}
+                {deLaSemana.length === 1 ? 'tema de la semana' : 'temas de la semana'}
               </span>
               <span className={styles.semanaFechas}>
                 {rangoLegible(lunes, finDe(deLaSemana[0], semanas, fines))}
@@ -279,7 +282,7 @@ export default function Home() {
         </section>
 
         <section id="cronograma" className={styles.ruta}>
-          <span className={styles.rotuloSeccion}>Cronograma</span>
+          <span className={styles.rotuloSeccion}>cronograma</span>
           <h2 className={styles.tituloRuta}>Elige por dónde empezar</h2>
 
           {grupos.map((grupo) => (
@@ -426,18 +429,9 @@ function mulberry32(semilla: number) {
   };
 }
 
-/** Los tokens de la paleta Dala, en el orden en que se reparten. Se leen del
- *  CSS y no se escriben aquí: el tema claro los redefine. */
-const TINTES = [
-  '--dala-iris',
-  '--dala-spark',
-  /* El blanco hueso de la referencia. Sale del token de texto, así que en
-     tema claro se vuelve casi negro y sigue viéndose. */
-  '--color-text',
-  '--dala-verdant',
-  '--dala-magenta',
-  '--dala-azul',
-];
+/** Los acentos de la plantilla terminal, en el orden en que se reparten. Se
+ *  leen del CSS (Home.module.css / temas.css) y no se escriben aquí. */
+const TINTES = ['--term-verde', '--term-amarillo', '--color-text', '--term-azul', '--term-morado'];
 
 /** Niveles de opacidad en que se agrupan las partículas para dibujarlas. */
 const CUBOS = 6;
@@ -445,119 +439,72 @@ const CUBOS = 6;
 /** Lienzo de diseño. Todo se calcula aquí y se escala al tamaño real. */
 const LIENZO_ANCHO = 620;
 const LIENZO_ALTO = 560;
-/** Partículas dentro de la silueta, y las sueltas que flotan alrededor. */
-const EN_CEREBRO = 1300;
+/** Partículas dentro de la figura, y las sueltas que flotan alrededor. */
+const EN_FIGURA = 1150;
 const AMBIENTE = 80;
 
-/** Reparto de tintes: manda el violeta, el blanco y el ámbar puntean. Un
- *  sorteo uniforme entre los seis deja la figura con aire de confeti. */
-const REPARTO = [0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 4, 5];
+/** Reparto de tintes: manda el verde de los prompts, el blanco y el amarillo
+ *  puntean, y el azul y el morado —los de la sintaxis— salpican. Un sorteo
+ *  uniforme entre los cinco deja la figura con aire de confeti. */
+const REPARTO = [0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 4];
 
-const CEREBRO_CX = 306;
-const CEREBRO_CY = 218;
-const CEREBRO_RX = 172;
-const CEREBRO_RY = 140;
+/** Centro y radios de la figura en el lienzo de diseño: los usan el halo y
+ *  el anillo de partículas sueltas. */
+const FIGURA_CX = 310;
+const FIGURA_CY = 280;
+const FIGURA_RX = 240;
+const FIGURA_RY = 175;
+
+/** Grosor de los trazos de `</>`, en píxeles del lienzo de diseño. */
+const GROSOR = 46;
 
 /**
- * Dibuja la silueta del cerebro en un lienzo aparte, que nunca se muestra:
- * sirve de molde. Después se siembran las partículas donde ese molde tiene
- * tinta, así que la figura sale de aquí y no de ajustar posiciones a mano.
+ * Dibuja `</>` en un lienzo aparte, que nunca se muestra: sirve de molde.
+ * Después se siembran las partículas donde ese molde tiene tinta, así que la
+ * figura sale de aquí y no de ajustar posiciones a mano.
  *
- * Lo que se dibuja con más alfa termina con más partículas. Por eso los
- * surcos y el contorno van a tope y el relleno a media tinta: son los surcos
- * los que hacen que se lea "cerebro" y no "mancha redonda".
+ * Son trazos geométricos y no la letra de la fuente a propósito: el molde se
+ * arma una vez, al montar la portada, y en ese momento la fuente web puede no
+ * haber cargado todavía — el `</>` saldría en la letra de reserva.
+ *
+ * Lo que se dibuja con más alfa termina con más partículas. El borde de cada
+ * trazo va a tope y el interior a media tinta: así la figura tiene contorno
+ * nítido, que es lo que la hace legible, en vez de ser una banda pareja.
  */
-function moldeDelCerebro(): ImageData | null {
+function moldeDeLaFigura(): ImageData | null {
   const molde = document.createElement('canvas');
   molde.width = LIENZO_ANCHO;
   molde.height = LIENZO_ALTO;
   const c = molde.getContext('2d');
   if (!c) return null;
 
-  // — corteza: perfil de lado, mirando a la izquierda —
-  // De lado es la vista que se reconoce sin dudar: frontal a la izquierda,
-  // occipital a la derecha y el lóbulo temporal marcado abajo.
-  const corteza = new Path2D(
-    'M 146 232' +
-      'C 142 182, 172 140, 214 118' +
-      'C 244 102, 282 96, 314 104' +
-      'C 344 88, 386 94, 414 116' +
-      'C 446 140, 464 176, 462 212' +
-      'C 474 234, 470 262, 452 280' +
-      'C 440 296, 420 306, 398 308' +
-      'C 392 326, 374 338, 352 338' +
-      'C 336 338, 322 330, 314 318' +
-      'C 296 332, 270 340, 246 336' +
-      'C 214 330, 186 312, 166 286' +
-      'C 150 266, 144 250, 146 232 Z',
-  );
+  const figura = new Path2D();
+  // <
+  figura.moveTo(210, 150);
+  figura.lineTo(80, FIGURA_CY);
+  figura.lineTo(210, 410);
+  // /
+  figura.moveTo(365, 112);
+  figura.lineTo(255, 448);
+  // >
+  figura.moveTo(410, 150);
+  figura.lineTo(540, FIGURA_CY);
+  figura.lineTo(410, 410);
 
-  // — cerebelo: bajo el occipital, con sus propias estrías —
-  const cerebelo = new Path2D();
-  cerebelo.ellipse(398, 336, 54, 34, 0.16, 0, Math.PI * 2);
-
-  // — tallo: baja y se afina, como el tronco de la referencia —
-  const tallo = new Path2D(
-    'M 318 322 C 310 360, 307 410, 309 464 L 347 464 C 349 410, 347 362, 352 324 Z',
-  );
-
-  c.fillStyle = '#fff';
   c.strokeStyle = '#fff';
   c.lineJoin = 'round';
   c.lineCap = 'round';
 
-  // Relleno flojo: el interior solo se puntea. Si se sube, las partículas se
-  // reparten parejo por dentro y la figura pierde estructura — se vuelve una
-  // mancha con forma de cerebro en vez de un cerebro.
-  c.globalAlpha = 0.14;
-  c.fill(tallo);
-  c.fill(cerebelo);
-  c.fill(corteza);
+  // Trazo grueso a tope…
+  c.lineWidth = GROSOR;
+  c.stroke(figura);
 
-  // Contorno a tope y grueso: el borde nítido es lo que hace legible la figura.
-  c.globalAlpha = 1;
-  c.lineWidth = 4.5;
-  c.stroke(corteza);
-  c.stroke(cerebelo);
-  c.lineWidth = 3.4;
-  c.stroke(tallo);
-
-  // — surcos: contornos concéntricos, no líneas horizontales —
-  // Esta es la diferencia entre que se lea "cerebro" y que se lea "arbusto":
-  // los pliegues de un cerebro envuelven la forma. Se consigue redibujando el
-  // mismo contorno cada vez más pequeño, con un giro y un corrimiento leves
-  // para que no parezcan anillos de cebolla.
-  c.save();
-  c.clip(corteza);
-  c.lineWidth = 3;
-  for (let k = 0; k < 6; k++) {
-    const f = 0.84 - k * 0.13;
-    c.save();
-    c.translate(CEREBRO_CX, CEREBRO_CY + k * 5);
-    c.rotate((k % 2 ? 1 : -1) * 0.05);
-    c.scale(f, f * (1 + 0.04 * (k % 3)));
-    c.translate(-CEREBRO_CX, -CEREBRO_CY);
-    c.stroke(corteza);
-    c.restore();
-  }
-
-  // Cisura lateral: el corte profundo que separa el lóbulo temporal. Es el
-  // rasgo que más ayuda a identificar el perfil.
-  c.lineWidth = 5;
-  c.stroke(new Path2D('M 168 252 C 220 292, 288 304, 340 284'));
-  c.restore();
-
-  // Estrías del cerebelo: finas y muy juntas, como las de verdad.
-  c.save();
-  c.clip(cerebelo);
-  c.lineWidth = 2.2;
-  for (let k = -4; k <= 4; k++) {
-    c.beginPath();
-    c.moveTo(398 + k * 12 - 26, 336 - 40);
-    c.lineTo(398 + k * 12 + 12, 336 + 40);
-    c.stroke();
-  }
-  c.restore();
+  // …y se le vacía el centro a medias: queda un borde de 5 px a plena tinta y
+  // el interior al 35%.
+  c.globalCompositeOperation = 'destination-out';
+  c.globalAlpha = 0.65;
+  c.lineWidth = GROSOR - 10;
+  c.stroke(figura);
 
   return c.getImageData(0, 0, LIENZO_ANCHO, LIENZO_ALTO);
 }
@@ -604,7 +551,7 @@ function nuevaParticula(azar: () => number, hx: number, hy: number, dentro: bool
     o: (dentro ? 0.45 : 0.18) + azar() * (dentro ? 0.55 : 0.26),
     fase: azar() * Math.PI * 2,
     vel: 0.45 + azar() * 1.1,
-    // La deriva es corta a propósito: si se pasa, el cerebro se deshace.
+    // La deriva es corta a propósito: si se pasa, la figura se deshace.
     amp: (dentro ? 1.4 : 4) + azar() * (dentro ? 2.2 : 6),
     vx: 0.18 + azar() * 0.4,
     vy: 0.18 + azar() * 0.4,
@@ -617,13 +564,13 @@ function nuevaParticula(azar: () => number, hx: number, hy: number, dentro: bool
 function generarParticulas(): Particula[] {
   const azar = mulberry32(20260918);
   const salida: Particula[] = [];
-  const molde = moldeDelCerebro();
+  const molde = moldeDeLaFigura();
 
   if (molde) {
     // Muestreo por rechazo: se tira un punto al azar y se acepta con la
     // probabilidad que marque el alfa del molde en ese píxel.
     let intentos = 0;
-    while (salida.length < EN_CEREBRO && intentos < EN_CEREBRO * 400) {
+    while (salida.length < EN_FIGURA && intentos < EN_FIGURA * 400) {
       intentos++;
       const x = azar() * LIENZO_ANCHO;
       const y = azar() * LIENZO_ALTO;
@@ -638,12 +585,12 @@ function generarParticulas(): Particula[] {
     const a = azar() * Math.PI * 2;
     // Bien afuera: si se acercan al contorno lo emborronan y la silueta,
     // que es lo que cuesta conseguir, se pierde.
-    const r = 1.18 + azar() * 0.6;
+    const r = 1.05 + azar() * 0.42;
     salida.push(
       nuevaParticula(
         azar,
-        CEREBRO_CX + Math.cos(a) * CEREBRO_RX * r,
-        CEREBRO_CY + Math.sin(a) * CEREBRO_RY * r,
+        FIGURA_CX + Math.cos(a) * FIGURA_RX * r,
+        FIGURA_CY + Math.sin(a) * FIGURA_RY * r,
         false,
       ),
     );
@@ -690,7 +637,7 @@ function Constelacion({ reduce }: { reduce: boolean }) {
 
     function leerTintes() {
       const estilo = getComputedStyle(lienzo!);
-      tintes = TINTES.map((t) => estilo.getPropertyValue(t).trim() || '#8052ff');
+      tintes = TINTES.map((t) => estilo.getPropertyValue(t).trim() || '#6cc24a');
     }
 
     function medir() {
@@ -717,12 +664,12 @@ function Constelacion({ reduce }: { reduce: boolean }) {
       const ox = (ancho - LIENZO_ANCHO * escala) / 2;
       const oy = (alto - LIENZO_ALTO * escala) / 2;
 
-      // Halo: lo único degradado de la portada. Dala lo permite justo aquí
-      // —en la visualización de partículas— y no en los componentes.
+      // Halo: lo único degradado de la portada. Va solo aquí, en la
+      // visualización de partículas, y nunca en los componentes.
       // Respira muy lento para que la figura no se vea plana.
-      const hx = ox + CEREBRO_CX * escala + actual.x * 0.4;
-      const hy = oy + CEREBRO_CY * escala + actual.y * 0.4;
-      const halo = 215 * escala * (1 + 0.04 * Math.sin(t * 0.35));
+      const hx = ox + FIGURA_CX * escala + actual.x * 0.4;
+      const hy = oy + FIGURA_CY * escala + actual.y * 0.4;
+      const halo = 250 * escala * (1 + 0.04 * Math.sin(t * 0.35));
       if (halo > 0) {
         const brillo = ctx!.createRadialGradient(hx, hy, 0, hx, hy, halo);
         brillo.addColorStop(0, tintes[0]);
@@ -819,15 +766,6 @@ function Constelacion({ reduce }: { reduce: boolean }) {
     });
     observadorPantalla.observe(lienzo);
 
-    // El tema cambia los tokens de color: hay que releerlos.
-    const observadorTema = new MutationObserver(leerTintes);
-    observadorTema.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
-    });
-    const consultaTema = window.matchMedia('(prefers-color-scheme: dark)');
-    consultaTema.addEventListener('change', leerTintes);
-
     document.addEventListener('visibilitychange', alCambiarVisibilidad);
     if (!reduce) window.addEventListener('pointermove', alMover, { passive: true });
 
@@ -838,8 +776,6 @@ function Constelacion({ reduce }: { reduce: boolean }) {
       parar();
       observadorTamano.disconnect();
       observadorPantalla.disconnect();
-      observadorTema.disconnect();
-      consultaTema.removeEventListener('change', leerTintes);
       document.removeEventListener('visibilitychange', alCambiarVisibilidad);
       window.removeEventListener('pointermove', alMover);
     };

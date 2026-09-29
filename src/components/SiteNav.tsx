@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { BotonTema } from './BotonTema';
 import styles from './SiteNav.module.css';
 
 export function SiteNav() {
@@ -35,8 +34,6 @@ export function SiteNav() {
       <NavLink to="/recursos" className={styles.link}>
         Recursos
       </NavLink>
-
-      <BotonTema />
 
       {!loading &&
         (user ? (

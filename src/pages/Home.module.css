@@ -1,53 +1,24 @@
-/* Portada — lenguaje visual "Dala" sobre el sistema Nocturne.
+/* Portada — plantilla "terminal" de las diapositivas del curso.
 
-   Dala es un escenario oscuro: negro puro, un solo violeta saturado para la
-   acción, ámbar para los rótulos, y tipografía monolítica —peso 400 a tamaños
-   enormes con tracking muy negativo— en vez de negritas. Nada de tarjetas:
-   los bloques flotan sobre el fondo, sin bordes ni sombras.
+   La composición sale de la portada anterior (la figura de partículas detrás
+   del titular, bloques que flotan sobre el fondo sin tarjetas), pero la piel es
+   la de las clases: fondo #0D1117, verde para la acción y los prompts, amarillo
+   para lo que está "en curso", y títulos en monoespaciada. Los rótulos se
+   escriben como en la terminal: `$` para un comando, `//` para un comentario.
 
-   Dos decisiones que lo adaptan a este sitio y no a la referencia literal:
-
-   1. El sitio tiene tema claro y oscuro (`styles/temas.css`). Dala es solo
-      oscuro, así que aquí se declara la paleta dos veces: en oscuro es Dala
-      literal —el fondo ya es #000 en temas.css—, y en claro su equivalente
-      legible. El ámbar #ffb829 se queda en 1.7:1 sobre el fondo claro: ahí va
-      un ámbar quemado que sí pasa AA.
-   2. Los hex viven solo en este bloque de tokens, como hace temas.css. De ahí
-      para abajo todo es `var(--dala-*)`. */
+   Los acentos que no están en temas.css —los tintes de las partículas— se
+   declaran aquí una sola vez. De ahí para abajo todo es `var(--term-*)`. */
 
 .pagina {
-  /* Paleta Dala — tema oscuro (el de partida). */
-  --dala-iris: #8052ff;          /* violeta de acción: relleno del botón */
-  --dala-iris-texto: #a78bff;    /* el mismo violeta, aclarado para leerse */
-  --dala-spark: #ffb829;         /* ámbar: rótulos y énfasis */
-  --dala-verdant: #15846e;
-  --dala-magenta: #e05fc4;
-  --dala-azul: #4d8dff;
-  /* Con blanco encima, #8052ff se queda en 4.3:1 — igual que le pasa al azul
-     del sistema en temas.css. Un 12% de negro lo sube a AA sin cambiar el
-     color a la vista. */
-  --dala-iris-fill: color-mix(in srgb, var(--dala-iris) 88%, #000);
+  --term-verde: var(--color-accent);
+  --term-amarillo: var(--color-code);
+  --term-azul: #58a6ff;
+  --term-morado: #bc8cff;
 
-  padding-bottom: var(--dala-hueco-lg);
+  padding-bottom: var(--term-hueco-lg);
 
-  /* Ritmo: Dala respira de 60 a 120px entre secciones. */
-  --dala-hueco: 60px;
-  --dala-hueco-lg: 120px;
-}
-
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme='dark']) .pagina {
-    --dala-iris-texto: #5b2fd6;
-    --dala-spark: #8a5a00;
-    --dala-magenta: #a3277f;
-    --dala-azul: #1f5fd0;
-  }
-}
-:root[data-theme='light'] .pagina {
-  --dala-iris-texto: #5b2fd6;
-  --dala-spark: #8a5a00;
-  --dala-magenta: #a3277f;
-  --dala-azul: #1f5fd0;
+  --term-hueco: 60px;
+  --term-hueco-lg: 120px;
 }
 
 .ancho {
@@ -56,22 +27,29 @@
   padding: 0 30px;
 }
 
-/* — rótulo de sección: 14px, versalitas, ámbar. El único adorno tipográfico
-     que se repite en toda la página. — */
+/* — rótulo de sección: un comentario de código, `// cronograma`, como los
+     títulos de sección de las diapositivas. El del hero es un comando (`$`). — */
 .rotuloSeccion {
   display: block;
+  font-family: var(--font-mono);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.2;
-  letter-spacing: 0.025em;
-  text-transform: uppercase;
-  color: var(--dala-spark);
+  color: var(--term-verde);
   font-feature-settings: 'tnum' 1;
+}
+.rotuloSeccion::before {
+  content: '// ';
+  color: var(--color-text-3);
+}
+.rotuloPrompt::before {
+  content: '$ ';
+  color: var(--term-verde);
 }
 
 /* ── hero ──────────────────────────────────────────────────────────────── */
 
-/* El cerebro va DETRÁS del titular, no en una segunda columna.
+/* La figura `</>` va DETRÁS del titular, no en una segunda columna.
 
    En dos columnas, al llegar a móvil la constelación se iba debajo del texto
    y empujaba media pantalla de contenido hacia abajo: quien entrara desde el
@@ -83,12 +61,16 @@
   display: flex;
   align-items: center;
   min-height: clamp(520px, 76vh, 780px);
-  padding: 72px 0 var(--dala-hueco);
+  padding: 72px 0 var(--term-hueco);
 }
 
+/* En escritorio la capa ocupa solo la parte derecha del hero: la figura se
+   centra dentro de ella y queda en el espacio que el titular deja libre,
+   rozando el final de las líneas en vez de taparlas. En pantallas angostas
+   (ver el bloque responsive) vuelve a ocupar todo el ancho. */
 .heroVisual {
   position: absolute;
-  inset: 0;
+  inset: 0 0 0 40%;
   z-index: 0;
   /* No intercepta el puntero: debajo hay enlaces y el botón. */
   pointer-events: none;
@@ -103,28 +85,47 @@
   align-items: flex-start;
   gap: 24px;
   /* El texto no cruza toda la caja: deja respirar el lado derecho del
-     cerebro, igual que en la referencia. */
+     `</>`, igual que en la referencia. */
   max-width: 62%;
 }
 
-/* Peso 400 a 113px: la jerarquía la da la escala y el tracking, nunca la
-   negrita. Eso es lo que hace que se lea como Dala y no como otra portada. */
+/* Monoespaciada en negrita, como los títulos de las diapositivas. Es más
+   ancha que una sans, por eso el tope baja de 113 a 84 px: a más, "programando."
+   no cabe en la columna. */
 .titular {
   margin: 0;
-  font-size: clamp(44px, 7.4vw, 113px);
-  line-height: 1.04;
-  letter-spacing: -0.04em;
-  font-weight: 400;
+  font-family: var(--font-mono);
+  font-size: clamp(36px, 6vw, 84px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  font-weight: 700;
 }
 .titularApagado { color: var(--color-text-2); }
 
-/* Peso 200 en el cuerpo: la firma de Dala. No subirlo a 400 — con 400 la
-   página se vuelve una landing cualquiera. */
+/* El cursor de la terminal al final del titular. Parpadea en pasos, no se
+   funde: una terminal real no hace fundidos. Si la animación se congela en
+   su fotograma apagado no se pierde nada — es adorno. */
+.cursorTerminal {
+  display: inline-block;
+  width: 0.55em;
+  height: 0.9em;
+  margin-left: 0.12em;
+  vertical-align: -0.08em;
+  background: var(--term-verde);
+  animation: parpadeo 1.1s steps(1) infinite;
+}
+@keyframes parpadeo {
+  50% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cursorTerminal { animation: none; }
+}
+
 .entrada {
   margin: 0;
   max-width: 34em;
   font-size: 18px;
-  font-weight: 200;
+  font-weight: 400;
   line-height: 1.5;
   color: var(--color-text);
 }
@@ -137,17 +138,17 @@
   margin-top: 6px;
 }
 
-/* La única superficie rellena de la página. Dala permite un solo botón
-   violeta por vista: todo lo demás son enlaces de texto. */
+/* La única superficie rellena de la página: el botón verde de las
+   diapositivas, con texto oscuro encima (blanco sobre este verde no pasa AA).
+   Todo lo demás son enlaces de texto. */
 .pastilla {
-  padding: 15px 26px;
-  border-radius: var(--radius-pill);
-  background: var(--dala-iris-fill);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.025em;
-  text-transform: uppercase;
+  padding: 14px 22px;
+  border-radius: var(--radius-control);
+  background: var(--term-verde);
+  color: var(--color-on-accent);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 700;
   text-decoration: none;
   white-space: nowrap;
   transition:
@@ -168,15 +169,14 @@
 
 .enlaceAccion {
   color: var(--color-text);
-  font-size: 14px;
+  font-family: var(--font-mono);
+  font-size: 15px;
   font-weight: 600;
-  letter-spacing: 0.025em;
-  text-transform: uppercase;
   text-decoration: none;
   transition: color var(--dur-fast) var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
-  .enlaceAccion:hover { color: var(--dala-spark); }
+  .enlaceAccion:hover { color: var(--term-amarillo); }
 }
 
 /* ── constelación ──────────────────────────────────────────────────────── */
@@ -244,8 +244,8 @@
 .banda {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--dala-hueco);
-  padding-block: var(--dala-hueco);
+  gap: var(--term-hueco);
+  padding-block: var(--term-hueco);
 }
 .celdaBanda {
   display: flex;
@@ -255,16 +255,17 @@
 
 .cifra {
   margin: 0;
-  font-size: clamp(42px, 5.2vw, 78px);
-  font-weight: 400;
-  letter-spacing: -0.04em;
+  font-family: var(--font-mono);
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: 1;
   font-feature-settings: 'tnum' 1;
 }
 .cifraDe,
 .cifraUnidad {
   font-size: 0.34em;
-  font-weight: 200;
+  font-weight: 400;
   letter-spacing: -0.01em;
   color: var(--color-text-2);
 }
@@ -272,7 +273,7 @@
 .rotulo {
   margin: 0;
   font-size: 14px;
-  font-weight: 200;
+  font-weight: 400;
   color: var(--color-text-2);
 }
 
@@ -286,7 +287,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  background: var(--dala-iris);
+  background: var(--term-verde);
   transform-origin: left;
 }
 
@@ -300,11 +301,11 @@
   border-radius: 50%;
   background: var(--color-track);
 }
-.diaActivo { background: var(--dala-iris); }
+.diaActivo { background: var(--term-verde); }
 /* Hoy se marca aunque todavía no cuente: es una invitación, no un reproche. */
 .diaHoy:not(.diaActivo) {
   background: transparent;
-  box-shadow: inset 0 0 0 1px var(--dala-spark);
+  box-shadow: inset 0 0 0 1px var(--term-amarillo);
 }
 
 .segmentos {
@@ -316,8 +317,8 @@
   height: 2px;
   background: var(--color-track);
 }
-.segHecho { background: var(--dala-iris); }
-.segCurso { background: var(--dala-spark); }
+.segHecho { background: var(--term-verde); }
+.segCurso { background: var(--term-amarillo); }
 
 /* ── semana en curso ───────────────────────────────────────────────────── */
 
@@ -325,7 +326,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding-block: var(--dala-hueco) 0;
+  padding-block: var(--term-hueco) 0;
 }
 .semanaEncabezado {
   display: flex;
@@ -336,7 +337,7 @@
 }
 .semanaFechas {
   font-size: 14px;
-  font-weight: 200;
+  font-weight: 400;
   color: var(--color-text-2);
   font-feature-settings: 'tnum' 1;
 }
@@ -356,13 +357,13 @@
 }
 @media (hover: hover) and (pointer: fine) {
   a.semanaTema:hover { transform: translateX(6px); }
-  a.semanaTema:hover .semanaTitulo { color: var(--dala-iris-texto); }
+  a.semanaTema:hover .semanaTitulo { color: var(--term-verde); }
 }
 @media (prefers-reduced-motion: reduce) {
   a.semanaTema:hover { transform: none; }
 }
 a.semanaTema:focus-visible {
-  outline: 2px solid var(--dala-iris);
+  outline: 2px solid var(--term-verde);
   outline-offset: 6px;
 }
 .semanaApagado { opacity: 0.5; }
@@ -373,15 +374,16 @@ a.semanaTema:focus-visible {
   font-feature-settings: 'tnum' 1;
 }
 .semanaTitulo {
-  font-size: 27px;
-  font-weight: 400;
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
   transition: color var(--dur-fast) var(--ease-out);
 }
 .semanaCuenta {
   font-size: 14px;
-  font-weight: 200;
+  font-weight: 400;
   color: var(--color-text-2);
   font-feature-settings: 'tnum' 1;
 }
@@ -395,7 +397,7 @@ a.semanaTema:focus-visible {
   flex-direction: column;
   align-items: flex-start;
   gap: 18px;
-  padding-block: var(--dala-hueco);
+  padding-block: var(--term-hueco);
 }
 
 .buscador {
@@ -409,7 +411,7 @@ a.semanaTema:focus-visible {
   color: var(--color-text-2);
   transition: border-color var(--dur-fast) var(--ease-out);
 }
-.buscador:focus-within { border-color: var(--dala-iris); }
+.buscador:focus-within { border-color: var(--term-verde); }
 .lupa { flex: none; }
 .entradaBusqueda {
   flex: 1 1 auto;
@@ -417,9 +419,9 @@ a.semanaTema:focus-visible {
   border: 0;
   background: none;
   font: inherit;
-  font-size: 24px;
-  font-weight: 200;
-  letter-spacing: -0.02em;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 400;
   color: var(--color-text);
 }
 .entradaBusqueda::placeholder { color: var(--color-text-3); }
@@ -436,35 +438,36 @@ a.semanaTema:focus-visible {
   background: none;
   color: var(--color-text-2);
   font: inherit;
+  font-family: var(--font-mono);
   font-size: 14px;
   cursor: pointer;
   transition: color var(--dur-fast) var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
-  .sugerencia:hover { color: var(--dala-spark); }
+  .sugerencia:hover { color: var(--term-amarillo); }
 }
-.sugerencia:active { color: var(--dala-iris-texto); }
+.sugerencia:active { color: var(--term-verde); }
 
 .resultado {
   margin: 0;
   font-size: 14px;
-  font-weight: 200;
+  font-weight: 400;
   color: var(--color-text-2);
 }
 
 /* ── cronograma ────────────────────────────────────────────────────────── */
 
-.ruta { padding-block: var(--dala-hueco) 0; }
+.ruta { padding-block: var(--term-hueco) 0; }
 
 .tituloRuta {
   margin: 12px 0 0;
-  font-size: clamp(32px, 4.4vw, 78px);
+  font-size: clamp(30px, 4vw, 60px);
   line-height: 1.1;
-  letter-spacing: -0.04em;
-  font-weight: 400;
+  letter-spacing: -0.03em;
+  font-weight: 700;
 }
 
-.modulo { margin-top: var(--dala-hueco); }
+.modulo { margin-top: var(--term-hueco); }
 
 .cabeceraModulo {
   display: flex;
@@ -472,12 +475,11 @@ a.semanaTema:focus-visible {
   gap: 12px;
   padding-bottom: 18px;
 }
-.iconoModulo { color: var(--dala-iris-texto); flex: none; }
+.iconoModulo { color: var(--term-verde); flex: none; }
 .nombreModulo {
+  font-family: var(--font-mono);
   font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.025em;
-  text-transform: uppercase;
+  font-weight: 700;
 }
 .cuentaModulo {
   font-size: 12px;
@@ -506,9 +508,9 @@ a.semanaTema:focus-visible {
 @media (hover: hover) and (pointer: fine) {
   .fila:hover {
     transform: translateX(8px);
-    border-color: var(--dala-iris);
+    border-color: var(--term-verde);
   }
-  .fila:hover .tituloFila { color: var(--dala-iris-texto); }
+  .fila:hover .tituloFila { color: var(--term-verde); }
   .fila:hover .chevron { transform: translateX(4px); opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -516,22 +518,23 @@ a.semanaTema:focus-visible {
   .fila:hover .chevron { transform: none; }
 }
 .fila:focus-visible {
-  outline: 2px solid var(--dala-iris);
+  outline: 2px solid var(--term-verde);
   outline-offset: 4px;
 }
-.filaActual { border-color: var(--dala-spark); }
+.filaActual { border-color: var(--term-amarillo); }
 .filaApagada { opacity: 0.4; cursor: default; }
 
 /* El número de sesión, sin círculo ni relleno: cifra tabular y ya. */
 .marca {
-  font-size: 24px;
-  font-weight: 200;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--color-text-3);
   font-feature-settings: 'tnum' 1;
 }
-.marcaHecha { color: var(--dala-iris-texto); }
-.marcaActual { color: var(--dala-spark); }
+.marcaHecha { color: var(--term-verde); }
+.marcaActual { color: var(--term-amarillo); }
 
 .textoFila {
   display: flex;
@@ -540,15 +543,16 @@ a.semanaTema:focus-visible {
   min-width: 0;
 }
 .tituloFila {
-  font-size: clamp(20px, 2.2vw, 27px);
-  font-weight: 400;
+  font-family: var(--font-mono);
+  font-size: clamp(18px, 2vw, 23px);
+  font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.15;
   transition: color var(--dur-fast) var(--ease-out);
 }
 .resumenFila {
   font-size: 15px;
-  font-weight: 200;
+  font-weight: 400;
   line-height: 1.5;
   color: var(--color-text-2);
   max-width: 62ch;
@@ -568,11 +572,10 @@ a.semanaTema:focus-visible {
   overflow: hidden;
 }
 .vasAqui {
-  font-size: 12px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
   font-weight: 600;
-  letter-spacing: 0.025em;
-  text-transform: uppercase;
-  color: var(--dala-spark);
+  color: var(--term-amarillo);
 }
 
 .finFila {
@@ -595,21 +598,19 @@ a.semanaTema:focus-visible {
     opacity var(--dur-fast) var(--ease-out);
 }
 
-/* Ni siquiera "Continuar" lleva relleno aquí: el violeta relleno está
+/* Ni siquiera "Continuar" lleva relleno aquí: el verde relleno está
    reservado al botón del hero. */
 .pastillaChica {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.025em;
-  text-transform: uppercase;
-  color: var(--dala-iris-texto);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--term-verde);
   white-space: nowrap;
 }
 
 .proximamente {
-  font-size: 12px;
-  letter-spacing: 0.025em;
-  text-transform: uppercase;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
   color: var(--color-text-3);
   white-space: nowrap;
 }
@@ -618,15 +619,15 @@ a.semanaTema:focus-visible {
 
 @media (max-width: 1000px) {
   .pagina {
-    --dala-hueco: 48px;
-    --dala-hueco-lg: 80px;
+    --term-hueco: 48px;
+    --term-hueco-lg: 80px;
   }
   .hero {
     min-height: clamp(460px, 68vh, 620px);
     padding-top: 48px;
   }
   /* Sin dos columnas que repartir, el texto vuelve a ancho completo — y ahí
-     el cerebro le pasa por encima al párrafo. Se ancla arriba, a la altura
+     la figura le pasa por encima al párrafo. Se ancla arriba, a la altura
      del titular, y se atenúa: detrás de un texto de 15 px en un teléfono,
      a plena intensidad no se lee nada. */
   .heroTexto { max-width: 100%; }

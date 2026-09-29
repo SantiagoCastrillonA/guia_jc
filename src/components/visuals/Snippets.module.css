@@ -42,7 +42,7 @@
 .filtroOn {
   background: var(--color-accent-fill);
   border-color: transparent;
-  color: #fff;
+  color: var(--color-on-accent);
 }
 @media (prefers-reduced-motion: reduce) {
   .filtro:hover { transform: none; }
@@ -127,7 +127,7 @@
 .copiado {
   background: var(--color-accent-fill);
   border-color: transparent;
-  color: #fff;
+  color: var(--color-on-accent);
 }
 @media (prefers-reduced-motion: reduce) {
   .copiar:hover,

@@ -99,11 +99,18 @@ La **racha** de días de práctica (`src/lib/racha.ts`) vive **solo en
 `localStorage`**: el servidor guarda *qué* ejercicios se resolvieron, no
 *cuándo*, así que cambiar de equipo la reinicia.
 
-Tema claro/oscuro en `src/lib/tema.tsx` + `src/styles/temas.css`: patrón de
-tres estados — sin elección propia sigue `prefers-color-scheme` sin escribir
-en `<html>`; al tocar el botón se fija `data-theme` y se guarda. El primer
-valor lo pinta un script inline en `index.html` antes del primer frame, para
-que quien eligió claro no vea un fogonazo oscuro.
+La portada (`src/pages/Home.tsx`) lleva detrás del titular una figura `</>`
+hecha de partículas en `<canvas>`. La forma sale de un **molde**: se dibuja en
+un lienzo oculto y las partículas se siembran donde el molde tiene tinta
+(más alfa = más partículas). Cambiar la figura es cambiar ese dibujo
+(`moldeDeLaFigura`), no mover coordenadas. Va con trazos geométricos y no con
+`fillText`: el molde se arma al montar y la fuente web puede no haber cargado.
+
+Las demos de un tema que simulan una app (p. ej. `topics/mongodb-crud/Demos.tsx`,
+el tutorial de instalación) generan su marcado como texto y lo encierran bajo
+una clase del módulo con `:global(...)`. Ojo con las clases globales que ya
+existen en el sitio (`.nav`, `.card`, `.radio`): dentro de esas demos se usan
+nombres propios (`s-nav`, `s-card`, `s-radio`) para que no se cuelen.
 
 ### Visibilidad y semanas de los temas
 
@@ -149,12 +156,21 @@ bytes exactos) y nunca filtra el stack de error al cliente.
 
 ## Reglas de diseño y movimiento
 
-- Todo color, tipografía, radio y sombra sale de las variables de
-  `src/styles/nocturne.css` (sistema de diseño Nocturne). No se escriben hex
-  ni px sueltos. Colores de apoyo en `src/styles/layout.css`: `--color-tech`
-  (datos y progreso) y `--color-ok` / `--color-off` (encendido/apagado).
-- El acento (`#9184d9`) se usa como línea y como brillo, nunca como relleno
-  grande. La única superficie saturada es la banda de cifras de la home.
+- El sitio usa la **plantilla "terminal" de las diapositivas del curso**
+  (paleta oscura de GitHub): fondo `#0D1117`, paneles `#161B22`, bordes
+  `#30363D`, acento verde `#6CC24A`, amarillo `#F7DF1E` para el código en
+  línea. Los tokens viven en `src/styles/temas.css`, que manda sobre
+  `nocturne.css` (espejo de un sistema remoto: no se toca). No se escriben hex
+  ni px sueltos fuera de esos bloques de tokens.
+- **Solo hay tema oscuro.** La plantilla no tiene versión clara y el
+  interruptor de tema se quitó a propósito.
+- Sobre un relleno de acento el texto va en `var(--color-on-accent)` (oscuro),
+  **nunca `#fff`**: blanco sobre el verde da 2.3:1 y no pasa AA.
+- Letra: JetBrains Mono (autoalojada con `@fontsource-variable`, sin
+  peticiones a Google) en títulos e interfaz vía `--font-mono` /
+  `--font-heading`; el cuerpo de las lecciones sigue en sans. Gramática de
+  terminal: el `.kicker` lleva `$ ` delante (comando) y los rótulos de sección
+  se escriben como comentario (`// cronograma`).
 - `src/lib/motion.ts` da tres transiciones —`enter`, `settle`, `springy`— más
   el paso `STAGGER`. Una cuarta necesita una razón. Sus curvas coinciden con
   los tokens `--ease-*` / `--dur-*` de CSS. Nada de UI por encima de 300 ms.

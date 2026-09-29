@@ -6,6 +6,9 @@ import { AuthProvider } from './lib/auth';
 import { ProgressProvider } from './lib/progress';
 import { TopicVisibilityProvider } from './lib/topicVisibility';
 import { AvisosToaster } from './lib/avisos';
+// Autoalojada y no desde Google Fonts: la bajan equipos de estudiantes
+// menores de edad, y así no sale ninguna petición a un tercero por ella.
+import '@fontsource-variable/jetbrains-mono';
 import './styles/nocturne.css';
 import './styles/layout.css';
 import './styles/temas.css';
