@@ -9,6 +9,7 @@ import {
   TrueFalse,
 } from '../../components/exercises';
 import { Callout, Compare, Figure, RefTable, Step, Steps, Terminal } from '../../components/visuals';
+import { InstalarMongo } from './Demos';
 
 const SLUG = 'mongodb-crud';
 
@@ -163,28 +164,37 @@ export default function MongodbCrud() {
         </Callout>
       </Lesson>
 
-      <Lesson title="5. Conectar Mongo con tu API, paso a paso">
+      <Lesson title="5. Instala MongoDB en tu computador">
+        <p>
+          Para aprender, la base de datos vive en tu propio computador: no depende de internet, no
+          pide cuenta y lo que rompas solo lo rompes tú. Sigue el tutorial de tu sistema operativo;
+          al final, la shell te tiene que mostrar las bases <code>admin</code>, <code>config</code>{' '}
+          y <code>local</code>.
+        </p>
+        <InstalarMongo />
+      </Lesson>
+
+      <Lesson title="6. Conectar Mongo con tu API, paso a paso">
         <Callout>
-          Este curso usa <strong>MongoDB Atlas</strong> (capa gratuita M0: en la nube, gratis para
-          siempre, sin tarjeta de crédito, 512 MB) y no Mongo instalado en el computador. En equipos
-          de colegio con permisos limitados, instalar y mantener corriendo un servidor de base de
-          datos local suele dar más problemas de los que resuelve.
+          En clase trabajas con el Mongo <strong>de tu computador</strong>. Cuando publiques el
+          proyecto (sesión 24) la base pasa a <strong>MongoDB Atlas</strong>, en la nube, porque el
+          servidor en internet no puede ver tu equipo. Tu código no cambia: solo cambia la cadena de
+          conexión en <code>.env</code>. Por eso la guardamos ahí desde el primer día.
         </Callout>
         <Steps>
-          <Step title="Crea tu clúster en Atlas">
-            En <code>cloud.mongodb.com</code>: cuenta, clúster con el plan <strong>M0 (Free)</strong>,
-            un usuario de base de datos (anota usuario y contraseña), y en <strong>Network Access</strong>{' '}
-            agrega tu dirección IP. Al final copias tu cadena de conexión:
-            <Terminal
-              lineas={['mongodb+srv://usuario:<password>@cluster.xxxxx.mongodb.net/mi_negocio']}
-            />
+          <Step title="Ten MongoDB corriendo">
+            Es el servicio que dejaste instalado en la lección anterior. Su dirección, con el nombre de
+            tu base al final, es:
+            <Terminal lineas={['mongodb://localhost:27017/mi_negocio']} />
+            Si la base <code>mi_negocio</code> no existe todavía, no importa: Mongo la crea sola la
+            primera vez que guardas algo en ella.
           </Step>
           <Step title="Guárdala en .env, nunca en el código">
-            <Terminal
-              titulo=".env"
-              lineas={['MONGO_URL=mongodb+srv://usuario:<password>@cluster.xxxxx.mongodb.net/mi_negocio']}
-            />
+            <Terminal titulo=".env" lineas={['MONGO_URL=mongodb://localhost:27017/mi_negocio']} />
             <Terminal titulo=".gitignore" lineas={['.env', 'node_modules']} />
+            Al publicar, esa línea se reemplaza por la de Atlas, que tiene usuario y contraseña (
+            <code>mongodb+srv://usuario:&lt;password&gt;@…</code>) — y justamente por eso{' '}
+            <code>.env</code> nunca se sube a GitHub.
           </Step>
           <Step title="Instala el driver">
             <Terminal lineas={['$ npm install mongodb']} />

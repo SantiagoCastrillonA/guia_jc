@@ -1,0 +1,615 @@
+/* Tutorial de instalación de MongoDB (ver Demos.tsx).
+
+   Dos mundos en un mismo componente:
+
+   - El marco —pestañas, panel del paso, botones, lista de pasos— es parte del
+     sitio y usa sus tokens. Como el sitio ya lleva la plantilla terminal, se ve
+     igual que el tutorial original sin repetir ningún color.
+   - La pantalla simulada imita apps reales (el sitio de MongoDB, el instalador
+     de Windows, Compass, la Terminal de Mac). Esas apps son claras, así que su
+     paleta es propia y fija: se declara una vez en `.escena` como `--m-*`.
+
+   Todo lo de la simulación va bajo `.escena :global(...)`: el marcado se genera
+   como texto con clases normales, y encerrarlo aquí evita que choque con las
+   clases globales del sitio en cualquiera de las dos direcciones. */
+
+.raiz {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: var(--leading) 0;
+}
+/* El foco del contenedor solo sirve para que las flechas funcionen tras un
+   clic en la simulación; no es un destino de teclado (tabIndex -1). */
+.raiz:focus { outline: none; }
+
+/* ── cabecera ──────────────────────────────────────────────────────────── */
+
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+  align-items: end;
+  justify-content: space-between;
+}
+.prompt {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-accent-text);
+}
+.prompt::before { content: '$ '; }
+.titulo {
+  margin: 4px 0 0;
+  font-family: var(--font-mono);
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 700;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.pestanas { display: flex; gap: 8px; flex-wrap: wrap; }
+.pestana {
+  font: inherit;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 15px;
+  text-align: left;
+  padding: 10px 14px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--color-divider);
+  background: var(--color-surface);
+  color: var(--color-text-2);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.pestana small {
+  display: block;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--color-text-3);
+}
+.pestana[aria-selected='true'] {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  border-color: var(--color-accent);
+}
+.pestana:focus-visible,
+.boton:focus-visible,
+.pasos button:focus-visible {
+  outline: 2px solid var(--color-code);
+  outline-offset: 2px;
+}
+
+/* ── cuerpo: pantalla + panel ──────────────────────────────────────────── */
+
+.cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+/* Consulta de contenedor y no de pantalla: la columna de la lección es más
+   angosta que la ventana, y lo que importa es el ancho que tiene el tutorial. */
+@container (max-width: 820px) {
+  .cuerpo { grid-template-columns: minmax(0, 1fr); }
+}
+
+.columnaPantalla {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.ventana {
+  background: var(--color-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+.ventanaBarra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-divider);
+}
+.punto { width: 11px; height: 11px; border-radius: 50%; }
+.punto[data-c='rojo'] { background: var(--color-off); }
+.punto[data-c='amarillo'] { background: var(--color-code); }
+.punto[data-c='verde'] { background: var(--color-accent); }
+.ventanaEtiqueta {
+  margin-left: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vista {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 880 / 540;
+  overflow: hidden;
+  background: #f5f7f6;
+}
+
+/* ── panel del paso ────────────────────────────────────────────────────── */
+
+/* La tarjeta se estira hasta la altura de la columna de la pantalla: si el
+   paso tiene poco texto, el fondo de la tarjeta llena el espacio en vez de
+   dejar un hueco bajo ella. */
+.panel { display: flex; flex-direction: column; min-width: 0; align-self: stretch; }
+.tarjeta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 22px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-card);
+}
+.numero {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-accent-text);
+}
+.tituloPaso {
+  margin: 0;
+  font-size: clamp(20px, 2.2vw, 24px);
+  line-height: 1.25;
+  text-wrap: balance;
+}
+.lista {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 15.5px;
+  line-height: 1.45;
+}
+.lista code,
+.nota code { overflow-wrap: anywhere; }
+
+/* El nombre exacto de un botón o menú de la app real. */
+.panel :global(.ui) {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-divider);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.nota {
+  padding: 12px 14px;
+  font-size: 14.5px;
+  line-height: 1.45;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--color-divider);
+  background: var(--color-bg);
+}
+.nota b {
+  display: block;
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+.nota[data-tipo='tip'] b { color: var(--color-ok); }
+.nota[data-tipo='info'] b { color: var(--color-accent-2); }
+.nota[data-tipo='warn'] { border-color: color-mix(in srgb, var(--color-off) 45%, transparent); }
+.nota[data-tipo='warn'] b { color: var(--color-off); }
+
+.controles { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.boton {
+  font: inherit;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 9px 13px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--color-divider);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out), filter var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .boton:not(:disabled):hover { border-color: var(--color-text-3); }
+  .botonPri:not(:disabled):hover { filter: brightness(1.08); }
+}
+.boton:disabled { opacity: 0.4; cursor: default; }
+.botonPri {
+  background: var(--color-accent-fill);
+  border-color: var(--color-accent-fill);
+  color: var(--color-on-accent);
+}
+.boton[aria-pressed='true'] { border-color: var(--color-code); color: var(--color-code); }
+
+.pista {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-text-3);
+}
+
+/* ── progreso: fila horizontal bajo todo el tutorial ───────────────────────
+   Un círculo por paso, unidos por una línea que se pinta de verde a medida
+   que se avanza. Cada paso ocupa lo mismo; en anchos chicos la fila se
+   desliza de lado en vez de apretar los nombres. */
+
+.pasos {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 4px;
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+.pasos li {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 96px;
+  scroll-snap-align: center;
+}
+/* El tramo de línea que llega a este paso desde el anterior. Va detrás del
+   círculo, que tapa su extremo con su propio fondo. */
+.pasos li + li::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  right: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--color-divider);
+}
+.pasos li[data-estado='hecho']::before,
+.pasos li[data-estado='actual']::before {
+  background: var(--color-accent);
+}
+
+.pasos button {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 6px;
+  font: inherit;
+  font-size: 12.5px;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--color-text-2);
+  background: none;
+  border: 0;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .pasos button:hover { color: var(--color-text); }
+}
+.nombrePaso { text-wrap: balance; }
+
+.circulo {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--color-divider);
+  /* Fondo propio para tapar la línea que pasa por detrás. */
+  background: var(--color-bg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.pasos [data-estado='actual'] button {
+  color: var(--color-text);
+  font-weight: 700;
+}
+.pasos [data-estado='actual'] .circulo {
+  background: var(--color-accent-fill);
+  border-color: var(--color-accent-fill);
+  color: var(--color-on-accent);
+  font-weight: 800;
+}
+.pasos [data-estado='hecho'] .circulo {
+  border-color: var(--color-accent);
+  color: var(--color-accent-text);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pasos { scroll-behavior: auto; }
+}
+
+/* ══ pantalla simulada ═══════════════════════════════════════════════════
+   Lienzo fijo de 880 × 540, escalado desde JS. Paleta y tipografía de las
+   apps que imita: no siguen el tema del sitio a propósito. */
+
+.escena {
+  --m-bg: #f5f7f6;
+  --m-card: #ffffff;
+  --m-line: #dde3e0;
+  --m-fg: #1c2d27;
+  --m-muted: #6b7b75;
+  --m-green: #00a35c;
+  --m-sel: #e3fcf0;
+  --m-dark: #0f1a17;
+  --m-mono: 'JetBrains Mono Variable', 'Courier New', monospace;
+
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 880px;
+  height: 540px;
+  transform-origin: 0 0;
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--m-fg);
+  font-size: 14px;
+}
+/* El `code` suelto del sitio va en amarillo; dentro de las apps simuladas no. */
+.escena code { color: inherit; }
+
+.escena :global(.sim) {
+  position: absolute; right: 10px; top: 46px; z-index: 5;
+  font-family: var(--m-mono); font-size: 11px; color: var(--m-muted);
+  background: #ffffffcc; padding: 2px 6px; border-radius: 4px;
+}
+
+/* cursor y clic */
+.escena :global(.cursor) {
+  position: absolute; left: 0; top: 0; width: 26px; height: 26px; z-index: 50;
+  pointer-events: none; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+  transition: transform 0.7s cubic-bezier(0.4, 0.1, 0.2, 1);
+}
+.escena :global(.ripple) {
+  position: absolute; width: 36px; height: 36px; margin: -18px 0 0 -18px; z-index: 49;
+  border-radius: 50%; border: 3px solid var(--m-green); pointer-events: none;
+  animation: onda 0.5s ease-out forwards;
+}
+@keyframes onda {
+  from { transform: scale(0.3); opacity: 1; }
+  to { transform: scale(1.4); opacity: 0; }
+}
+
+/* navegador */
+.escena :global(.br) { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.escena :global(.br-bar) {
+  height: 40px; flex: none; background: #e8ecea; border-bottom: 1px solid var(--m-line);
+  display: flex; align-items: center; gap: 10px; padding: 0 12px;
+}
+.escena :global(.br-dots) { display: flex; gap: 6px; }
+.escena :global(.br-dots i) { width: 10px; height: 10px; border-radius: 50%; background: #c5ccc9; }
+.escena :global(.url) {
+  flex: 1; height: 26px; background: #fff; border: 1px solid var(--m-line); border-radius: 13px;
+  display: flex; align-items: center; padding: 0 12px; font-size: 13px; color: var(--m-muted);
+  font-family: var(--m-mono);
+}
+.escena :global(.url b) { color: var(--m-fg); font-weight: 400; }
+.escena :global(.br-body) { flex: 1; position: relative; overflow: hidden; }
+.escena :global(.s-nav) {
+  height: 46px; background: var(--m-dark); color: #fff; display: flex; align-items: center;
+  padding: 0 18px; gap: 18px; font-size: 13px;
+}
+.escena :global(.s-nav .brand) { font-weight: 700; letter-spacing: 0.2px; }
+.escena :global(.s-nav span) { opacity: 0.75; }
+.escena :global(.s-card) {
+  background: var(--m-card); border: 1px solid var(--m-line); border-radius: 10px; padding: 22px 26px;
+}
+.escena :global(.h) { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+.escena :global(.sub) { color: var(--m-muted); font-size: 13px; margin: 0 0 14px; }
+.escena :global(.lab) { font-size: 12px; font-weight: 700; margin: 10px 0 4px; color: var(--m-fg); }
+.escena :global(.in) {
+  height: 36px; border: 1px solid #b8c4bf; border-radius: 6px; background: #fff;
+  display: flex; align-items: center; padding: 0 10px; font-size: 14px;
+  font-family: var(--m-mono); white-space: nowrap; overflow: hidden;
+}
+.escena :global(.in .v:empty::before) { content: attr(data-ph); color: #9aa8a2; }
+.escena :global(.in.focus) { border-color: var(--m-green); box-shadow: 0 0 0 3px #00a35c33; }
+.escena :global(.in.sm) { height: 28px; font-size: 12px; background: #f3f5f4; color: #4a5a54; }
+.escena :global(.mbtn) {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 38px;
+  padding: 0 16px; border-radius: 6px; font-weight: 700; font-size: 14px;
+  border: 1px solid transparent; white-space: nowrap;
+}
+.escena :global(.mbtn.pri) { background: var(--m-green); color: #fff; }
+.escena :global(.mbtn.sec) { background: #fff; border-color: #b8c4bf; color: var(--m-fg); }
+.escena :global(.mbtn.pressed) { filter: brightness(0.88); transform: translateY(1px); }
+.escena :global(.chk) { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-top: 12px; }
+.escena :global(.box) {
+  width: 18px; height: 18px; border: 2px solid #8a9993; border-radius: 4px;
+  display: grid; place-items: center; background: #fff; flex: none;
+}
+.escena :global(.on .box),
+.escena :global(.box.on) { background: var(--m-green); border-color: var(--m-green); }
+.escena :global(.on .box::after),
+.escena :global(.box.on::after) {
+  content: ''; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+.escena :global(.toast) {
+  position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 20;
+  background: var(--m-dark); color: #fff; padding: 10px 16px; border-radius: 8px;
+  font-size: 13px; white-space: nowrap;
+}
+.escena :global(.toast b) { color: #71f6ba; }
+.escena :global(.modal-bg) {
+  position: absolute; inset: 0; background: #0f1a1766; z-index: 10;
+  display: flex; align-items: center; justify-content: center;
+}
+.escena :global(.list-opt) {
+  display: flex; align-items: center; justify-content: space-between; margin-top: 8px;
+  border: 1px solid var(--m-line); border-radius: 8px; padding: 10px 14px; background: #fff; font-size: 14px;
+}
+.escena :global(.list-opt span) { color: var(--m-muted); font-size: 12px; }
+.escena :global(.hl) { background: #fff2a8; border-radius: 3px; }
+.escena :global(.dl) {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 46px; z-index: 8;
+  background: #fff; border-top: 1px solid var(--m-line);
+  display: flex; align-items: center; gap: 12px; padding: 0 16px; font-size: 13px;
+}
+.escena :global(.fileic) {
+  width: 26px; height: 30px; border-radius: 4px; background: var(--m-green); color: #fff;
+  font-size: 9px; font-weight: 700; display: grid; place-items: end center; padding-bottom: 3px;
+}
+.escena :global(.select) {
+  height: 36px; border: 1px solid #b8c4bf; border-radius: 6px; background: #fff;
+  display: flex; align-items: center; justify-content: space-between; padding: 0 10px; font-size: 13px;
+}
+.escena :global(.select::after) {
+  content: ''; width: 7px; height: 7px; border: solid var(--m-muted); border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translateY(-3px);
+}
+.escena :global(.select.sel) { border-color: var(--m-green); box-shadow: 0 0 0 3px #00a35c33; }
+
+/* app de escritorio (Compass) */
+.escena :global(.app) { position: absolute; inset: 0; display: flex; flex-direction: column; background: #fff; }
+.escena :global(.app-bar) {
+  height: 34px; flex: none; background: #e8ecea; border-bottom: 1px solid var(--m-line);
+  display: flex; align-items: center; justify-content: center; font-size: 12px;
+  color: var(--m-muted); position: relative;
+}
+.escena :global(.app-bar .br-dots) { position: absolute; left: 12px; }
+.escena :global(.app-main) { flex: 1; display: flex; min-height: 0; position: relative; }
+.escena :global(.side) {
+  width: 210px; flex: none; background: #f3f6f5; border-right: 1px solid var(--m-line);
+  padding: 14px 12px; display: flex; flex-direction: column; gap: 10px; font-size: 13px;
+}
+.escena :global(.side .ttl) {
+  font-weight: 700; font-size: 12px; color: var(--m-muted); text-transform: uppercase; letter-spacing: 0.6px;
+}
+.escena :global(.conn) {
+  display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px;
+  background: #fff; border: 1px solid var(--m-line); font-weight: 600;
+}
+.escena :global(.conn i) { width: 8px; height: 8px; border-radius: 50%; background: var(--m-green); }
+.escena :global(.db) { padding: 3px 8px 3px 24px; color: var(--m-muted); font-family: var(--m-mono); font-size: 12px; }
+.escena :global(.content) { flex: 1; min-width: 0; position: relative; padding: 22px; }
+.escena :global(.shell) {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 210px; background: #0f1a17; color: #e6edf3;
+  font-family: var(--m-mono); font-size: 14px; padding: 12px 16px; line-height: 1.55;
+  border-top: 3px solid var(--m-green);
+}
+.escena :global(.shell .p) { color: #71f6ba; }
+.escena :global(.shell .o) { color: #a8b8b2; white-space: pre; }
+.escena :global(.caret) {
+  display: inline-block; width: 8px; height: 16px; background: currentColor;
+  vertical-align: -3px; opacity: 0.8; animation: titila 1s steps(1) infinite;
+}
+.escena :global(.in .caret) { display: none; }
+.escena :global(.in.focus .caret) { display: inline-block; background: var(--m-fg); }
+@keyframes titila { 50% { opacity: 0; } }
+
+/* asistente de instalación */
+.escena :global(.wiz) {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 540px; z-index: 6;
+  background: #fff; border: 1px solid #9aa8a2; border-radius: 8px; box-shadow: 0 18px 40px #0003; overflow: hidden;
+}
+.escena :global(.wiz-h) { background: #e8ecea; padding: 8px 12px; font-size: 12px; color: var(--m-muted); }
+.escena :global(.wiz-b) { padding: 18px 22px; min-height: 210px; }
+.escena :global(.wiz-f) {
+  display: flex; justify-content: flex-end; gap: 8px; padding: 12px 16px;
+  border-top: 1px solid var(--m-line); background: #f7f9f8;
+}
+.escena :global(.s-radio) {
+  display: flex; gap: 10px; align-items: flex-start; padding: 10px; margin-top: 8px;
+  border: 1px solid var(--m-line); border-radius: 6px; font-size: 13px;
+}
+.escena :global(.s-radio i) {
+  width: 16px; height: 16px; border-radius: 50%; border: 2px solid #8a9993; flex: none; margin-top: 1px;
+}
+.escena :global(.s-radio.on) { border-color: var(--m-green); background: var(--m-sel); }
+.escena :global(.s-radio.on i) { border: 5px solid var(--m-green); }
+.escena :global(.bar) { height: 10px; background: #e3e8e6; border-radius: 5px; overflow: hidden; margin-top: 14px; }
+.escena :global(.bar i) { display: block; height: 100%; width: 0; background: var(--m-green); transition: width 2s ease; }
+.escena :global(.bar.full i) { width: 100%; }
+
+/* escritorio de Windows */
+.escena :global(.desk) { position: absolute; inset: 0; background: radial-gradient(120% 90% at 30% 20%, #2f6f8f, #123a52 70%); }
+.escena :global(.desk .wiz) { top: 46%; }
+.escena :global(.taskbar) {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 40px; z-index: 4; background: #1f2a33ee;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.escena :global(.taskbar .start) { width: 22px; height: 22px; border-radius: 4px; background: linear-gradient(135deg, #4cc2ff, #0067c0); }
+.escena :global(.taskbar .tb-app) { width: 22px; height: 22px; border-radius: 4px; background: #ffffff33; }
+.escena :global(.taskbar .clock) { position: absolute; right: 14px; color: #fff; font-size: 12px; }
+.escena :global(.kv) { display: grid; grid-template-columns: 110px 1fr; align-items: center; gap: 8px; margin-top: 8px; font-size: 12.5px; }
+.escena :global(.uac) {
+  position: absolute; left: 50%; top: 44%; transform: translate(-50%, -50%); width: 460px; z-index: 20;
+  background: #1f3a5a; color: #fff; border-radius: 8px; box-shadow: 0 24px 60px #0008; overflow: hidden;
+}
+.escena :global(.uac-h) { padding: 8px 14px; font-size: 12px; background: #17304c; }
+.escena :global(.uac-b) { padding: 16px 18px; }
+.escena :global(.uac-f) { display: flex; gap: 8px; justify-content: flex-end; padding: 12px 16px; background: #17304c; }
+.escena :global(.run) {
+  position: absolute; left: 24px; bottom: 56px; width: 420px; z-index: 6; overflow: hidden;
+  background: #fff; border: 1px solid #9aa8a2; border-radius: 8px; box-shadow: 0 18px 40px #0005;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.escena :global(.svc) {
+  position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); width: 660px; z-index: 6; overflow: hidden;
+  background: #fff; border: 1px solid #9aa8a2; border-radius: 8px; box-shadow: 0 18px 40px #0005;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.escena :global(.svc-t) { padding: 6px 0; }
+.escena :global(.svc-r) { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 10px; padding: 7px 14px; font-size: 13px; }
+.escena :global(.svc-hd) { font-weight: 700; border-bottom: 1px solid var(--m-line); color: var(--m-muted); }
+.escena :global(.svc-r.sel) { background: #cce4f7; }
+.escena :global(.run-ok) { color: #0a7a3b; font-weight: 700; }
+
+/* Mac */
+.escena :global(.mac-desk) { position: absolute; inset: 0; background: linear-gradient(160deg, #6b5b95, #3e6b8a 60%, #2c4a5e); }
+.escena :global(.term) {
+  position: absolute; left: 40px; right: 40px; top: 30px; bottom: 30px; background: #1e1e1e;
+  border-radius: 10px; box-shadow: 0 20px 50px #0007; overflow: hidden; display: flex; flex-direction: column;
+}
+.escena :global(.term-bar) {
+  height: 30px; flex: none; background: #323232; color: #bbb; font-size: 12px;
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.escena :global(.term-bar .br-dots) { position: absolute; left: 12px; }
+.escena :global(.term-body) {
+  flex: 1; padding: 12px 16px; font-family: var(--m-mono); font-size: 14px; line-height: 1.55;
+  color: #e6e6e6; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end;
+}
+.escena :global(.term-body .pr) { color: #7ee787; }
+.escena :global(.term-body .ou) { color: #a8a8a8; white-space: pre-wrap; word-break: break-all; }
+.escena :global(.term-body g) { color: #7ee787; font-weight: 700; }
+.escena :global(.macdlg) {
+  position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); width: 400px; z-index: 20;
+  background: #f2f2f2; border-radius: 12px; padding: 18px 20px; box-shadow: 0 20px 50px #0008; font-size: 13px;
+}
+.escena :global(.dmg) {
+  position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%); width: 460px; z-index: 9;
+  background: #fff; border-radius: 10px; box-shadow: 0 20px 50px #0006; overflow: hidden;
+}
+.escena :global(.dmg-bar) { background: #e8e8e8; text-align: center; font-size: 12px; padding: 6px; color: #555; }
+.escena :global(.dmg-b) { display: flex; align-items: center; justify-content: space-around; padding: 30px 20px; }
+.escena :global(.dmg-ic) { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; padding: 8px; border-radius: 8px; }
+.escena :global(.dmg-ic.sel) { background: #dbeafe; }
+.escena :global(.leaf) { width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(160deg, #00ed64, #00684a); }
+.escena :global(.fold) { width: 64px; height: 50px; border-radius: 6px; background: linear-gradient(#6cb8f5, #3a8ee6); }
+.escena :global(.dmg-arrow) { font-size: 30px; color: #999; }
+.escena :global(.ghost) {
+  position: absolute; width: 48px; height: 48px; border-radius: 12px; z-index: 48; opacity: 0.7;
+  background: linear-gradient(160deg, #00ed64, #00684a); pointer-events: none;
+  transition: transform 0.9s cubic-bezier(0.4, 0.1, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .escena :global(.cursor),
+  .escena :global(.bar i) { transition: none; }
+  .escena :global(.ripple),
+  .escena :global(.caret) { animation: none; }
+}

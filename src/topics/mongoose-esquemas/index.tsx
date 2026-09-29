@@ -220,10 +220,10 @@ export default function MongooseEsquemas() {
           </Step>
         </Steps>
         <Callout>
-          Para tu proyecto, la <code>MONGO_URL</code> más simple es la de un cluster{' '}
-          <strong>MongoDB Atlas</strong> (capa gratuita M0): no instalas nada en tu computador, no
-          pide tarjeta, y la cadena de conexión (<code>mongodb+srv://…</code>) es la que copias tal
-          cual a tu <code>.env</code>.
+          La <code>MONGO_URL</code> es la misma de la sesión 13: el Mongo de tu computador,{' '}
+          <code>mongodb://localhost:27017/mi_negocio</code>. Cuando publiques el proyecto (sesión 24)
+          la cambias por la de <strong>MongoDB Atlas</strong>, y Mongoose se conecta igual — no se
+          toca ni una línea de código.
         </Callout>
       </Lesson>
 

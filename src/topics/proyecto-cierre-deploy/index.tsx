@@ -53,7 +53,7 @@ export default function ProyectoCierreDeploy() {
         <RefTable
           cabeceras={['Pieza', 'Dónde va', 'Nota']}
           filas={[
-            ['Base de datos', 'MongoDB Atlas M0', 'Ya la tienes desde la sesión 13'],
+            ['Base de datos', 'MongoDB Atlas M0', 'Se crea hoy: el Mongo de tu computador no se ve desde internet'],
             ['Backend', 'Render (plan free)', '750 horas al mes'],
             ['Frontend', 'GitHub Pages o sitio estático en Render', 'Ya usaste GitHub Pages en la sesión 7'],
           ]}
@@ -64,6 +64,29 @@ export default function ProyectoCierreDeploy() {
           normal, no un bug — pero significa algo muy concreto para la sesión 25:{' '}
           <strong>entra a tu app unos minutos antes de presentar</strong>, para que ya esté despierta.
         </Callout>
+
+        <p>
+          Hasta ahora tu base vivía en tu computador (<code>localhost:27017</code>, sesión 13). Un
+          servidor en internet no puede ver tu equipo, así que la base se muda a{' '}
+          <strong>MongoDB Atlas</strong>: en la nube, gratis para siempre en el plan M0, sin tarjeta
+          de crédito, 512 MB.
+        </p>
+        <Steps>
+          <Step title="Crea tu clúster en Atlas">
+            En <code>cloud.mongodb.com</code>: cuenta, clúster con el plan <strong>M0 (Free)</strong>,
+            un usuario de base de datos (anota usuario y contraseña), y en{' '}
+            <strong>Network Access</strong> permite la conexión desde tu servidor. Al final copias tu
+            cadena de conexión:
+            <Terminal
+              lineas={['mongodb+srv://usuario:<password>@cluster.xxxxx.mongodb.net/mi_negocio']}
+            />
+          </Step>
+          <Step title="Cambia solo la MONGO_URL">
+            Es la misma variable que usas desde la sesión 13; nada más del código cambia. En local
+            puedes seguir con <code>localhost</code> y en el servidor va la de Atlas — cada lugar con
+            su propio <code>.env</code>.
+          </Step>
+        </Steps>
       </Lesson>
 
       <Lesson title="2. Variables de entorno: nada de direcciones fijas">
