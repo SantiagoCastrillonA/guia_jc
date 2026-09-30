@@ -9,7 +9,8 @@ import {
   TrueFalse,
 } from '../../components/exercises';
 import { Callout, Compare, Figure, RefTable, Step, Steps, Terminal } from '../../components/visuals';
-import { InstalarMongo } from './Demos';
+import { ConfigurarAtlas, InstalarMongo } from './Demos';
+import { MongoVsSql } from './EscenasMongoSql';
 
 const SLUG = 'mongodb-crud';
 
@@ -48,8 +49,10 @@ export default function MongodbCrud() {
       <Lesson title="2. Qué es MongoDB">
         <p>
           MongoDB guarda <strong>documentos</strong> que se parecen mucho a objetos de JavaScript.
-          No hay tablas con columnas fijas: cada documento lleva sus propios campos.
+          No hay tablas con columnas fijas: cada documento lleva sus propios campos. La animación
+          lo compara paso a paso con las bases de datos relacionales (SQL).
         </p>
+        <MongoVsSql />
 
         <Figure
           label="Diagrama: base de datos, colección y documento"
@@ -164,35 +167,61 @@ export default function MongodbCrud() {
         </Callout>
       </Lesson>
 
-      <Lesson title="5. Instala MongoDB en tu computador">
+      <Lesson title="5. Tu base de datos: en tu computador o en la nube">
         <p>
-          Para aprender, la base de datos vive en tu propio computador: no depende de internet, no
-          pide cuenta y lo que rompas solo lo rompes tú. Sigue el tutorial de tu sistema operativo;
-          al final, la shell te tiene que mostrar las bases <code>admin</code>, <code>config</code>{' '}
-          y <code>local</code>.
+          Hay dos formas de tener MongoDB, y el código de tu API es el mismo con cualquiera de las
+          dos: solo cambia la cadena de conexión. Elige una —o haz las dos, que no se estorban.
+        </p>
+        <RefTable
+          cabeceras={['', 'En tu computador', 'En la nube (Atlas)']}
+          filas={[
+            ['Qué instalas', 'MongoDB Server y Compass', 'Solo Compass (opcional)'],
+            ['Necesita internet', 'No', 'Sí'],
+            ['Pide cuenta', 'No', 'Sí, gratis (plan M0)'],
+            ['Sirve al publicar', 'No: tu equipo no se ve desde internet', 'Sí'],
+            [
+              'La cadena empieza por',
+              <code key="local">mongodb://localhost:27017</code>,
+              <code key="atlas">mongodb+srv://…</code>,
+            ],
+          ]}
+        />
+
+        <h3>En tu computador</h3>
+        <p>
+          Sigue el tutorial de tu sistema operativo. Al final, la shell te tiene que mostrar las
+          bases <code>admin</code>, <code>config</code> y <code>local</code>.
         </p>
         <InstalarMongo />
+
+        <h3>En la nube, con MongoDB Atlas</h3>
+        <p>
+          Atlas no instala nada en tu equipo, salvo Compass si quieres ver los datos con una
+          interfaz. Si no hiciste el tutorial local, descarga Compass aparte en{' '}
+          <code>mongodb.com/try/download/compass</code>.
+        </p>
+        <ConfigurarAtlas />
       </Lesson>
 
       <Lesson title="6. Conectar Mongo con tu API, paso a paso">
         <Callout>
-          En clase trabajas con el Mongo <strong>de tu computador</strong>. Cuando publiques el
-          proyecto (sesión 24) la base pasa a <strong>MongoDB Atlas</strong>, en la nube, porque el
-          servidor en internet no puede ver tu equipo. Tu código no cambia: solo cambia la cadena de
-          conexión en <code>.env</code>. Por eso la guardamos ahí desde el primer día.
+          Tu código es el mismo con las dos opciones de la lección anterior: lo único que cambia
+          es la cadena de conexión, y por eso vive en <code>.env</code> desde el primer día. Al
+          publicar el proyecto (sesión 24) siempre se usa <strong>Atlas</strong>: un servidor en
+          internet no puede ver tu equipo.
         </Callout>
         <Steps>
-          <Step title="Ten MongoDB corriendo">
-            Es el servicio que dejaste instalado en la lección anterior. Su dirección, con el nombre de
-            tu base al final, es:
+          <Step title="Ten tu cadena de conexión a mano">
+            Con Mongo en tu computador es esta, con el nombre de tu base al final:
             <Terminal lineas={['mongodb://localhost:27017/mi_negocio']} />
-            Si la base <code>mi_negocio</code> no existe todavía, no importa: Mongo la crea sola la
-            primera vez que guardas algo en ella.
+            Con Atlas es la <code>mongodb+srv://…</code> que guardaste en el último paso de su
+            tutorial. Si la base <code>mi_negocio</code> no existe todavía, no importa: Mongo la crea
+            sola la primera vez que guardas algo en ella.
           </Step>
           <Step title="Guárdala en .env, nunca en el código">
             <Terminal titulo=".env" lineas={['MONGO_URL=mongodb://localhost:27017/mi_negocio']} />
             <Terminal titulo=".gitignore" lineas={['.env', 'node_modules']} />
-            Al publicar, esa línea se reemplaza por la de Atlas, que tiene usuario y contraseña (
+            Con Atlas, esa línea lleva tu cadena con usuario y contraseña (
             <code>mongodb+srv://usuario:&lt;password&gt;@…</code>) — y justamente por eso{' '}
             <code>.env</code> nunca se sube a GitHub.
           </Step>

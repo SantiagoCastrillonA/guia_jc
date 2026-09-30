@@ -607,9 +607,82 @@
   transition: transform 0.9s cubic-bezier(0.4, 0.1, 0.2, 1);
 }
 
+/* Atlas (sitio web) */
+.escena[data-sim='abajo'] :global(.sim) { top: auto; bottom: 8px; }
+.escena :global(.center) { display: flex; justify-content: center; padding-top: 26px; }
+.escena :global(.row) { display: flex; gap: 10px; }
+.escena :global(.row > *) { flex: 1; min-width: 0; }
+.escena :global(.tiers) { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+.escena :global(.tier) { border: 2px solid var(--m-line); border-radius: 8px; padding: 12px; background: #fff; }
+.escena :global(.tier .t) { font-weight: 700; font-size: 15px; }
+.escena :global(.tier .p) { font-size: 13px; color: var(--m-muted); margin-top: 4px; }
+.escena :global(.tier.sel) { border-color: var(--m-green); background: var(--m-sel); }
+.escena :global(.chip) {
+  height: 34px; display: flex; align-items: center; justify-content: center;
+  border: 1px solid #b8c4bf; border-radius: 6px; font-size: 13px; background: #fff;
+}
+.escena :global(.chip.sel) { border-color: var(--m-green); background: var(--m-sel); font-weight: 700; }
+.escena :global(.spin) {
+  width: 18px; height: 18px; border: 3px solid #ffffff55; border-top-color: #fff; border-radius: 50%;
+  animation: giro 0.8s linear infinite;
+}
+@keyframes giro { to { transform: rotate(360deg); } }
+.escena :global(.list-opt.sel) { border-color: var(--m-green); background: var(--m-sel); }
+.escena :global(.connstr) {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  font-family: var(--m-mono); font-size: 12.5px; background: #f0f3f2;
+  border: 1px solid var(--m-line); border-radius: 6px; padding: 10px 12px;
+}
+.escena :global(.connstr code) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.escena :global(.iprow) {
+  display: flex; justify-content: space-between; gap: 10px; padding: 8px 0;
+  border-bottom: 1px solid var(--m-line); font-size: 13px; font-family: var(--m-mono);
+}
+.escena :global(.alayout) { display: flex; height: calc(100% - 46px); }
+.escena :global(.aside) {
+  width: 170px; flex: none; background: #f3f6f5; border-right: 1px solid var(--m-line);
+  padding: 14px 10px; display: flex; flex-direction: column; gap: 4px;
+}
+.escena :global(.aitem) { padding: 8px 10px; border-radius: 6px; font-size: 13px; color: var(--m-muted); }
+.escena :global(.aitem.on) { background: var(--m-sel); color: #00684a; font-weight: 700; }
+/* El estado arranca con un color en línea ("Pending"); `!important` es la
+   única forma de que la clase lo cambie a verde al activarse. */
+.escena :global(#ip-st.ok) { color: var(--m-green) !important; }
+
+/* VS Code */
+.escena :global(.vs) {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  background: #1e1e1e; color: #d4d4d4; font-family: var(--m-mono);
+}
+.escena :global(.vs-bar) {
+  height: 32px; flex: none; display: grid; place-items: center;
+  background: #323233; color: #ccc; font-size: 12px; font-family: Arial, sans-serif;
+}
+.escena :global(.vs-main) { flex: 1; display: flex; min-height: 0; }
+.escena :global(.vs-side) { width: 220px; flex: none; background: #252526; padding: 10px 0; font-size: 14px; }
+.escena :global(.vs-h) { font-size: 11px; color: #9d9d9d; padding: 4px 16px 10px; font-family: Arial, sans-serif; letter-spacing: 0.8px; }
+.escena :global(.vs-f) { padding: 5px 16px; color: #cccccc; }
+.escena :global(.vs-f.act) { background: #37373d; color: #fff; }
+.escena :global(.vs-new) { color: #4ec9b0; margin-top: 10px; }
+.escena :global(.vs-ed) { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.escena :global(.vs-tab) {
+  height: 36px; flex: none; width: max-content; display: flex; align-items: center; padding: 0 16px;
+  background: #1e1e1e; border-bottom: 1px solid #333; border-top: 2px solid #0078d4; font-size: 13px; color: #fff;
+}
+.escena :global(.vs-code) { padding: 14px 0; font-size: 15px; line-height: 1.8; overflow: hidden; }
+.escena :global(.vs-code > div) { white-space: pre-wrap; word-break: break-all; padding-left: 44px; text-indent: -44px; }
+.escena :global(.vs-ln) { display: inline-block; width: 44px; text-align: right; padding-right: 16px; color: #6e7681; }
+.escena :global(.vk) { color: #9cdcfe; }
+.escena :global(.vv),
+.escena :global(.vs2) { color: #ce9178; }
+.escena :global(.vc) { color: #6a9955; }
+.escena :global(.vk2) { color: #569cd6; }
+.escena :global(.hlv) { background: #f7df1e33; color: #f7df1e; padding: 0 4px; border-radius: 3px; }
+
 @media (prefers-reduced-motion: reduce) {
   .escena :global(.cursor),
   .escena :global(.bar i) { transition: none; }
   .escena :global(.ripple),
-  .escena :global(.caret) { animation: none; }
+  .escena :global(.caret),
+  .escena :global(.spin) { animation: none; }
 }

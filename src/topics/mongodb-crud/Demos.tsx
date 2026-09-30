@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 import styles from './Demos.module.css';
 
 /*
- * Tutorial animado: instalar MongoDB en el computador (Windows y macOS).
+ * Tutoriales animados de la sesión 13, con un mismo motor: instalar MongoDB
+ * en el computador (Windows y macOS) y configurar MongoDB Atlas en la nube.
  *
  * A la izquierda, una pantalla simulada —el sitio de descarga, el instalador,
  * Compass, la Terminal— sobre un lienzo fijo de 880 × 540 que se escala al
@@ -551,8 +552,412 @@ const MAC: Paso[] = [
   },
 ];
 
-const RUTAS = { win: WINDOWS, mac: MAC } as const;
-type Ruta = keyof typeof RUTAS;
+/* ── Atlas ──────────────────────────────────────────────────────────────── */
+
+const navAtlas = `<div class="s-nav"><span class="brand">Atlas</span><span>Organización</span><span>Project 0</span><span style="margin-left:auto">Laura Gómez</span></div>`;
+const ladoAtlas = (activo: string) =>
+  `<div class="aside">${['Clusters', 'Database Access', 'Network Access']
+    .map(
+      (x) =>
+        `<div class="aitem ${x === activo ? 'on' : ''}" id="nav-${x.split(' ')[0].toLowerCase()}">${x}</div>`,
+    )
+    .join('')}</div>`;
+
+/*
+ * La contraseña de ejemplo se muestra siempre enmascarada, y las cadenas de
+ * conexión que la llevan se arman por partes aquí. Una cadena didáctica con la
+ * forma `usuario:clave@host` escrita tal cual en el repo disparó una alerta
+ * pública de "Secret leak" en GitHub (commit dd336a2): el escaneo mira la
+ * forma de la cadena, no si la clave es real. Escrito completo en el código
+ * solo queda el marcador de Atlas entre corchetes, `<db_password>`.
+ */
+const CLAVE_DEMO = '●'.repeat(12);
+const USUARIO_ATLAS = 'mongodb+srv://laura_admin';
+const HOST_ATLAS = 'cluster0.ab12c.mongodb.net';
+const cadenaAtlas = (clave: string, base = '') => `${USUARIO_ATLAS}:${clave}@${HOST_ATLAS}/${base}`;
+
+const ATLAS: Paso[] = [
+  {
+    nombre: 'Crea tu cuenta',
+    etiqueta: 'navegador · cloud.mongodb.com',
+    titulo: 'Crea tu cuenta en Atlas',
+    cuerpo: [
+      "Entra a <code>cloud.mongodb.com</code> y haz clic en <span class='ui'>Sign up</span>.",
+      "Llena correo, nombre y contraseña, o usa <span class='ui'>Sign up with Google</span>.",
+      "Acepta los términos y haz clic en <span class='ui'>Create your Atlas account</span>.",
+      'Verifica tu correo y responde las preguntas de bienvenida: cualquier opción sirve.',
+    ],
+    nota: [
+      'info',
+      'Atlas es MongoDB en la nube',
+      'Es el mismo MongoDB, pero corriendo en los servidores de MongoDB en vez de tu computador: no instalas el servidor, y tu app sigue funcionando cuando la publicas en internet.',
+    ],
+    pantalla: () =>
+      navegador(
+        'cloud.mongodb.com/register',
+        `
+    <div class="center"><div class="s-card" style="width:420px">
+      <p class="h">Get started with Atlas</p><p class="sub">Create your free account</p>
+      <div class="mbtn sec" style="width:100%">Sign up with Google</div>
+      <div class="lab">Email</div>${campo('f-mail', 'name@example.com')}
+      <div class="row"><div><div class="lab">First name</div>${campo('f-first', '')}</div><div><div class="lab">Last name</div>${campo('f-last', '')}</div></div>
+      <div class="lab">Password</div>${campo('f-pass', '8 characters minimum')}
+      <div class="chk" id="terms"><span class="box"></span>I agree to the Terms of Service</div>
+      <div class="mbtn pri" id="b-create" style="width:100%;margin-top:14px">Create your Atlas account</div>
+    </div></div>
+    <div class="toast" id="t1" hidden>Revisa tu correo: <b>Verify your email</b></div>`,
+      ),
+    acciones: [
+      ['type', '#f-mail', 'laura.gomez@gmail.com'],
+      ['type', '#f-first', 'Laura'],
+      ['type', '#f-last', 'Gómez'],
+      ['type', '#f-pass', '●'.repeat(10)],
+      ['click', '#terms'],
+      ['add', '#terms', 'on'],
+      ['click', '#b-create'],
+      ['show', '#t1'],
+    ],
+  },
+  {
+    nombre: 'Crea el clúster gratis',
+    etiqueta: 'navegador · Deploy your cluster',
+    titulo: 'Crea un clúster gratis (M0)',
+    cuerpo: [
+      "En <span class='ui'>Deploy your cluster</span> elige el plan <span class='ui'>Free</span> (M0).",
+      'Deja el nombre <code>Cluster0</code> y el proveedor que viene por defecto.',
+      "En <span class='ui'>Region</span> elige la más cercana (por ejemplo, São Paulo o N. Virginia).",
+      "Haz clic en <span class='ui'>Create Deployment</span>. Tarda unos segundos.",
+    ],
+    nota: [
+      'tip',
+      'Gratis para siempre',
+      'El plan Free no pide tarjeta de crédito y te da 512 MB. Solo se permite un clúster gratis por proyecto.',
+    ],
+    pantalla: () =>
+      navegador(
+        'cloud.mongodb.com/v2#/clusters/deploy',
+        navAtlas +
+          `
+    <div style="padding:20px 28px">
+      <p class="h">Deploy your cluster</p><p class="sub">Choose a cluster type</p>
+      <div class="tiers">
+        <div class="tier"><div class="t">M10</div><div class="p">Dedicated · $0.08/hr</div></div>
+        <div class="tier"><div class="t">Flex</div><div class="p">Pay as you go</div></div>
+        <div class="tier" id="tier-free"><div class="t">Free</div><div class="p">M0 · 512 MB · Free forever</div></div>
+      </div>
+      <div class="row"><div><div class="lab">Name</div>${campo('c-name', '')}</div>
+        <div><div class="lab">Provider</div><div class="row"><div class="chip sel" id="p-aws">AWS</div><div class="chip">Google Cloud</div><div class="chip">Azure</div></div></div></div>
+      <div class="lab">Region</div><div class="select" id="c-reg" style="width:50%"><span class="pv">N. Virginia (us-east-1)</span></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:16px"><div class="mbtn pri" id="b-deploy">Create Deployment</div></div>
+    </div>
+    <div class="toast" id="t2" hidden><span style="display:inline-flex;gap:10px;align-items:center"><span class="spin"></span>Creando Cluster0…</span></div>`,
+      ),
+    acciones: [
+      ['set', '#c-name', 'Cluster0'],
+      ['click', '#tier-free'],
+      ['add', '#tier-free', 'sel'],
+      ['move', '#c-name'],
+      ['click', '#c-reg'],
+      ['text', '#c-reg .pv', 'São Paulo (sa-east-1)'],
+      ['click', '#b-deploy'],
+      ['show', '#t2'],
+      ['wait', 1400],
+    ],
+  },
+  {
+    nombre: 'Crea tu usuario',
+    etiqueta: 'navegador · Security Quickstart',
+    titulo: 'Crea el usuario de la base de datos',
+    cuerpo: [
+      "Aparece <span class='ui'>Security Quickstart</span>. En <span class='ui'>Username</span> escribe un usuario sin espacios.",
+      "Escribe una contraseña o usa <span class='ui'>Autogenerate Secure Password</span>.",
+      '<b>Cópiala y guárdala</b>: la necesitas en los pasos 6 y 7.',
+      "Haz clic en <span class='ui'>Create Database User</span>.",
+    ],
+    nota: [
+      'warn',
+      'Ojo con la contraseña',
+      'Evita símbolos como <code>@</code>, <code>/</code> o <code>:</code> porque rompen la cadena de conexión. Este usuario es de la base de datos, no es tu cuenta de Atlas.',
+    ],
+    pantalla: () =>
+      navegador(
+        'cloud.mongodb.com/v2#/security/quickstart',
+        navAtlas +
+          `
+    <div class="modal-bg"><div class="s-card" style="width:500px">
+      <p class="h">Security Quickstart</p><p class="sub">1. How would you like to authenticate your connection?</p>
+      <div class="lab">Username</div>${campo('u-name', '')}
+      <div class="lab">Password</div>
+      <div class="row" style="align-items:center"><div style="flex:2">${campo('u-pass', '')}</div><div class="mbtn sec" id="b-copy" style="flex:none">Copy</div></div>
+      <div class="mbtn sec" id="b-auto" style="margin-top:10px">Autogenerate Secure Password</div>
+      <div style="display:flex;justify-content:flex-end;margin-top:18px"><div class="mbtn pri" id="b-user">Create Database User</div></div>
+    </div></div>
+    <div class="toast" id="t3a" hidden><b>Copiada.</b> Pégala en un bloc de notas.</div>
+    <div class="toast" id="t3" hidden><b>✓</b> Usuario <b>laura_admin</b> creado</div>`,
+      ),
+    acciones: [
+      ['type', '#u-name', 'laura_admin'],
+      ['click', '#b-auto'],
+      ['set', '#u-pass', CLAVE_DEMO],
+      ['click', '#b-copy'],
+      ['show', '#t3a'],
+      ['wait', 1200],
+      ['hide', '#t3a'],
+      ['click', '#b-user'],
+      ['show', '#t3'],
+    ],
+  },
+  {
+    nombre: 'Autoriza tu IP',
+    etiqueta: 'navegador · Security Quickstart',
+    titulo: 'Autoriza tu dirección IP',
+    cuerpo: [
+      "En la misma ventana, en <span class='ui'>Where would you like to connect from?</span> deja <span class='ui'>My Local Environment</span>.",
+      "Haz clic en <span class='ui'>Add My Current IP Address</span>.",
+      "Haz clic en <span class='ui'>Finish and Close</span> y luego en <span class='ui'>Go to Overview</span>.",
+    ],
+    nota: [
+      'warn',
+      'No uses 0.0.0.0/0',
+      'Esa opción abre tu base de datos a todo internet. Atlas solo deja entrar a las IP de esta lista: en el paso 8 verás qué hacer si cambias de red.',
+    ],
+    pantalla: () =>
+      navegador(
+        'cloud.mongodb.com/v2#/security/quickstart',
+        navAtlas +
+          `
+    <div class="modal-bg"><div class="s-card" style="width:520px">
+      <p class="h">Security Quickstart</p><p class="sub">2. Where would you like to connect from?</p>
+      <div class="list-opt sel">My Local Environment <span>Recomendado</span></div>
+      <div class="lab" style="margin-top:16px">IP Access List</div>
+      <div class="iprow" style="color:var(--m-muted)"><span>IP Address</span><span>Comment</span></div>
+      <div class="iprow" id="ip-row" hidden><span>181.52.xx.xx/32</span><span>My IP Address</span></div>
+      <div class="mbtn sec" id="b-myip" style="margin-top:12px">Add My Current IP Address</div>
+      <div style="display:flex;justify-content:flex-end;margin-top:18px"><div class="mbtn pri" id="b-finish">Finish and Close</div></div>
+    </div></div>
+    <div class="toast" id="t4" hidden><b>✓</b> Acceso configurado</div>`,
+      ),
+    acciones: [
+      ['move', '#b-myip'],
+      ['click', '#b-myip'],
+      ['show', '#ip-row'],
+      ['wait', 500],
+      ['click', '#b-finish'],
+      ['show', '#t4'],
+    ],
+  },
+  {
+    nombre: 'Copia la cadena',
+    etiqueta: 'navegador · Clusters',
+    titulo: 'Copia la cadena de conexión',
+    cuerpo: [
+      "En la tarjeta de <code>Cluster0</code> haz clic en <span class='ui'>Connect</span>.",
+      "Elige <span class='ui'>Compass</span>.",
+      'Haz clic en el botón de copiar al lado de la cadena <code>mongodb+srv://…</code>.',
+    ],
+    nota: [
+      'info',
+      'Local vs. Atlas',
+      'Con MongoDB en tu computador la dirección es <code>mongodb://localhost:27017</code>. En Atlas empieza por <code>mongodb+srv://</code> y lleva tu usuario y contraseña.',
+    ],
+    pantalla: () =>
+      navegador(
+        'cloud.mongodb.com/v2#/clusters',
+        navAtlas +
+          `<div class="alayout">${ladoAtlas('Clusters')}
+    <div style="flex:1;padding:22px 26px">
+      <p class="h">Clusters</p>
+      <div class="s-card" style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;margin-top:12px">
+        <div><div style="font-weight:700;font-size:16px;display:flex;gap:8px;align-items:center"><span style="width:9px;height:9px;border-radius:50%;background:var(--m-green)"></span>Cluster0</div><div class="sub" style="margin:4px 0 0">M0 · AWS · São Paulo · Free</div></div>
+        <div style="display:flex;gap:8px"><div class="mbtn pri" id="b-connect">Connect</div><div class="mbtn sec">Browse Collections</div></div>
+      </div>
+    </div></div>
+    <div class="modal-bg" id="m5" hidden><div class="s-card" style="width:560px">
+      <p class="h">Connect to Cluster0</p><p class="sub">Choose a connection method</p>
+      <div class="list-opt">Drivers <span>Node.js, Python…</span></div>
+      <div class="list-opt" id="o-compass">Compass <span>Explore your data with a GUI</span></div>
+      <div class="list-opt">Shell <span>mongosh</span></div>
+      <div id="m5-str" hidden>
+        <div class="lab" style="margin-top:14px">Copy the connection string, then open MongoDB Compass</div>
+        <div class="connstr"><code>${cadenaAtlas('&lt;db_password&gt;')}</code><div class="mbtn sec" id="b-copy2" style="height:30px;padding:0 10px">Copy</div></div>
+      </div>
+    </div></div>
+    <div class="toast" id="t5" hidden><b>Copiada</b> al portapapeles</div>`,
+      ),
+    acciones: [
+      ['click', '#b-connect'],
+      ['show', '#m5'],
+      ['wait', 300],
+      ['click', '#o-compass'],
+      ['add', '#o-compass', 'sel'],
+      ['show', '#m5-str'],
+      ['wait', 400],
+      ['click', '#b-copy2'],
+      ['show', '#t5'],
+    ],
+  },
+  {
+    nombre: 'Conecta Compass',
+    etiqueta: 'MongoDB Compass',
+    titulo: 'Agrega Atlas en Compass',
+    cuerpo: [
+      "Abre Compass y haz clic en <span class='ui'>+ Add new connection</span>. Si hiciste el tutorial local, ahí verás también <code>localhost:27017</code>.",
+      'Borra el URI que aparece y pega la cadena de Atlas.',
+      'Cambia <code>&lt;db_password&gt;</code> por tu contraseña real, <b>sin los signos &lt; &gt;</b>.',
+      "En <span class='ui'>Name</span> escribe <code>Atlas</code> y haz clic en <span class='ui'>Save &amp; Connect</span>.",
+    ],
+    nota: [
+      'warn',
+      'El error más común',
+      '<code>Authentication failed</code> casi siempre significa que dejaste <code>&lt;db_password&gt;</code> o los signos <code>&lt; &gt;</code> en la cadena.',
+    ],
+    pantalla: () =>
+      aplicacion(
+        'MongoDB Compass',
+        `<div class="ttl">Connections</div><div class="conn" style="font-weight:500"><i style="background:#9aa8a2"></i>localhost:27017</div><div id="side-conn" hidden><div class="conn"><i></i>Atlas</div></div><div class="mbtn sec" id="b-new" style="height:32px;font-size:13px">+ Add new connection</div>`,
+        `<div id="welcome" style="text-align:center;padding-top:80px"><p class="h" style="font-size:22px">Your connections</p><p class="sub">Select a saved connection or add a new one</p></div>
+     <div class="modal-bg" id="m7" hidden><div class="s-card" style="width:600px">
+       <p class="h">New Connection</p><p class="sub">Manage your connection settings</p>
+       <div class="lab">URI</div>${campo('uri', '')}
+       <div class="lab">Name</div>${campo('cname', '')}
+       <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px"><div class="mbtn sec">Cancel</div><div class="mbtn sec">Save</div><div class="mbtn pri" id="b-sc">Save &amp; Connect</div></div>
+     </div></div>
+     <div id="after" hidden><p class="h">Atlas · Cluster0</p><p class="sub">Databases: 2</p><div class="list-opt">admin <span>Storage size</span></div><div class="list-opt">local <span>Storage size</span></div></div>
+     <div class="toast" id="t7" hidden><b>✓</b> Connected to Atlas</div>`,
+      ),
+    acciones: [
+      ['click', '#b-new'],
+      ['show', '#m7'],
+      ['set', '#uri', 'mongodb://localhost:27017/'],
+      ['click', '#uri'],
+      ['set', '#uri', ''],
+      ['paste', '#uri', cadenaAtlas('<db_password>')],
+      ['wait', 600],
+      ['mark', '#uri', '<db_password>'],
+      ['wait', 900],
+      ['replace', '#uri', '<db_password>', CLAVE_DEMO],
+      ['wait', 300],
+      ['type', '#cname', 'Atlas'],
+      ['click', '#b-sc'],
+      ['hide', '#m7'],
+      ['hide', '#welcome'],
+      ['show', '#side-conn'],
+      ['show', '#after'],
+      ['show', '#t7'],
+    ],
+  },
+  {
+    nombre: 'Guárdala en .env',
+    etiqueta: 'VS Code · mi-emprendimiento',
+    titulo: 'Guarda la cadena en tu proyecto',
+    cuerpo: [
+      'En la raíz del proyecto crea el archivo <code>.env</code>.',
+      'Escribe <code>MONGO_URL=</code> y pega la cadena con tu contraseña y el nombre de la base: <code>…mongodb.net/mi_negocio</code>.',
+      'Abre <code>.gitignore</code> y verifica que tenga la línea <code>.env</code>.',
+    ],
+    nota: [
+      'warn',
+      'Nunca en el código ni en GitHub',
+      "Si la cadena llega a GitHub, cualquiera puede entrar a tus datos. Si pasa por error, cambia la contraseña del usuario en <span class='ui'>Database Access</span>.",
+    ],
+    pantalla: () => `<div class="vs">
+    <div class="vs-bar">mi-emprendimiento — Visual Studio Code</div>
+    <div class="vs-main">
+      <div class="vs-side"><div class="vs-h">EXPLORER</div>
+        <div class="vs-f">node_modules/</div><div class="vs-f" id="f-gi">.gitignore</div><div class="vs-f" id="f-env" hidden>.env</div><div class="vs-f">package.json</div><div class="vs-f">server.js</div>
+        <div class="vs-f vs-new" id="b-newfile">+ Nuevo archivo</div></div>
+      <div class="vs-ed">
+        <div class="vs-tab" id="tab-name">server.js</div>
+        <div class="vs-code" id="ed-env" hidden><div><span class="vs-ln">1</span><span class="vk">MONGO_URL</span>=<span class="vv" id="env-v"></span><span class="caret" style="color:#e6edf3"></span></div></div>
+        <div class="vs-code" id="ed-gi" hidden><div><span class="vs-ln">1</span>node_modules</div><div><span class="vs-ln">2</span><span class="hlv">.env</span></div></div>
+        <div class="vs-code" id="ed-srv"><div><span class="vs-ln">1</span><span class="vc">// server.js</span></div><div><span class="vs-ln">2</span><span class="vk2">const</span> express = require(<span class="vs2">'express'</span>);</div></div>
+      </div>
+    </div></div>
+    <div class="toast" id="t8" hidden><b>✓</b> .env está protegido por .gitignore</div>`,
+    acciones: [
+      ['click', '#b-newfile'],
+      ['show', '#f-env'],
+      ['add', '#f-env', 'act'],
+      ['hide', '#ed-srv'],
+      ['show', '#ed-env'],
+      ['text', '#tab-name', '.env'],
+      ['wait', 300],
+      ['typeplain', '#env-v', cadenaAtlas(CLAVE_DEMO, 'mi_negocio')],
+      ['wait', 600],
+      ['click', '#f-gi'],
+      ['rm', '#f-env', 'act'],
+      ['add', '#f-gi', 'act'],
+      ['hide', '#ed-env'],
+      ['show', '#ed-gi'],
+      ['text', '#tab-name', '.gitignore'],
+      ['show', '#t8'],
+    ],
+  },
+  {
+    nombre: 'Si cambias de red',
+    etiqueta: 'navegador · Network Access',
+    titulo: '¿Cambiaste de red? Agrega tu IP',
+    cuerpo: [
+      'Si mañana te conectas desde otra red (casa, colegio, datos del celular), Atlas te va a rechazar.',
+      "En el menú de la izquierda entra a <span class='ui'>Network Access</span>.",
+      "Haz clic en <span class='ui'>+ Add IP Address</span>, luego en <span class='ui'>Add Current IP Address</span> y en <span class='ui'>Confirm</span>.",
+      "Espera a que el estado diga <span class='ui'>Active</span> (unos segundos).",
+    ],
+    nota: [
+      'warn',
+      'El error que verás',
+      '<code>MongoServerSelectionError</code> o un timeout al conectar casi siempre significa esto: tu IP actual no está en la lista.',
+    ],
+    pantalla: () =>
+      navegador(
+        'cloud.mongodb.com/v2#/security/network/accessList',
+        navAtlas +
+          `<div class="alayout">${ladoAtlas('Clusters')}
+    <div style="flex:1;padding:22px 26px;position:relative">
+      <div id="pg-na" hidden>
+        <div style="display:flex;justify-content:space-between;align-items:center"><p class="h">Network Access</p><div class="mbtn pri" id="b-addip">+ Add IP Address</div></div>
+        <div class="iprow" style="color:var(--m-muted);margin-top:12px"><span>IP Address</span><span>Comment</span><span>Status</span></div>
+        <div class="iprow"><span>181.52.xx.xx/32</span><span>Casa</span><span style="color:var(--m-green)">● Active</span></div>
+        <div class="iprow" id="ip-new" hidden><span>190.24.xx.xx/32</span><span>Colegio</span><span id="ip-st" style="color:#b7791f">● Pending</span></div>
+      </div>
+      <div id="pg-cl"><p class="h">Clusters</p><p class="sub">Cluster0 · M0</p></div>
+    </div></div>
+    <div class="modal-bg" id="m8" hidden><div class="s-card" style="width:480px">
+      <p class="h">Add IP Access List Entry</p>
+      <div class="mbtn sec" id="b-cur" style="margin-top:6px">Add Current IP Address</div>
+      <div class="lab">Access List Entry</div>${campo('ip-in', '')}
+      <div class="lab">Comment</div>${campo('ip-cm', 'Optional')}
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><div class="mbtn sec">Cancel</div><div class="mbtn pri" id="b-conf">Confirm</div></div>
+    </div></div>`,
+      ),
+    acciones: [
+      ['click', '#nav-network'],
+      ['rm', '#nav-clusters', 'on'],
+      ['add', '#nav-network', 'on'],
+      ['hide', '#pg-cl'],
+      ['show', '#pg-na'],
+      ['wait', 300],
+      ['click', '#b-addip'],
+      ['show', '#m8'],
+      ['click', '#b-cur'],
+      ['set', '#ip-in', '190.24.xx.xx/32'],
+      ['type', '#ip-cm', 'Colegio'],
+      ['click', '#b-conf'],
+      ['hide', '#m8'],
+      ['show', '#ip-new'],
+      ['wait', 1200],
+      ['text', '#ip-st', '● Active'],
+      ['add', '#ip-st', 'ok'],
+    ],
+  },
+];
+
+interface Ruta {
+  id: string;
+  nombre: string;
+  detalle: string;
+  pasos: Paso[];
+}
 
 const CURSOR = `<svg class="cursor" id="cur" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2l15 11-6.5 1.2L16 21l-3 1.4-3.4-6.8L4 20z" fill="#fff" stroke="#111" stroke-width="1.4" stroke-linejoin="round"/></svg>`;
 const ANCHO_ESCENA = 880;
@@ -677,6 +1082,18 @@ async function ejecutar(m: Motor, [op, sel, arg = '', arg2]: Accion) {
       if (v) v.textContent = v.textContent ?? '';
       break;
     }
+    case 'paste': {
+      enfocar(m, el);
+      const v = el?.querySelector('.v');
+      if (v) v.textContent = arg;
+      await dormir(m, 200);
+      break;
+    }
+    case 'replace': {
+      const v = el?.querySelector('.v');
+      if (v) v.textContent = (v.textContent ?? '').replace(arg, arg2 ?? '');
+      break;
+    }
     case 'show':
       if (el) el.hidden = false;
       await dormir(m, 250);
@@ -686,6 +1103,9 @@ async function ejecutar(m: Motor, [op, sel, arg = '', arg2]: Accion) {
       break;
     case 'add':
       el?.classList.add(arg);
+      break;
+    case 'rm':
+      el?.classList.remove(arg);
       break;
     case 'wait':
       await dormir(m, typeof sel === 'number' ? sel : 0);
@@ -727,8 +1147,56 @@ async function ejecutar(m: Motor, [op, sel, arg = '', arg2]: Accion) {
 
 /* ── componente ─────────────────────────────────────────────────────────── */
 
+interface PropsTutorial {
+  /** El comando del rótulo, sin el `$` (lo pone el CSS). */
+  prompt: string;
+  titulo: string;
+  /** Una ruta por pestaña. Con una sola, la pestaña se muestra como rótulo. */
+  rutas: readonly Ruta[];
+  mensajeFin: string;
+  /** Baja la etiqueta "simulación" a la esquina inferior: en las pantallas de
+   *  Atlas, arriba a la derecha tapaba el nombre del usuario. */
+  simAbajo?: boolean;
+}
+
+/* Fuera del componente para que no cambien en cada render: el efecto de la
+   animación depende de ellas. */
+const RUTAS_LOCAL: readonly Ruta[] = [
+  { id: 'win', nombre: 'Windows', detalle: '8 pasos · instalador .msi', pasos: WINDOWS },
+  { id: 'mac', nombre: 'macOS', detalle: '7 pasos · Homebrew', pasos: MAC },
+];
+const RUTAS_ATLAS: readonly Ruta[] = [
+  { id: 'atlas', nombre: 'Atlas + Compass + .env', detalle: '8 pasos · plan gratis M0', pasos: ATLAS },
+];
+
+/** Instalar MongoDB en el computador: Windows o macOS. */
 export function InstalarMongo() {
-  const [ruta, setRuta] = useState<Ruta>('win');
+  return (
+    <TutorialSimulado
+      prompt="sesion13 --tutorial instalacion-local"
+      titulo="Instala MongoDB en tu computador"
+      rutas={RUTAS_LOCAL}
+      mensajeFin="¡Instalación completa!"
+    />
+  );
+}
+
+/** MongoDB en la nube: cuenta, clúster gratis, usuario, IP y la cadena en .env. */
+export function ConfigurarAtlas() {
+  return (
+    <TutorialSimulado
+      prompt="sesion13 --tutorial atlas"
+      titulo="Configura MongoDB Atlas"
+      rutas={RUTAS_ATLAS}
+      mensajeFin="¡Atlas configurado!"
+      simAbajo
+    />
+  );
+}
+
+function TutorialSimulado({ prompt, titulo, rutas, mensajeFin, simAbajo }: PropsTutorial) {
+  const idBase = useId();
+  const [ruta, setRuta] = useState(rutas[0].id);
   const [paso, setPaso] = useState(0);
   const [auto, setAuto] = useState(false);
   const [terminado, setTerminado] = useState(false);
@@ -741,7 +1209,7 @@ export function InstalarMongo() {
   const escalaRef = useRef(1);
   const autoRef = useRef(auto);
 
-  const pasos = RUTAS[ruta];
+  const pasos = (rutas.find((r) => r.id === ruta) ?? rutas[0]).pasos;
   const actual = pasos[paso];
 
   useEffect(() => {
@@ -769,7 +1237,7 @@ export function InstalarMongo() {
     if (!escena) return;
     let vivo = true;
     let temporizador = 0;
-    const lista = RUTAS[ruta];
+    const lista = (rutas.find((r) => r.id === ruta) ?? rutas[0]).pasos;
     const p = lista[paso];
 
     const motor: Motor = {
@@ -810,7 +1278,7 @@ export function InstalarMongo() {
       vivo = false;
       clearTimeout(temporizador);
     };
-  }, [ruta, paso, vuelta]);
+  }, [rutas, ruta, paso, vuelta]);
 
   // En pantallas angostas la fila de pasos se desliza de lado: se centra en el
   // paso actual. Se mueve el `scrollLeft` de la fila y no se usa
@@ -834,7 +1302,7 @@ export function InstalarMongo() {
     setPaso(Math.max(0, Math.min(pasos.length - 1, k)));
   }
 
-  function cambiarRuta(r: Ruta) {
+  function cambiarRuta(r: string) {
     setRuta(r);
     setTerminado(false);
     setPaso(0);
@@ -873,34 +1341,43 @@ export function InstalarMongo() {
     <div className={styles.raiz} tabIndex={-1} onKeyDown={alTeclado}>
       <div className={styles.cabecera}>
         <div>
-          <div className={styles.prompt}>sesion13 --tutorial instalacion-local</div>
-          <p className={styles.titulo}>Instala MongoDB en tu computador</p>
+          <div className={styles.prompt}>{prompt}</div>
+          <p className={styles.titulo}>{titulo}</p>
         </div>
-        <div className={styles.pestanas} role="tablist" aria-label="Sistema operativo">
-          {(
-            [
-              ['win', 'Windows', '8 pasos · instalador .msi'],
-              ['mac', 'macOS', '7 pasos · Homebrew'],
-            ] as const
-          ).map(([id, nombre, detalle]) => (
-            <button
-              key={id}
-              type="button"
-              role="tab"
-              id={`tab-${id}`}
-              aria-selected={ruta === id}
-              aria-controls="tutorial-mongo"
-              className={styles.pestana}
-              onClick={() => cambiarRuta(id)}
-            >
-              {nombre}
-              <small>{detalle}</small>
-            </button>
-          ))}
-        </div>
+        {rutas.length > 1 ? (
+          <div className={styles.pestanas} role="tablist" aria-label="Sistema operativo">
+            {rutas.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                role="tab"
+                id={`${idBase}-tab-${r.id}`}
+                aria-selected={ruta === r.id}
+                aria-controls={`${idBase}-panel`}
+                className={styles.pestana}
+                onClick={() => cambiarRuta(r.id)}
+              >
+                {r.nombre}
+                <small>{r.detalle}</small>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className={styles.pestanas}>
+            <span className={styles.pestana} aria-selected="true">
+              {rutas[0].nombre}
+              <small>{rutas[0].detalle}</small>
+            </span>
+          </div>
+        )}
       </div>
 
-      <div className={styles.cuerpo} id="tutorial-mongo" role="tabpanel" aria-labelledby={`tab-${ruta}`}>
+      <div
+        className={styles.cuerpo}
+        id={`${idBase}-panel`}
+        role={rutas.length > 1 ? 'tabpanel' : undefined}
+        aria-labelledby={rutas.length > 1 ? `${idBase}-tab-${ruta}` : undefined}
+      >
         {/* Los controles van bajo la pantalla, como los de un video, y no en la
             tarjeta del paso: dentro de ella la alargaban hasta 200 px más que
             la pantalla en un portátil de 1366 px, y quedaba un hueco abajo. */}
@@ -918,7 +1395,11 @@ export function InstalarMongo() {
               role="img"
               aria-label={`Simulación: ${actual.titulo}`}
             >
-              <div className={styles.escena} ref={escenaRef} />
+              <div
+                className={styles.escena}
+                ref={escenaRef}
+                data-sim={simAbajo ? 'abajo' : undefined}
+              />
             </div>
           </section>
 
@@ -942,7 +1423,7 @@ export function InstalarMongo() {
         <aside className={styles.panel}>
           <div className={styles.tarjeta} aria-live="polite">
             <div className={styles.numero}>
-              {terminado ? '¡Instalación completa!' : `Paso ${paso + 1} de ${pasos.length}`}
+              {terminado ? mensajeFin : `Paso ${paso + 1} de ${pasos.length}`}
             </div>
             <h3 className={styles.tituloPaso}>{actual.titulo}</h3>
             <ol className={styles.lista}>

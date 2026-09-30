@@ -1,0 +1,358 @@
+/* Reproductor "MongoDB vs. SQL" (ver EscenasMongoSql.tsx).
+
+   Las escenas usan sus propios nombres de color (`--mongo`, `--sql`,
+   `--yellow`…) dentro del HTML de cada escena. Aquí se conectan a los tokens
+   del sitio —que ya son la paleta terminal— en vez de repetir los hex. El
+   único color propio es el morado de la sintaxis, que no tiene token.
+
+   Todo lo de dentro del lienzo va bajo `.lienzo :global(...)`, igual que en
+   los tutoriales: el marcado es texto con clases normales y así no choca con
+   las clases globales del sitio. */
+
+.raiz {
+  --bg: var(--color-bg);
+  --panel: var(--color-surface);
+  --panel-2: var(--color-surface-2);
+  --line: var(--color-divider);
+  --fg: var(--color-text);
+  --muted: var(--color-text-2);
+  --mongo: var(--color-accent);
+  --sql: var(--color-accent-2);
+  --yellow: var(--color-code);
+  --red: var(--color-off);
+  --purple: #bc8cff;
+  --mono: var(--font-mono);
+  --sans: var(--font-body);
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: var(--leading) 0;
+}
+.raiz:focus { outline: none; }
+
+/* ── cabecera ──────────────────────────────────────────────────────────── */
+
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: end;
+  gap: 8px 20px;
+}
+.prompt { font-family: var(--mono); font-size: 14px; color: var(--mongo); }
+.prompt::before { content: '$ '; }
+.titulo {
+  margin: 4px 0 0;
+  font-family: var(--mono);
+  font-size: clamp(20px, 2.6vw, 28px);
+  font-weight: 700;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.leyenda {
+  display: flex;
+  gap: 14px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+}
+.leyenda span::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 3px;
+  vertical-align: -1px;
+}
+.leyenda [data-c='sql']::before { background: var(--sql); }
+.leyenda [data-c='mongo']::before { background: var(--mongo); }
+
+/* ── reproductor ───────────────────────────────────────────────────────── */
+
+.reproductor {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+.vista {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--bg);
+}
+.lienzo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1280px;
+  height: 720px;
+  transform-origin: 0 0;
+  font-family: var(--sans);
+  color: var(--fg);
+}
+
+/* La barra se llena con `scaleX` y no con `width`: se actualiza en cada
+   cuadro, y así no obliga a recalcular el diseño 60 veces por segundo. */
+.progreso { height: 4px; background: var(--panel-2); }
+.progreso i {
+  display: block;
+  height: 100%;
+  background: var(--mongo);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--line);
+}
+.boton {
+  font: inherit;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 9px 13px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  color: var(--fg);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out), filter var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .boton:not(:disabled):hover { border-color: var(--color-text-3); }
+  .botonPri:not(:disabled):hover { filter: brightness(1.08); }
+}
+.boton:disabled { opacity: 0.4; cursor: default; }
+.botonPri {
+  background: var(--mongo);
+  border-color: var(--mongo);
+  color: var(--color-on-accent);
+}
+.boton:focus-visible,
+.puntos button:focus-visible {
+  outline: 2px solid var(--yellow);
+  outline-offset: 2px;
+}
+
+.puntos { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.puntos button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.puntos [data-estado='actual'] {
+  background: var(--mongo);
+  border-color: var(--mongo);
+  color: var(--color-on-accent);
+  font-weight: 800;
+}
+.puntos [data-estado='hecho'] { border-color: var(--mongo); color: var(--mongo); }
+
+/* ── narración ─────────────────────────────────────────────────────────── */
+
+.narracion {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+}
+.numero { font-family: var(--mono); font-size: 13px; color: var(--mongo); }
+.tituloEscena { margin: 0; font-size: clamp(19px, 2.1vw, 24px); }
+.texto { margin: 0; font-size: clamp(15.5px, 1.5vw, 18px); line-height: 1.5; max-width: 80ch; }
+.pista { font-family: var(--mono); font-size: 12px; color: var(--color-text-3); }
+
+@media (max-width: 640px) {
+  .puntos { margin-left: 0; }
+}
+
+/* ══ lienzo de las escenas ═══════════════════════════════════════════════
+
+   Aquí sí hay entradas por opacidad, contra la regla general del proyecto
+   (las entradas desplazan, nunca desvanecen). Es un reproductor: que cada
+   pieza aparezca a su tiempo ES el contenido, y con solo desplazar todo
+   estaría visible desde el primer cuadro. El riesgo se acota así: las piezas
+   se revelan poniendo una clase desde un temporizador, no con una animación
+   que se pueda congelar a medias; con movimiento reducido todo aparece de
+   una; y "Repetir escena" siempre vuelve a montar la escena entera. */
+
+.lienzo :global(.a) {
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.lienzo :global(.a.in) { opacity: 1; transform: none; }
+.lienzo :global(.up) { transform: translateY(24px); }
+.lienzo :global(.left) { transform: translateX(-40px); }
+.lienzo :global(.right) { transform: translateX(40px); }
+.lienzo :global(.pop) { transform: scale(0.7); }
+.lienzo :global(.abs) { position: absolute; }
+
+.lienzo :global(.ttl) {
+  position: absolute; left: 60px; top: 40px;
+  font-family: var(--mono); font-size: 38px; font-weight: 800; letter-spacing: -0.5px;
+}
+.lienzo :global(.ttl small) {
+  display: block; margin-bottom: 6px;
+  font-size: 16px; font-weight: 400; letter-spacing: 0;
+}
+.lienzo :global(.sqlc) { color: var(--sql); }
+.lienzo :global(.mgc) { color: var(--mongo); }
+.lienzo :global(.yc) { color: var(--yellow); }
+.lienzo :global(.mc) { color: var(--muted); }
+.lienzo :global(.rc) { color: var(--red); }
+.lienzo :global(.chip) {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
+  border-radius: 999px; border: 1.5px solid currentColor; font-family: var(--mono); font-size: 16px;
+}
+
+/* tablas */
+.lienzo :global(.tbl) {
+  position: absolute; background: var(--panel); border-radius: 8px; overflow: hidden;
+  outline: 1.5px solid color-mix(in srgb, var(--sql) 55%, transparent);
+  font-family: var(--mono); font-size: 17px;
+}
+.lienzo :global(.tbl .cap-t) {
+  position: absolute; top: -34px; left: 0;
+  font-family: var(--mono); font-size: 17px; color: var(--sql); font-weight: 600;
+}
+.lienzo :global(.tr) {
+  display: grid; height: 48px; align-items: center; border-bottom: 1px solid var(--line);
+  transition: background 0.4s, opacity 0.4s;
+}
+.lienzo :global(.tr:last-child) { border-bottom: 0; }
+.lienzo :global(.tr > span) {
+  height: 100%; display: flex; align-items: center; padding: 0 14px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-right: 1px solid var(--line);
+}
+.lienzo :global(.tr > span:last-child) { border-right: 0; }
+.lienzo :global(.th) { background: color-mix(in srgb, var(--sql) 16%, var(--panel)); color: var(--sql); font-weight: 600; }
+.lienzo :global(.tr.hl) { background: color-mix(in srgb, var(--yellow) 18%, var(--panel)); }
+.lienzo :global(.tr.dim) { opacity: 0.35; }
+.lienzo :global(.tbl.dim.in) { opacity: 0.3; }
+.lienzo :global(.th.hl) { background: color-mix(in srgb, var(--yellow) 30%, var(--panel)); color: var(--yellow); }
+.lienzo :global(.null) { color: var(--red); font-style: italic; }
+.lienzo :global(.newcol) { opacity: 0; transition: opacity 0.5s, background 0.5s; }
+.lienzo :global(.newcol.in) { opacity: 1; background: color-mix(in srgb, var(--red) 10%, transparent); }
+.lienzo :global(.th .newcol.in) { background: color-mix(in srgb, var(--yellow) 25%, transparent); color: var(--yellow); }
+
+/* código */
+.lienzo :global(.code) {
+  position: absolute; background: #0a0d12; border: 1px solid var(--line); border-radius: 10px;
+  padding: 14px 18px; font-family: var(--mono); font-size: 18px; line-height: 1.6;
+  white-space: pre; color: var(--fg);
+}
+.lienzo :global(.code .k) { color: var(--purple); }
+.lienzo :global(.code .s) { color: var(--yellow); }
+.lienzo :global(.code .c) { color: var(--muted); }
+.lienzo :global(.code .f) { color: var(--mongo); }
+.lienzo :global(.code .b) { color: var(--sql); }
+.lienzo :global(.typed::after) {
+  content: ''; display: inline-block; width: 10px; height: 20px; margin-left: 2px;
+  vertical-align: -4px; background: var(--fg); animation: parpadeo 1s steps(1) infinite;
+}
+.lienzo :global(.typed.done::after) { display: none; }
+@keyframes parpadeo { 50% { opacity: 0; } }
+
+/* documentos y colecciones */
+.lienzo :global(.doc) {
+  position: absolute; background: var(--panel); border-radius: 12px; padding: 16px 20px;
+  border: 1.5px solid color-mix(in srgb, var(--mongo) 60%, transparent);
+  font-family: var(--mono); font-size: 18px; line-height: 1.55; white-space: pre;
+}
+.lienzo :global(.doc .ln) { display: block; }
+.lienzo :global(.doc.blk) { white-space: normal; }
+.lienzo :global(.doc.blk .ln) { white-space: pre; }
+.lienzo :global(.doc .kk) { color: var(--fg); }
+.lienzo :global(.doc .s) { color: var(--yellow); }
+.lienzo :global(.doc .n) { color: var(--purple); }
+.lienzo :global(.doc .p) { color: var(--muted); }
+.lienzo :global(.doc .emb) { background: color-mix(in srgb, var(--mongo) 14%, transparent); border-radius: 4px; }
+.lienzo :global(.doc-h) {
+  position: absolute; top: -34px; left: 0;
+  font-family: var(--mono); font-size: 17px; color: var(--mongo); font-weight: 600;
+}
+.lienzo :global(.badge) {
+  position: absolute; right: -12px; top: -14px; padding: 4px 10px; border-radius: 999px;
+  background: var(--mongo); color: var(--color-on-accent); font-family: var(--mono); font-weight: 800; font-size: 14px;
+}
+.lienzo :global(.coll) {
+  position: absolute; border-radius: 18px;
+  border: 2px dashed color-mix(in srgb, var(--mongo) 60%, transparent);
+}
+.lienzo :global(.coll-h) {
+  position: absolute; top: -16px; left: 24px; padding: 0 10px; background: var(--bg);
+  font-family: var(--mono); font-size: 18px; color: var(--mongo); font-weight: 600;
+}
+
+/* formulario (imita una app real, por eso es claro) y tarjetas */
+.lienzo :global(.form) {
+  position: absolute; background: #fff; color: #1c2d27; border-radius: 16px; padding: 22px;
+  box-shadow: 0 16px 40px #0007;
+}
+.lienzo :global(.form .lab) { font-size: 13px; font-weight: 700; margin: 10px 0 4px; color: #4a5a54; }
+.lienzo :global(.form .inp) {
+  height: 38px; border: 1px solid #b8c4bf; border-radius: 8px; display: flex; align-items: center;
+  padding: 0 10px; font-family: var(--mono); font-size: 15px;
+}
+.lienzo :global(.form .go) {
+  margin-top: 16px; height: 42px; border-radius: 8px; background: #00a35c; color: #fff;
+  font-weight: 800; display: grid; place-items: center;
+}
+.lienzo :global(.e-card) {
+  position: absolute; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 14px; padding: 22px 26px;
+}
+.lienzo :global(.e-card h3) { margin: 0 0 12px; font-size: 26px; }
+.lienzo :global(.e-card ul) { margin: 0; padding-left: 24px; font-size: 23px; line-height: 1.65; }
+
+/* diccionario SQL → MongoDB */
+.lienzo :global(.map-row) {
+  position: absolute; left: 150px; width: 980px; height: 66px;
+  display: grid; grid-template-columns: 1fr 120px 1fr; align-items: center;
+}
+.lienzo :global(.map-row .l),
+.lienzo :global(.map-row .r) {
+  height: 56px; border-radius: 10px; display: flex; align-items: center;
+  padding: 0 20px; font-size: 23px; font-weight: 600;
+}
+.lienzo :global(.map-row .l) {
+  justify-content: flex-end; color: var(--sql);
+  background: color-mix(in srgb, var(--sql) 14%, var(--panel));
+}
+.lienzo :global(.map-row .r) { color: var(--mongo); background: color-mix(in srgb, var(--mongo) 14%, var(--panel)); }
+.lienzo :global(.map-row small) {
+  margin-left: 10px; font-family: var(--mono); font-size: 15px; font-weight: 400; color: var(--muted);
+}
+
+/* líneas que se dibujan */
+.lienzo :global(svg.lines path) {
+  fill: none; stroke-width: 3; stroke-dasharray: 1; stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1s ease;
+}
+.lienzo :global(svg.lines path.in) { stroke-dashoffset: 0; }
+.lienzo :global(.big) { font-size: 30px; font-weight: 800; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lienzo :global(.a),
+  .lienzo :global(.newcol),
+  .lienzo :global(svg.lines path) { transition: none; }
+  .lienzo :global(.typed::after) { animation: none; }
+}

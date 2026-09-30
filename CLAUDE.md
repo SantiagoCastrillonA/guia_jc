@@ -106,11 +106,17 @@ un lienzo oculto y las partículas se siembran donde el molde tiene tinta
 (`moldeDeLaFigura`), no mover coordenadas. Va con trazos geométricos y no con
 `fillText`: el molde se arma al montar y la fuente web puede no haber cargado.
 
-Las demos de un tema que simulan una app (p. ej. `topics/mongodb-crud/Demos.tsx`,
-el tutorial de instalación) generan su marcado como texto y lo encierran bajo
-una clase del módulo con `:global(...)`. Ojo con las clases globales que ya
-existen en el sitio (`.nav`, `.card`, `.radio`): dentro de esas demos se usan
-nombres propios (`s-nav`, `s-card`, `s-radio`) para que no se cuelen.
+Las demos de un tema que simulan una app o narran con escenas (en
+`topics/mongodb-crud/`: `Demos.tsx` con los tutoriales de instalación local y
+de Atlas sobre un mismo motor, `EscenasMongoSql.tsx` con el reproductor de
+MongoDB vs SQL) generan su marcado como texto y lo encierran bajo una clase
+del módulo con `:global(...)`. Ojo con las clases globales que ya existen en
+el sitio (`.nav`, `.card`, `.radio`): dentro de esas demos se usan nombres
+propios (`s-nav`, `s-card`, `s-radio`, `e-card`) para que no se cuelen. Las
+cadenas de conexión de ejemplo nunca van escritas con la forma
+`usuario:clave@host` (GitHub la marca como fuga): marcador entre corchetes
+(`<password>`) o, si la animación tiene que mostrar una clave, enmascarada y
+armada por partes (ver `cadenaAtlas` en `Demos.tsx`).
 
 ### Visibilidad y semanas de los temas
 

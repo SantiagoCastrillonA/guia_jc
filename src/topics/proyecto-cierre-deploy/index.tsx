@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Exercises, Lesson, TopicPage } from '../../components/TopicPage';
 import {
   FillBlank,
@@ -53,7 +54,7 @@ export default function ProyectoCierreDeploy() {
         <RefTable
           cabeceras={['Pieza', 'Dónde va', 'Nota']}
           filas={[
-            ['Base de datos', 'MongoDB Atlas M0', 'Se crea hoy: el Mongo de tu computador no se ve desde internet'],
+            ['Base de datos', 'MongoDB Atlas M0', 'Si en la sesión 13 trabajaste local, créala hoy'],
             ['Backend', 'Render (plan free)', '750 horas al mes'],
             ['Frontend', 'GitHub Pages o sitio estático en Render', 'Ya usaste GitHub Pages en la sesión 7'],
           ]}
@@ -66,17 +67,17 @@ export default function ProyectoCierreDeploy() {
         </Callout>
 
         <p>
-          Hasta ahora tu base vivía en tu computador (<code>localhost:27017</code>, sesión 13). Un
-          servidor en internet no puede ver tu equipo, así que la base se muda a{' '}
-          <strong>MongoDB Atlas</strong>: en la nube, gratis para siempre en el plan M0, sin tarjeta
-          de crédito, 512 MB.
+          La base del proyecto publicado siempre va en <strong>MongoDB Atlas</strong>: un servidor en
+          internet no puede ver tu computador. Es gratis para siempre en el plan M0, sin tarjeta de
+          crédito, 512 MB.
         </p>
         <Steps>
-          <Step title="Crea tu clúster en Atlas">
-            En <code>cloud.mongodb.com</code>: cuenta, clúster con el plan <strong>M0 (Free)</strong>,
-            un usuario de base de datos (anota usuario y contraseña), y en{' '}
-            <strong>Network Access</strong> permite la conexión desde tu servidor. Al final copias tu
-            cadena de conexión:
+          <Step title="Ten tu clúster de Atlas">
+            Si en la sesión 13 elegiste Atlas, ya lo tienes. Si trabajaste con Mongo en tu computador,
+            créalo ahora con el tutorial animado de la{' '}
+            <Link to="/tema/mongodb-crud">sesión 13, lección 5</Link>: cuenta, clúster M0, usuario de
+            la base y, en <strong>Network Access</strong>, permiso para que tu servidor se conecte. Al
+            final tienes una cadena con esta forma:
             <Terminal
               lineas={['mongodb+srv://usuario:<password>@cluster.xxxxx.mongodb.net/mi_negocio']}
             />

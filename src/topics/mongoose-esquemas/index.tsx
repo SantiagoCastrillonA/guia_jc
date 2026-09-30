@@ -220,10 +220,9 @@ export default function MongooseEsquemas() {
           </Step>
         </Steps>
         <Callout>
-          La <code>MONGO_URL</code> es la misma de la sesión 13: el Mongo de tu computador,{' '}
-          <code>mongodb://localhost:27017/mi_negocio</code>. Cuando publiques el proyecto (sesión 24)
-          la cambias por la de <strong>MongoDB Atlas</strong>, y Mongoose se conecta igual — no se
-          toca ni una línea de código.
+          La <code>MONGO_URL</code> es la misma de la sesión 13: <code>localhost:27017</code> si
+          instalaste Mongo en tu computador, o la de <strong>MongoDB Atlas</strong> si usas la nube.
+          Mongoose se conecta igual con las dos — no se toca ni una línea de código.
         </Callout>
       </Lesson>
 
