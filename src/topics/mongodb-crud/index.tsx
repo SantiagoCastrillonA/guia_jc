@@ -181,7 +181,7 @@ export default function MongodbCrud() {
             ['Sirve al publicar', 'No: tu equipo no se ve desde internet', 'Sí'],
             [
               'La cadena empieza por',
-              <code key="local">mongodb://localhost:27017</code>,
+              <code key="local">mongodb://127.0.0.1:27017</code>,
               <code key="atlas">mongodb+srv://…</code>,
             ],
           ]}
@@ -213,13 +213,16 @@ export default function MongodbCrud() {
         <Steps>
           <Step title="Ten tu cadena de conexión a mano">
             Con Mongo en tu computador es esta, con el nombre de tu base al final:
-            <Terminal lineas={['mongodb://localhost:27017/mi_negocio']} />
-            Con Atlas es la <code>mongodb+srv://…</code> que guardaste en el último paso de su
+            <Terminal lineas={['mongodb://127.0.0.1:27017/mi_negocio']} />
+            Va <code>127.0.0.1</code> y no <code>localhost</code>: en las versiones recientes de Node,{' '}
+            <code>localhost</code> puede apuntar a la dirección IPv6 (<code>::1</code>), donde Mongo no
+            escucha, y la conexión falla con <code>ECONNREFUSED</code>. Compass sí entiende{' '}
+            <code>localhost</code>; tu código, mejor con el número. Con Atlas es la <code>mongodb+srv://…</code> que guardaste en el último paso de su
             tutorial. Si la base <code>mi_negocio</code> no existe todavía, no importa: Mongo la crea
             sola la primera vez que guardas algo en ella.
           </Step>
           <Step title="Guárdala en .env, nunca en el código">
-            <Terminal titulo=".env" lineas={['MONGO_URL=mongodb://localhost:27017/mi_negocio']} />
+            <Terminal titulo=".env" lineas={['MONGO_URL=mongodb://127.0.0.1:27017/mi_negocio']} />
             <Terminal titulo=".gitignore" lineas={['.env', 'node_modules']} />
             Con Atlas, esa línea lleva tu cadena con usuario y contraseña (
             <code>mongodb+srv://usuario:&lt;password&gt;@…</code>) — y justamente por eso{' '}

@@ -74,8 +74,18 @@ progreso.
 
 Material gráfico reutilizable en `src/components/visuals/`: `Figure`,
 `Steps`/`Step`, `Callout`, `Compare`, `RefTable`, `Terminal` (todo en
-`index.tsx`), más `Snippets` (recetario con estado y portapapeles, en su
-propio archivo).
+`index.tsx`), más `Snippets` (recetario con estado y portapapeles) y
+`ReproductorEscenas` (las animaciones tipo "video que se lee": motor y
+controles; cada tema pone sus escenas y el CSS de sus piezas), cada uno en su
+propio archivo.
+
+El código de ejemplo de las lecciones y animaciones sigue unas convenciones
+fijas — al traer material nuevo del profesor se adapta a ellas: módulos de
+JavaScript (`import`, `"type": "module"`, `.js` en las rutas propias),
+`node --env-file=.env` en vez del paquete dotenv, la variable `MONGO_URL`, la
+base `mi_negocio`, carpetas `modelos/`, `rutas/`, `config/` y `servidor.js`, y
+`mongodb://127.0.0.1:27017` en el código (no `localhost`: en Node reciente
+puede resolver a `::1` y dar `ECONNREFUSED`; Compass sí usa `localhost`).
 
 Segundo registro con el mismo patrón: `src/data/recursos.ts` alimenta la
 página `/recursos`. Agregar un recurso es agregar una entrada ahí y nada más.
@@ -106,13 +116,15 @@ un lienzo oculto y las partículas se siembran donde el molde tiene tinta
 (`moldeDeLaFigura`), no mover coordenadas. Va con trazos geométricos y no con
 `fillText`: el molde se arma al montar y la fuente web puede no haber cargado.
 
-Las demos de un tema que simulan una app o narran con escenas (en
-`topics/mongodb-crud/`: `Demos.tsx` con los tutoriales de instalación local y
-de Atlas sobre un mismo motor, `EscenasMongoSql.tsx` con el reproductor de
-MongoDB vs SQL) generan su marcado como texto y lo encierran bajo una clase
-del módulo con `:global(...)`. Ojo con las clases globales que ya existen en
-el sitio (`.nav`, `.card`, `.radio`): dentro de esas demos se usan nombres
-propios (`s-nav`, `s-card`, `s-radio`, `e-card`) para que no se cuelen. Las
+Las demos de un tema que simulan una app o narran con escenas
+(`topics/mongodb-crud/Demos.tsx`: tutoriales de instalación local y de Atlas
+sobre un mismo motor; `EscenasMongoSql.tsx` y
+`topics/mongoose-esquemas/EscenasMongoose.tsx`: escenas para
+`ReproductorEscenas`) generan su marcado como texto y lo encierran bajo una
+clase del módulo con `:global(...)`. Ojo con las clases globales que ya
+existen en el sitio (`.nav`, `.card`, `.radio`, `.tag`, `.rule`): dentro de
+esas demos se usan nombres propios (`s-nav`, `s-card`, `s-radio`, `e-card`,
+`e-tag`, `e-rule`) para que no se cuelen. Las
 cadenas de conexión de ejemplo nunca van escritas con la forma
 `usuario:clave@host` (GitHub la marca como fuga): marcador entre corchetes
 (`<password>`) o, si la animación tiene que mostrar una clave, enmascarada y
@@ -165,7 +177,8 @@ bytes exactos) y nunca filtra el stack de error al cliente.
 - El sitio usa la **plantilla "terminal" de las diapositivas del curso**
   (paleta oscura de GitHub): fondo `#0D1117`, paneles `#161B22`, bordes
   `#30363D`, acento verde `#6CC24A`, amarillo `#F7DF1E` para el código en
-  línea. Los tokens viven en `src/styles/temas.css`, que manda sobre
+  línea, morado `#BC8CFF` (`--color-morado`) para la sintaxis y Mongoose.
+  Los tokens viven en `src/styles/temas.css`, que manda sobre
   `nocturne.css` (espejo de un sistema remoto: no se toca). No se escriben hex
   ni px sueltos fuera de esos bloques de tokens.
 - **Solo hay tema oscuro.** La plantilla no tiene versión clara y el

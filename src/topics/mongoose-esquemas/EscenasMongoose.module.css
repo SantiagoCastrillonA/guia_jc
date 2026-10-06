@@ -1,0 +1,248 @@
+/* Piezas de las escenas de "Mongoose" (ver EscenasMongoose.tsx). El marco del
+   reproductor está en components/visuals/ReproductorEscenas.
+
+   Las escenas usan sus propios nombres de color dentro de su HTML: amarillo =
+   Express/JS, morado = Mongoose, verde = MongoDB. Aquí se conectan a los
+   tokens del sitio. El único color propio es el naranja de los números en el
+   código, que no tiene token. */
+
+.escenas {
+  --bg: var(--color-bg);
+  --panel: var(--color-surface);
+  --panel-2: var(--color-surface-2);
+  --line: var(--color-divider);
+  --fg: var(--color-text);
+  --muted: var(--color-text-2);
+  --mongo: var(--color-accent);
+  --mgs: var(--color-morado);
+  --yellow: var(--color-code);
+  --red: var(--color-off);
+  --blue: var(--color-accent-2);
+  --numero: #ff9e64;
+  --mono: var(--font-mono);
+  --sans: var(--font-body);
+}
+
+/* ══ lienzo de las escenas ═══════════════════════════════════════════════
+
+   Entradas por opacidad, contra la regla general del proyecto: es un
+   reproductor, que cada pieza aparezca a su tiempo ES el contenido. Igual
+   que en MongoDB vs SQL, las piezas se revelan con una clase puesta desde un
+   temporizador, con movimiento reducido todo aparece de una, y "Repetir
+   escena" vuelve a montar la escena entera. */
+
+.escenas :global(.a) {
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.escenas :global(.a.in) { opacity: 1; transform: none; }
+.escenas :global(.up) { transform: translateY(24px); }
+.escenas :global(.left) { transform: translateX(-40px); }
+.escenas :global(.right) { transform: translateX(40px); }
+.escenas :global(.pop) { transform: scale(0.7); }
+.escenas :global(.abs) { position: absolute; }
+
+.escenas :global(.ttl) {
+  position: absolute; left: 60px; top: 40px;
+  font-family: var(--mono); font-size: 38px; font-weight: 800; letter-spacing: -0.5px;
+}
+.escenas :global(.ttl small) {
+  display: block; margin-bottom: 6px;
+  font-size: 16px; font-weight: 400; letter-spacing: 0;
+}
+.escenas :global(.mgc) { color: var(--mongo); }
+.escenas :global(.sc) { color: var(--mgs); }
+.escenas :global(.yc) { color: var(--yellow); }
+.escenas :global(.mc) { color: var(--muted); }
+.escenas :global(.rc) { color: var(--red); }
+.escenas :global(.bc) { color: var(--blue); }
+.escenas :global(.chip) {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
+  border-radius: 999px; border: 1.5px solid currentColor; font-family: var(--mono); font-size: 16px;
+}
+
+/* código */
+.escenas :global(.code) {
+  position: absolute; background: #0a0d12; border: 1px solid var(--line); border-radius: 10px;
+  padding: 14px 18px; font-family: var(--mono); font-size: 18px; line-height: 1.6;
+  white-space: pre; color: var(--fg);
+}
+.escenas :global(.code .k) { color: var(--mgs); }
+.escenas :global(.code .s) { color: var(--yellow); }
+.escenas :global(.code .c) { color: var(--muted); }
+.escenas :global(.code .f) { color: var(--mongo); }
+.escenas :global(.code .b) { color: var(--blue); }
+.escenas :global(.code .n) { color: var(--numero); }
+.escenas :global(.code .ln) { display: block; }
+.escenas :global(.code.blk) { white-space: normal; }
+.escenas :global(.code.blk .ln) { white-space: pre; }
+.escenas :global(.code-h) {
+  position: absolute; top: -30px; left: 0;
+  font-family: var(--mono); font-size: 15px; color: var(--muted);
+}
+.escenas :global(.typed::after) {
+  content: ''; display: inline-block; width: 10px; height: 20px; margin-left: 2px;
+  vertical-align: -4px; background: var(--fg); animation: parpadeo 1s steps(1) infinite;
+}
+.escenas :global(.typed.done::after) { display: none; }
+@keyframes parpadeo { 50% { opacity: 0; } }
+.escenas :global(.kw) { border-radius: 4px; transition: background 0.4s, color 0.4s, box-shadow 0.4s; }
+.escenas :global(.kw.hlw) {
+  color: var(--yellow);
+  background: color-mix(in srgb, var(--yellow) 26%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--yellow) 26%, transparent);
+}
+.escenas :global(.code .ln.emb) { background: color-mix(in srgb, var(--mgs) 14%, transparent); border-radius: 4px; }
+.escenas :global(.code .ln.embg) { background: color-mix(in srgb, var(--mongo) 14%, transparent); border-radius: 4px; }
+.escenas :global(.e-tag) {
+  margin-left: 10px; padding: 1px 8px; border-radius: 999px; vertical-align: 2px;
+  font-family: var(--mono); font-size: 13px;
+  background: color-mix(in srgb, var(--mgs) 25%, transparent); color: var(--mgs);
+}
+
+/* la tabla del dibujo */
+.escenas :global(.tbl) {
+  position: absolute; background: var(--panel); border-radius: 8px; overflow: hidden;
+  outline: 1.5px solid color-mix(in srgb, var(--mgs) 50%, transparent);
+  font-family: var(--mono); font-size: 16px;
+}
+.escenas :global(.tbl .cap-t) {
+  position: absolute; top: -30px; left: 0; font-family: var(--mono); font-size: 15px; color: var(--muted);
+}
+.escenas :global(.tr) {
+  display: grid; height: 44px; align-items: center; border-bottom: 1px solid var(--line);
+  transition: background 0.4s;
+}
+.escenas :global(.tr:last-child) { border-bottom: 0; }
+.escenas :global(.tr > span) {
+  height: 100%; display: flex; align-items: center; padding: 0 12px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-right: 1px solid var(--line);
+}
+.escenas :global(.tr > span:last-child) { border-right: 0; }
+.escenas :global(.th) { background: color-mix(in srgb, var(--mgs) 16%, var(--panel)); color: var(--mgs); font-weight: 600; }
+.escenas :global(.tr.ok) { background: color-mix(in srgb, var(--mgs) 12%, var(--panel)); }
+
+/* documentos y colecciones */
+.escenas :global(.doc) {
+  position: absolute; background: var(--panel); border-radius: 12px; padding: 14px 18px;
+  border: 1.5px solid color-mix(in srgb, var(--mongo) 60%, transparent);
+  font-family: var(--mono); font-size: 16px; line-height: 1.55; white-space: pre;
+}
+.escenas :global(.doc .kk) { color: var(--fg); }
+.escenas :global(.doc .s) { color: var(--yellow); }
+.escenas :global(.doc .n) { color: var(--numero); }
+.escenas :global(.doc .p) { color: var(--muted); }
+.escenas :global(.coll) {
+  position: absolute; border-radius: 18px;
+  border: 2px dashed color-mix(in srgb, var(--mongo) 60%, transparent);
+}
+.escenas :global(.coll-h) {
+  position: absolute; top: -16px; left: 24px; padding: 0 10px; background: var(--bg);
+  font-family: var(--mono); font-size: 17px; color: var(--mongo); font-weight: 600;
+}
+
+/* tarjetas, nodos y reglas */
+.escenas :global(.e-card) {
+  position: absolute; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 14px; padding: 20px 24px;
+}
+.escenas :global(.e-card h3) { margin: 0 0 8px; font-size: 26px; }
+.escenas :global(.e-card p) { margin: 0; font-size: 19px; line-height: 1.45; color: var(--muted); }
+.escenas :global(.node) {
+  position: absolute; display: flex; flex-direction: column; justify-content: center; gap: 4px;
+  padding: 16px 18px; border-radius: 14px; background: var(--panel); border: 2px solid var(--line);
+}
+.escenas :global(.node b) { font-size: 26px; }
+.escenas :global(.node span) { font-family: var(--mono); font-size: 15px; color: var(--muted); }
+.escenas :global(.e-rule) {
+  position: absolute; left: 850px; width: 380px; height: 64px;
+  display: grid; grid-template-columns: 120px 1fr; align-items: center; gap: 12px;
+  padding: 0 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+}
+.escenas :global(.e-rule code) { font-family: var(--mono); font-size: 17px; font-weight: 800; color: var(--yellow); }
+.escenas :global(.e-rule span) { font-size: 17px; line-height: 1.25; }
+
+/* equivalencias mongosh → Mongoose */
+.escenas :global(.map-row) {
+  position: absolute; left: 90px; width: 1100px; height: 62px;
+  display: grid; grid-template-columns: 1fr 90px 1.25fr; align-items: center;
+}
+.escenas :global(.map-row .l),
+.escenas :global(.map-row .r) {
+  height: 54px; border-radius: 10px; display: flex; align-items: center;
+  padding: 0 20px; font-family: var(--mono); font-size: 20px; font-weight: 600;
+}
+.escenas :global(.map-row .l) {
+  justify-content: flex-end; color: var(--mongo);
+  background: color-mix(in srgb, var(--mongo) 13%, var(--panel));
+}
+.escenas :global(.map-row .r) { color: var(--mgs); background: color-mix(in srgb, var(--mgs) 14%, var(--panel)); }
+.escenas :global(.map-h) { position: absolute; top: 150px; font-family: var(--mono); font-size: 16px; }
+
+/* error de validación */
+.escenas :global(.err) {
+  position: absolute; border-radius: 10px; padding: 14px 18px;
+  background: color-mix(in srgb, var(--red) 10%, #0a0d12);
+  border: 1.5px solid color-mix(in srgb, var(--red) 70%, transparent);
+  font-family: var(--mono); font-size: 15px; line-height: 1.6; color: var(--fg);
+}
+.escenas :global(.err .ln) { display: block; white-space: pre; }
+.escenas :global(.big) { font-size: 30px; font-weight: 800; }
+
+/* el portero: un paquete que pasa y otro que rebota */
+.escenas :global(.rail) {
+  position: absolute; height: 4px;
+  background: repeating-linear-gradient(90deg, var(--line) 0 14px, transparent 14px 24px);
+}
+.escenas :global(.gate) { position: absolute; width: 8px; border-radius: 4px; background: var(--mgs); }
+.escenas :global(.gate.ok) { animation: destelloVerde 1.1s ease; }
+.escenas :global(.gate.no) { animation: destelloRojo 1.2s ease forwards; }
+@keyframes destelloVerde {
+  40% { background: var(--mongo); box-shadow: 0 0 26px var(--mongo); }
+}
+@keyframes destelloRojo {
+  30%, 100% { background: var(--red); box-shadow: 0 0 26px var(--red); }
+}
+.escenas :global(.pkt) {
+  position: absolute; height: 46px; padding: 0 16px; border-radius: 10px;
+  display: flex; align-items: center; white-space: nowrap;
+  font-family: var(--mono); font-size: 17px; font-weight: 600;
+  background: var(--panel); border: 2px solid var(--mongo); color: var(--mongo);
+}
+.escenas :global(.pkt.go) { animation: pasa 2.2s ease-in-out forwards; }
+.escenas :global(.pkt.bounce) {
+  animation: rebota 1.8s ease-out forwards; border-color: var(--yellow); color: var(--yellow);
+}
+.escenas :global(.pkt.bad) {
+  border-color: var(--red); color: var(--red); transition: border-color 0.3s, color 0.3s;
+}
+@keyframes pasa {
+  0% { transform: translateX(0); }
+  85% { transform: translateX(735px); opacity: 1; }
+  100% { transform: translateX(790px) scale(0.6); opacity: 0; }
+}
+@keyframes rebota {
+  0% { transform: translateX(0); }
+  45% { transform: translateX(185px); }
+  62%, 100% { transform: translateX(120px); }
+}
+
+/* árbol de archivos */
+.escenas :global(.tree) {
+  position: absolute; background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 16px 20px; font-family: var(--mono); font-size: 18px; line-height: 1.75; white-space: pre;
+}
+.escenas :global(.tree .ln) { display: block; }
+.escenas :global(.tree .new) { color: var(--mgs); }
+.escenas :global(.tree .sec) { color: var(--red); }
+
+@media (prefers-reduced-motion: reduce) {
+  .escenas :global(.a),
+  .escenas :global(.kw),
+  .escenas :global(.tr) { transition: none; }
+  .escenas :global(.typed::after) { animation: none; }
+  .escenas :global(.pkt.go),
+  .escenas :global(.pkt.bounce),
+  .escenas :global(.gate.ok),
+  .escenas :global(.gate.no) { animation-duration: 0.01s; }
+}

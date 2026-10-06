@@ -12,8 +12,8 @@
 .pagina {
   --term-verde: var(--color-accent);
   --term-amarillo: var(--color-code);
-  --term-azul: #58a6ff;
-  --term-morado: #bc8cff;
+  --term-azul: var(--color-accent-2);
+  --term-morado: var(--color-morado);
 
   padding-bottom: var(--term-hueco-lg);
 

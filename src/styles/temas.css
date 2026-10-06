@@ -49,6 +49,9 @@
   /* El amarillo del código en línea: en las diapositivas, cada `comando` o
      `valor` dentro de un párrafo va en este tono. */
   --color-code: #f7df1e;
+  /* El morado de la sintaxis (palabras clave en los bloques de código) y el
+     color de Mongoose en las animaciones. 7.6:1 sobre el fondo. */
+  --color-morado: #bc8cff;
   --color-code-comment: #8b949e;
 
   --color-ok: #3fb950;

@@ -1,0 +1,171 @@
+/* Marco del reproductor de escenas (ver ReproductorEscenas.tsx).
+
+   Solo el marco: cabecera, lienzo escalado, barra, controles y narración. Las
+   piezas de cada escena las estiliza el tema con su propia clase. `--acento`
+   llega del componente: cada video tiene su color (verde para MongoDB,
+   morado para Mongoose…). */
+
+.raiz {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: var(--leading) 0;
+}
+/* El foco del contenedor solo sirve para que las teclas funcionen tras un
+   clic en el lienzo; no es un destino de teclado (tabIndex -1). */
+.raiz:focus { outline: none; }
+
+/* ── cabecera ──────────────────────────────────────────────────────────── */
+
+.cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: end;
+  gap: 8px 20px;
+}
+.prompt { font-family: var(--font-mono); font-size: 14px; color: var(--acento); }
+.prompt::before { content: '$ '; }
+.titulo {
+  margin: 4px 0 0;
+  font-family: var(--font-mono);
+  font-size: clamp(20px, 2.6vw, 28px);
+  font-weight: 700;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-text-2);
+}
+.leyenda span::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 3px;
+  vertical-align: -1px;
+  background: var(--c);
+}
+
+/* ── reproductor ───────────────────────────────────────────────────────── */
+
+.reproductor {
+  background: var(--color-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+.vista {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+.lienzo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1280px;
+  height: 720px;
+  transform-origin: 0 0;
+  font-family: var(--font-body);
+  color: var(--color-text);
+}
+
+/* La barra se llena con `scaleX` y no con `width`: se actualiza en cada
+   cuadro, y así no obliga a recalcular el diseño 60 veces por segundo. */
+.progreso { height: 4px; background: var(--color-surface-2); }
+.progreso i {
+  display: block;
+  height: 100%;
+  background: var(--acento);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.controles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--color-divider);
+}
+.boton {
+  font: inherit;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 9px 13px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--color-divider);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out), filter var(--dur-fast) var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .boton:not(:disabled):hover { border-color: var(--color-text-3); }
+  .botonPri:not(:disabled):hover { filter: brightness(1.08); }
+}
+.boton:disabled { opacity: 0.4; cursor: default; }
+/* Texto oscuro sobre el acento, como manda el tema: los acentos de los
+   videos (verde, morado) son claros y con blanco no pasan AA. */
+.botonPri {
+  background: var(--acento);
+  border-color: var(--acento);
+  color: var(--color-on-accent);
+}
+.boton:focus-visible,
+.puntos button:focus-visible {
+  outline: 2px solid var(--color-code);
+  outline-offset: 2px;
+}
+
+.puntos { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.puntos button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--color-divider);
+  background: var(--color-bg);
+  color: var(--color-text-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.puntos [data-estado='actual'] {
+  background: var(--acento);
+  border-color: var(--acento);
+  color: var(--color-on-accent);
+  font-weight: 800;
+}
+.puntos [data-estado='hecho'] { border-color: var(--acento); color: var(--acento); }
+
+/* ── narración ─────────────────────────────────────────────────────────── */
+
+.narracion {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-divider);
+  border-radius: var(--radius-card);
+}
+.numero { font-family: var(--font-mono); font-size: 13px; color: var(--acento); }
+.tituloEscena { margin: 0; font-size: clamp(19px, 2.1vw, 24px); }
+.texto { margin: 0; font-size: clamp(15.5px, 1.5vw, 18px); line-height: 1.5; max-width: 80ch; }
+.pista { font-family: var(--font-mono); font-size: 12px; color: var(--color-text-3); }
+
+@media (max-width: 640px) {
+  .puntos { margin-left: 0; }
+}

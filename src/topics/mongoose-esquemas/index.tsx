@@ -9,6 +9,7 @@ import {
   TrueFalse,
 } from '../../components/exercises';
 import { Callout, Compare, Figure, RefTable, Step, Steps, Terminal } from '../../components/visuals';
+import { ExplicaMongoose } from './EscenasMongoose';
 
 const SLUG = 'mongoose-esquemas';
 
@@ -32,7 +33,9 @@ export default function MongooseEsquemas() {
         <p>
           Cuatro documentos, cuatro formas distintas. Cualquier cálculo sobre esa colección va a
           fallar de manera impredecible. <strong>Mongoose</strong> pone la regla que Mongo no exige.
+          La animación recorre la sesión completa: de instalarlo a usarlo en una ruta de Express.
         </p>
+        <ExplicaMongoose />
       </Lesson>
 
       <Lesson title="2. El esquema: la forma del documento">
@@ -200,6 +203,8 @@ export default function MongooseEsquemas() {
               lineas={[
                 'backend/',
                 '├── servidor.js        # arranque y middleware',
+                '├── config/',
+                '│   └── db.js          # la conexión a Mongo',
                 '├── modelos/',
                 '│   ├── Producto.js',
                 '│   └── Usuario.js',
@@ -220,7 +225,7 @@ export default function MongooseEsquemas() {
           </Step>
         </Steps>
         <Callout>
-          La <code>MONGO_URL</code> es la misma de la sesión 13: <code>localhost:27017</code> si
+          La <code>MONGO_URL</code> es la misma de la sesión 13: <code>127.0.0.1:27017</code> si
           instalaste Mongo en tu computador, o la de <strong>MongoDB Atlas</strong> si usas la nube.
           Mongoose se conecta igual con las dos — no se toca ni una línea de código.
         </Callout>

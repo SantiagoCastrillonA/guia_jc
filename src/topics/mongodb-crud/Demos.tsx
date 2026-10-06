@@ -335,7 +335,7 @@ const WINDOWS: Paso[] = [
     nota: [
       'tip',
       '¿Qué es localhost:27017?',
-      '<code>localhost</code> significa "este mismo computador" y <code>27017</code> es la puerta por donde MongoDB escucha. Es la dirección que usaremos desde Express.',
+      '<code>localhost</code> significa "este mismo computador" y <code>27017</code> es la puerta por donde MongoDB escucha. Desde Express la escribiremos con su número, <code>127.0.0.1</code>: evita un error de conexión común en Node.',
     ],
     pantalla: () => compassConectar('localhost:27017'),
     acciones: accionesCompass,
@@ -758,7 +758,7 @@ const ATLAS: Paso[] = [
     nota: [
       'info',
       'Local vs. Atlas',
-      'Con MongoDB en tu computador la dirección es <code>mongodb://localhost:27017</code>. En Atlas empieza por <code>mongodb+srv://</code> y lleva tu usuario y contraseña.',
+      'Con MongoDB en tu computador la dirección es <code>mongodb://127.0.0.1:27017</code>. En Atlas empieza por <code>mongodb+srv://</code> y lleva tu usuario y contraseña.',
     ],
     pantalla: () =>
       navegador(

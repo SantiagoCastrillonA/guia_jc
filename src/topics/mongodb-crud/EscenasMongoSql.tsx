@@ -1,29 +1,12 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { ReproductorEscenas, type Escena } from '../../components/visuals/ReproductorEscenas';
 import styles from './EscenasMongoSql.module.css';
 
 /*
- * "¿Qué es MongoDB y en qué se diferencia de SQL?" — reproductor de escenas.
- *
- * Nueve escenas sobre un lienzo fijo de 1280 × 720 que se escala al ancho.
- * Cada pieza de una escena trae `data-t` (a qué milisegundo aparece) y a veces
- * `data-at="ms:clase"` (a qué milisegundo cambia de estado). El reproductor
- * programa esos tiempos, lleva la barra de progreso y, si está en
- * "reproducir", pasa sola a la escena siguiente.
- *
- * Igual que en los tutoriales de Demos.tsx, las escenas son HTML escrito como
- * cadenas constantes de este archivo y se montan con `innerHTML`: nada viene
- * de un usuario. `.card` ya existe en el CSS global del sitio, así que aquí la
- * tarjeta se llama `e-card`.
+ * "¿Qué es MongoDB y en qué se diferencia de SQL?" — las nueve escenas. El
+ * motor y los controles están en `ReproductorEscenas`; aquí van el contenido y
+ * el aspecto de las piezas (EscenasMongoSql.module.css). `.card` ya existe en
+ * el CSS global del sitio, así que aquí la tarjeta se llama `e-card`.
  */
-
-interface Escena {
-  titulo: string;
-  /** Narración bajo el reproductor. Admite <b> y <code>. */
-  texto: string;
-  /** Cuánto se queda la escena completa en pantalla antes de pasar. */
-  pausa: number;
-  html: string;
-}
 
 const fila = (cols: string, celdas: string[], clase = '', attrs = '') =>
   `<div class="tr ${clase}" style="grid-template-columns:${cols}" ${attrs}>${celdas
@@ -228,232 +211,21 @@ const ESCENAS: Escena[] = [
   },
 ];
 
-const ANCHO_LIENZO = 1280;
-
+/** Animación de la sesión 13: qué es MongoDB y en qué se diferencia de SQL. */
 export function MongoVsSql() {
-  const [escena, setEscena] = useState(0);
-  const [reproduciendo, setReproduciendo] = useState(true);
-  /** Subirlo repite la escena actual. */
-  const [vuelta, setVuelta] = useState(0);
-  /** No arranca hasta que el reproductor se ve por primera vez. */
-  const [activo, setActivo] = useState(false);
-
-  const raizRef = useRef<HTMLDivElement>(null);
-  const vistaRef = useRef<HTMLDivElement>(null);
-  const lienzoRef = useRef<HTMLDivElement>(null);
-  const barraRef = useRef<HTMLElement>(null);
-  const reproduciendoRef = useRef(reproduciendo);
-  const visibleRef = useRef(false);
-  const finRef = useRef(0);
-
-  useEffect(() => {
-    reproduciendoRef.current = reproduciendo;
-  }, [reproduciendo]);
-
-  // El lienzo mide 1280 px de diseño y se escala al ancho que haya.
-  useEffect(() => {
-    const vista = vistaRef.current;
-    const lienzo = lienzoRef.current;
-    if (!vista || !lienzo) return;
-    const ajustar = () => {
-      lienzo.style.transform = `scale(${vista.clientWidth / ANCHO_LIENZO})`;
-    };
-    ajustar();
-    const observador = new ResizeObserver(ajustar);
-    observador.observe(vista);
-    return () => observador.disconnect();
-  }, []);
-
-  // Arranca al verse y no avanza de escena mientras está fuera de pantalla: en
-  // una lección larga, si corriera desde que carga la página, el estudiante
-  // llegaría a la mitad de la explicación.
-  useEffect(() => {
-    const raiz = raizRef.current;
-    if (!raiz) return;
-    const observador = new IntersectionObserver(
-      ([entrada]) => {
-        visibleRef.current = entrada.isIntersecting;
-        if (entrada.isIntersecting) setActivo(true);
-      },
-      { threshold: 0.4 },
-    );
-    observador.observe(raiz);
-    return () => observador.disconnect();
-  }, []);
-
-  // La línea de tiempo de la escena: programa cada pieza y lleva la barra.
-  useEffect(() => {
-    const lienzo = lienzoRef.current;
-    if (!activo || !lienzo) return;
-    const rapido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const temporizadores: number[] = [];
-    let cuadro = 0;
-    const en = (ms: number, fn: () => void) =>
-      temporizadores.push(window.setTimeout(fn, rapido ? 0 : ms));
-
-    const teclear = (el: HTMLElement, texto: string) => {
-      if (rapido) {
-        el.textContent = texto;
-        el.classList.add('done');
-        return;
-      }
-      let i = 0;
-      el.textContent = '';
-      const paso = () => {
-        el.textContent = texto.slice(0, ++i);
-        if (i < texto.length) temporizadores.push(window.setTimeout(paso, 45));
-        else el.classList.add('done');
-      };
-      paso();
-    };
-
-    const sc = ESCENAS[escena];
-    lienzo.innerHTML = sc.html;
-    let maxT = 0;
-    lienzo.querySelectorAll<HTMLElement>('[data-t]').forEach((el) => {
-      const t = Number(el.dataset.t);
-      maxT = Math.max(maxT, t);
-      const texto = el.dataset.type;
-      if (texto) en(t, () => teclear(el, texto));
-      else en(t, () => el.classList.add('in'));
-    });
-    lienzo.querySelectorAll<HTMLElement>('[data-at]').forEach((el) => {
-      (el.dataset.at ?? '').split(',').forEach((par) => {
-        const [ms, clase] = par.split(':');
-        maxT = Math.max(maxT, Number(ms));
-        en(Number(ms), () => el.classList.add(clase));
-      });
-    });
-
-    const inicio = performance.now();
-    const fin = inicio + maxT + sc.pausa;
-    finRef.current = fin;
-
-    const avanzar = () => {
-      const p = Math.min(1, (performance.now() - inicio) / (fin - inicio));
-      if (barraRef.current) {
-        barraRef.current.style.transform = `scaleX(${(escena + p) / ESCENAS.length})`;
-      }
-      if (p < 1) {
-        cuadro = requestAnimationFrame(avanzar);
-        return;
-      }
-      if (escena === ESCENAS.length - 1) {
-        setReproduciendo(false);
-        return;
-      }
-      if (!reproduciendoRef.current) return;
-      // Terminó la escena pero el reproductor no se ve: espera a que vuelva.
-      if (!visibleRef.current) {
-        cuadro = requestAnimationFrame(avanzar);
-        return;
-      }
-      setEscena(escena + 1);
-    };
-    avanzar();
-
-    return () => {
-      temporizadores.forEach(clearTimeout);
-      cancelAnimationFrame(cuadro);
-    };
-  }, [activo, escena, vuelta]);
-
-  function ir(k: number) {
-    setEscena(Math.max(0, Math.min(ESCENAS.length - 1, k)));
-    setVuelta((n) => n + 1);
-  }
-
-  function alternar() {
-    const nuevo = !reproduciendo;
-    setReproduciendo(nuevo);
-    // Si la escena ya había terminado, "reproducir" sigue con la próxima; en la
-    // última, vuelve a empezar.
-    if (nuevo && performance.now() >= finRef.current) {
-      ir(escena === ESCENAS.length - 1 ? 0 : escena + 1);
-    }
-  }
-
-  // Teclas solo con el foco dentro del reproductor, como en los tutoriales.
-  function alTeclado(e: KeyboardEvent<HTMLDivElement>) {
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-    const destino = e.target as HTMLElement;
-    if (destino.closest('input, textarea, [contenteditable="true"]')) return;
-    // Sobre un botón, Espacio y Enter lo activan: no se toca.
-    if (destino.closest('button') && (e.key === ' ' || e.key === 'Enter')) return;
-    if (e.key === ' ') {
-      e.preventDefault();
-      alternar();
-    } else if (e.key === 'ArrowRight') ir(escena + 1);
-    else if (e.key === 'ArrowLeft') ir(escena - 1);
-    else if (e.key.toLowerCase() === 'r') ir(escena);
-  }
-
-  const sc = ESCENAS[escena];
-
   return (
-    <div className={styles.raiz} ref={raizRef} tabIndex={-1} onKeyDown={alTeclado}>
-      <div className={styles.cabecera}>
-        <div>
-          <div className={styles.prompt}>sesion13 --explica bases-de-datos</div>
-          <p className={styles.titulo}>¿Qué es MongoDB y en qué se diferencia de SQL?</p>
-        </div>
-        <div className={styles.leyenda}>
-          <span data-c="sql">Relacional (SQL)</span>
-          <span data-c="mongo">MongoDB</span>
-        </div>
-      </div>
-
-      <section className={styles.reproductor}>
-        <div className={styles.vista} ref={vistaRef} role="img" aria-label={`Escena: ${sc.titulo}`}>
-          <div className={styles.lienzo} ref={lienzoRef} />
-        </div>
-        <div className={styles.progreso}>
-          <i ref={barraRef} />
-        </div>
-        <div className={styles.controles}>
-          <button type="button" className={styles.boton} onClick={() => ir(escena - 1)} disabled={escena === 0}>
-            ← Anterior
-          </button>
-          <button type="button" className={`${styles.boton} ${styles.botonPri}`} onClick={alternar}>
-            {reproduciendo ? '❚❚ Pausa' : '▶ Reproducir'}
-          </button>
-          <button type="button" className={styles.boton} onClick={() => ir(escena)}>
-            ↻ Repetir escena
-          </button>
-          <button
-            type="button"
-            className={styles.boton}
-            onClick={() => ir(escena + 1)}
-            disabled={escena === ESCENAS.length - 1}
-          >
-            Siguiente →
-          </button>
-          <div className={styles.puntos}>
-            {ESCENAS.map((s, k) => (
-              <button
-                key={k}
-                type="button"
-                data-estado={k === escena ? 'actual' : k < escena ? 'hecho' : undefined}
-                aria-label={`Escena ${k + 1}: ${s.titulo}`}
-                aria-current={k === escena ? 'step' : undefined}
-                title={s.titulo}
-                onClick={() => ir(k)}
-              >
-                {k + 1}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.narracion} aria-live="polite">
-        <div className={styles.numero}>
-          Escena {escena + 1} de {ESCENAS.length}
-        </div>
-        <h3 className={styles.tituloEscena}>{sc.titulo}</h3>
-        <p className={styles.texto} dangerouslySetInnerHTML={{ __html: sc.texto }} />
-        <div className={styles.pista}>Espacio: pausa/continúa · ← → cambiar de escena · R repetir</div>
-      </section>
-    </div>
+    <ReproductorEscenas
+      prompt="sesion13 --explica bases-de-datos"
+      titulo="¿Qué es MongoDB y en qué se diferencia de SQL?"
+      leyenda={LEYENDA}
+      escenas={ESCENAS}
+      claseEscenas={styles.escenas}
+      acento="var(--color-accent)"
+    />
   );
 }
+
+const LEYENDA = [
+  { color: 'var(--color-accent-2)', texto: 'Relacional (SQL)' },
+  { color: 'var(--color-accent)', texto: 'MongoDB' },
+];
