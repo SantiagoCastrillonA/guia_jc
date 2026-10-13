@@ -1,9 +1,26 @@
 /* Retoques a sileo que no caben en sus opciones.
 
-   El titulo viene con `text-transform: capitalize`. En ingles pasa
-   desapercibido; en espanol convierte cada frase en "Ya Esta Disponible". Se
-   apunta desde el viewport para ganarle en especificidad sin depender del
-   orden en que se inserten las hojas de estilo. */
+   Todo se apunta desde el viewport para ganarle en especificidad sin
+   depender del orden en que se inserten las hojas de estilo. */
+
+/* El titulo viene con `text-transform: capitalize`. En ingles pasa
+   desapercibido; en espanol convierte cada frase en "Ya Esta Disponible". */
 [data-sileo-viewport] [data-sileo-title] {
   text-transform: none;
+}
+
+/* La descripcion de sileo va en blanco al 50 %: sobre el panel se queda
+   cerca de 4:1. Con el gris secundario del tema pasa AA. El selector es más
+   largo que el de sileo a propósito: su regla se inyecta en tiempo de
+   ejecución, después de esta hoja, y con la misma especificidad ganaría. */
+[data-sileo-viewport][data-theme] [data-sileo-toast] [data-sileo-description] {
+  color: var(--color-text-2);
+}
+
+/* El aviso es una forma SVG sin borde: sobre el fondo oscuro del sitio se
+   perdia, y sobre las zonas claras (pantallas simuladas, tarjetas blancas)
+   no tenia contorno. Un filo del color de los bordes y una sombra lo separan
+   de cualquier fondo, como la elevacion del resto de la plantilla. */
+[data-sileo-viewport] [data-sileo-svg] {
+  filter: drop-shadow(0 0 0.5px var(--color-text-3)) drop-shadow(0 8px 24px rgba(1, 4, 9, 0.6));
 }

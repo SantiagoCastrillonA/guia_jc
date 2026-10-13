@@ -17,12 +17,15 @@ function token(nombre: string) {
 
 /** Se monta una sola vez, en la raíz de la app. */
 export function AvisosToaster() {
+  // Ojo con los nombres de sileo: su tema "dark" es relleno CLARO con texto
+  // oscuro, y "light" es relleno oscuro con texto claro. Con relleno oscuro
+  // propio y "dark", la descripción salía negra sobre negro.
   return (
     <Toaster
       position="bottom-right"
-      theme="dark"
+      theme="light"
       offset={{ bottom: 24, right: 24 }}
-      options={{ fill: token('--color-surface'), duration: 4500 }}
+      options={{ fill: token('--color-surface-2'), duration: 4500 }}
     />
   );
 }
