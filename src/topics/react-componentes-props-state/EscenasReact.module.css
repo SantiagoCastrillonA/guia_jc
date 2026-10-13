@@ -1,0 +1,256 @@
+/* Piezas de las escenas de "React por dentro" (ver EscenasReact.tsx). El
+   marco del reproductor está en components/visuals/ReproductorEscenas.
+
+   Las escenas usan sus propios nombres de color dentro de su HTML: cian =
+   componentes, morado = props, verde = state, amarillo = JSX / JavaScript.
+   Aquí se conectan a los tokens del sitio. Lo único con paleta propia es lo
+   que imita algo de afuera: la sintaxis del editor (rojo de palabras clave,
+   lila de funciones, naranja de números) y la página clara de la tienda que
+   ve el cliente (`--web-*`), que es blanca como en el navegador real. */
+
+.escenas {
+  --bg: var(--color-bg);
+  --panel: var(--color-surface);
+  --panel-2: var(--color-surface-2);
+  --line: var(--color-divider);
+  --deep: #0a0d12;
+  --fg: var(--color-text);
+  --muted: var(--color-text-2);
+  --react: var(--color-react);
+  --props: var(--color-morado);
+  --state: var(--color-accent);
+  --yellow: var(--color-code);
+  --red: var(--color-off);
+  --blue: var(--color-accent-2);
+  --kw: #ff7b72;
+  --fn: #d2a8ff;
+  --numero: #ff9e64;
+  --mono: var(--font-mono);
+
+  --web-bg: #f6f8fa;
+  --web-bg-2: #eef1f4;
+  --web-fg: #1f2328;
+  --web-muted: #57606a;
+  --web-precio: #1a7f37;
+  --web-boton: #0969da;
+  --web-hueco: #8250df;
+  --web-hueco-bg: #f3e8ff;
+  --web-barra: #e9edf1;
+  --web-punto: #c3cad1;
+  --web-rotulo: #0b7a96;
+}
+
+/* ══ lienzo de las escenas ═══════════════════════════════════════════════
+
+   Entradas por opacidad, contra la regla general del proyecto: es un
+   reproductor, que cada pieza aparezca a su tiempo ES el contenido. Igual
+   que en los otros videos, las piezas se revelan con una clase puesta desde
+   un temporizador, con movimiento reducido todo aparece de una, y "Repetir
+   escena" vuelve a montar la escena entera. */
+
+.escenas :global(.a) {
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.escenas :global(.a.in) { opacity: 1; transform: none; }
+.escenas :global(.up) { transform: translateY(24px); }
+.escenas :global(.left) { transform: translateX(-40px); }
+.escenas :global(.right) { transform: translateX(40px); }
+.escenas :global(.pop) { transform: scale(0.7); }
+.escenas :global(.abs) { position: absolute; }
+
+.escenas :global(.ttl) {
+  position: absolute; left: 60px; top: 40px;
+  font-family: var(--mono); font-size: 38px; font-weight: 800; letter-spacing: -0.5px;
+}
+.escenas :global(.ttl small) {
+  display: block; margin-bottom: 6px;
+  font-size: 16px; font-weight: 400; letter-spacing: 0;
+}
+.escenas :global(.rc) { color: var(--react); }
+.escenas :global(.pc) { color: var(--props); }
+.escenas :global(.sc) { color: var(--state); }
+.escenas :global(.yc) { color: var(--yellow); }
+.escenas :global(.mc) { color: var(--muted); }
+.escenas :global(.xc) { color: var(--red); }
+.escenas :global(.bc) { color: var(--blue); }
+.escenas :global(.fm) { font-family: var(--mono); }
+.escenas :global(.chip) {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px;
+  border-radius: 999px; border: 1.5px solid currentColor;
+  font-family: var(--mono); font-size: 16px; white-space: nowrap;
+}
+
+/* código */
+.escenas :global(.code) {
+  position: absolute; background: var(--deep); border: 1px solid var(--line); border-radius: 10px;
+  padding: 14px 18px; font-family: var(--mono); font-size: 18px; line-height: 1.6; color: var(--fg);
+}
+.escenas :global(.code .ln) { display: block; white-space: pre; }
+.escenas :global(.code .k) { color: var(--kw); }
+.escenas :global(.code .s) { color: var(--yellow); }
+.escenas :global(.code .c) { color: var(--muted); }
+.escenas :global(.code .f) { color: var(--fn); }
+.escenas :global(.code .t) { color: var(--blue); }
+.escenas :global(.code .cp) { color: var(--react); }
+.escenas :global(.code .p) { color: var(--props); }
+.escenas :global(.code .n) { color: var(--numero); }
+.escenas :global(.code .st) { color: var(--state); }
+.escenas :global(.code-h) {
+  position: absolute; top: -30px; left: 0;
+  font-family: var(--mono); font-size: 15px; color: var(--muted); white-space: nowrap;
+}
+.escenas :global(.kw) { border-radius: 4px; transition: background 0.4s, box-shadow 0.4s; }
+.escenas :global(.kw.hl) {
+  background: color-mix(in srgb, var(--yellow) 26%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--yellow) 26%, transparent);
+}
+.escenas :global(.kw.hlx) {
+  background: color-mix(in srgb, var(--red) 30%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--red) 30%, transparent);
+}
+.escenas :global(.code .ln.markx) {
+  background: color-mix(in srgb, var(--red) 16%, transparent); border-radius: 4px;
+}
+
+/* la página que ve el cliente: clara, como en el navegador */
+.escenas :global(.pcard) {
+  position: absolute; background: var(--web-bg); color: var(--web-fg); border-radius: 12px;
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; font-family: var(--font-body);
+}
+.escenas :global(.pcard h4) { margin: 0; font-size: 22px; color: var(--web-fg); }
+.escenas :global(.pcard .pr) { font-weight: 800; font-size: 19px; color: var(--web-precio); }
+.escenas :global(.pcard .bt) {
+  align-self: flex-start; background: var(--web-boton); color: #fff; border-radius: 8px;
+  padding: 7px 12px; font-weight: 700; font-size: 15px;
+}
+.escenas :global(.pcard .qt) {
+  font-size: 17px; color: var(--web-muted); border-radius: 4px; padding: 0 4px; margin-left: -4px;
+}
+.escenas :global(.pcard .slot) {
+  align-self: flex-start; font-family: var(--mono); font-size: 16px; color: var(--web-hueco);
+  background: var(--web-hueco-bg); border-radius: 4px; padding: 2px 6px;
+}
+.escenas :global(.pcard .hole) { border: 2px dashed var(--red); border-radius: 6px; height: 30px; width: 150px; }
+.escenas :global(.mini) {
+  position: absolute; width: 130px; height: 86px; background: var(--web-bg); color: var(--web-fg);
+  border-radius: 10px; padding: 10px 12px; font-size: 15px; font-weight: 700;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.escenas :global(.mini span) { font-weight: 800; color: var(--web-precio); font-size: 14px; }
+.escenas :global(.browser) {
+  position: absolute; background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid var(--line);
+}
+.escenas :global(.browser .bb) {
+  height: 34px; background: var(--web-barra); display: flex; align-items: center; gap: 6px; padding: 0 12px;
+}
+.escenas :global(.browser .bb i) { width: 10px; height: 10px; border-radius: 50%; background: var(--web-punto); }
+.escenas :global(.browser .bb span) { margin-left: 10px; font-family: var(--mono); font-size: 13px; color: var(--web-muted); }
+
+/* cajas y nodos */
+.escenas :global(.node) {
+  position: absolute; border-radius: 12px; background: var(--panel); border: 2px solid var(--react);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--react);
+}
+.escenas :global(.dash) { position: absolute; border: 2px dashed var(--react); border-radius: 12px; }
+.escenas :global(.dash .lbl) {
+  position: absolute; top: -13px; right: 12px; background: #fff; color: var(--web-rotulo);
+  font-family: var(--mono); font-size: 13px; font-weight: 700; padding: 0 6px; border-radius: 4px;
+}
+.escenas :global(.err) {
+  position: absolute; background: color-mix(in srgb, var(--red) 10%, var(--deep));
+  border: 1.5px solid color-mix(in srgb, var(--red) 70%, transparent); border-radius: 10px;
+  padding: 14px 18px; font-family: var(--mono); font-size: 16px; line-height: 1.55; color: var(--fg);
+}
+.escenas :global(.console) {
+  position: absolute; background: var(--deep); border: 1px solid var(--line); border-radius: 10px;
+  padding: 10px 16px; font-family: var(--mono); font-size: 16px; line-height: 1.6;
+}
+.escenas :global(.console .h) { color: var(--muted); font-size: 13px; margin-bottom: 4px; }
+.escenas :global(.paso) {
+  position: absolute; height: 64px; border-radius: 12px; border: 1.5px solid var(--line);
+  background: var(--panel); display: flex; align-items: center; gap: 10px; padding: 0 14px;
+  font-size: 17px; font-weight: 600; color: var(--muted);
+  transition: border-color 0.4s, color 0.4s, background 0.4s;
+}
+.escenas :global(.paso b) {
+  display: grid; place-items: center; flex: none; width: 28px; height: 28px; border-radius: 50%;
+  border: 1.5px solid currentColor; font-family: var(--mono); font-size: 15px;
+}
+.escenas :global(.paso.on) {
+  border-color: var(--react); color: var(--fg);
+  background: color-mix(in srgb, var(--react) 12%, var(--panel));
+}
+.escenas :global(.paso.on b) { background: var(--react); color: var(--bg); border-color: var(--react); }
+.escenas :global(.tree) {
+  position: absolute; background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 44px 18px 16px; font-family: var(--mono); font-size: 15px; line-height: 1.9;
+}
+.escenas :global(.tree .h) { position: absolute; top: 12px; left: 18px; font-size: 14px; color: var(--muted); }
+.escenas :global(.tree .ln) {
+  display: block; white-space: pre; border-radius: 4px; padding: 0 4px;
+  transition: background 0.4s, color 0.4s;
+}
+.escenas :global(.tree .ln.same) { color: var(--muted); }
+.escenas :global(.tree .ln.diff) {
+  background: color-mix(in srgb, var(--yellow) 22%, transparent); color: var(--yellow); font-weight: 700;
+}
+.escenas :global(.mem) {
+  position: absolute; display: flex; align-items: center; gap: 16px; padding: 0 22px;
+  background: color-mix(in srgb, var(--state) 10%, var(--panel));
+  border: 2px solid color-mix(in srgb, var(--state) 60%, transparent); border-radius: 14px;
+  font-family: var(--mono); font-size: 20px;
+}
+.escenas :global(.frame) {
+  position: absolute; background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+  padding: 16px 20px; font-family: var(--mono); font-size: 17px; line-height: 1.9;
+}
+.escenas :global(.frame .h) { font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+.escenas :global(.frame .row) { display: flex; justify-content: space-between; gap: 10px; white-space: nowrap; }
+.escenas :global(.frame .row em) { font-style: normal; font-size: 13px; font-family: var(--font-body); align-self: center; }
+.escenas :global(.pkt) {
+  position: absolute; height: 40px; padding: 0 14px; border-radius: 999px;
+  display: flex; align-items: center; white-space: nowrap;
+  font-family: var(--mono); font-size: 16px; font-weight: 600;
+  background: var(--panel); border: 2px solid var(--props); color: var(--props);
+}
+.escenas :global(.arrow) { position: absolute; font-size: 34px; color: var(--muted); line-height: 1; }
+
+/* movimiento: piezas que vuelan a su sitio, destellos y clics */
+.escenas :global(.fly) {
+  opacity: 0; transform: translate(var(--sx, 0), var(--sy, 0)) scale(0.5);
+  transition: transform 1.1s cubic-bezier(0.3, 0.7, 0.2, 1), opacity 0.5s;
+}
+.escenas :global(.fly.go) { opacity: 1; transform: none; }
+.escenas :global(.fly.go.gone) { opacity: 0; }
+.escenas :global(.fl.go) { animation: destello 1.2s ease; }
+@keyframes destello {
+  30% {
+    background: color-mix(in srgb, var(--yellow) 55%, transparent);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--yellow) 45%, transparent);
+  }
+}
+.escenas :global(.rip) {
+  position: absolute; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%;
+  border: 3px solid var(--react); opacity: 0; pointer-events: none;
+}
+.escenas :global(.rip.go) { animation: onda 0.6s ease-out; }
+@keyframes onda {
+  0% { opacity: 1; transform: scale(0.3); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+.escenas :global(.ptr) {
+  position: absolute; width: 22px; height: 22px; pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .escenas :global(.a),
+  .escenas :global(.kw),
+  .escenas :global(.paso),
+  .escenas :global(.tree .ln),
+  .escenas :global(.fly) { transition: none; }
+  .escenas :global(.fl.go),
+  .escenas :global(.rip.go) { animation: none; }
+}

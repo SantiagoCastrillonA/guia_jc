@@ -74,10 +74,13 @@ progreso.
 
 Material gráfico reutilizable en `src/components/visuals/`: `Figure`,
 `Steps`/`Step`, `Callout`, `Compare`, `RefTable`, `Terminal` (todo en
-`index.tsx`), más `Snippets` (recetario con estado y portapapeles) y
+`index.tsx`), más `Snippets` (recetario con estado y portapapeles),
 `ReproductorEscenas` (las animaciones tipo "video que se lee": motor y
-controles; cada tema pone sus escenas y el CSS de sus piezas), cada uno en su
-propio archivo.
+controles; cada tema pone sus escenas y el CSS de sus piezas) y
+`TutorialSimulado` (tutoriales paso a paso con una pantalla simulada y un
+cursor que hace los clics; cada tema pone sus pasos, sus pantallas y el CSS de
+ellas vía `clasePantalla`), cada uno en su propio archivo. Los dos últimos
+reciben un `acento` de color por video o tutorial.
 
 El código de ejemplo de las lecciones y animaciones sigue unas convenciones
 fijas — al traer material nuevo del profesor se adapta a ellas: módulos de
@@ -85,7 +88,14 @@ JavaScript (`import`, `"type": "module"`, `.js` en las rutas propias),
 `node --env-file=.env` en vez del paquete dotenv, la variable `MONGO_URL`, la
 base `mi_negocio`, carpetas `modelos/`, `rutas/`, `config/` y `servidor.js`, y
 `mongodb://127.0.0.1:27017` en el código (no `localhost`: en Node reciente
-puede resolver a `::1` y dar `ECONNREFUSED`; Compass sí usa `localhost`).
+puede resolver a `::1` y dar `ECONNREFUSED`; Compass sí usa `localhost`). En
+React, el componente de ejemplo es `TarjetaProducto` y vive en
+`src/componentes/`; el proyecto se llama `mi-tienda-react`.
+
+Una animación larga del profesor se reparte en videos cortos, uno por lección
+(ver `topics/react-componentes-props-state/EscenasReact.tsx`: componentes,
+props y state), en vez de un solo video de doce escenas lejos de lo que
+explica.
 
 Segundo registro con el mismo patrón: `src/data/recursos.ts` alimenta la
 página `/recursos`. Agregar un recurso es agregar una entrada ahí y nada más.
@@ -116,11 +126,13 @@ un lienzo oculto y las partículas se siembran donde el molde tiene tinta
 (`moldeDeLaFigura`), no mover coordenadas. Va con trazos geométricos y no con
 `fillText`: el molde se arma al montar y la fuente web puede no haber cargado.
 
-Las demos de un tema que simulan una app o narran con escenas
-(`topics/mongodb-crud/Demos.tsx`: tutoriales de instalación local y de Atlas
-sobre un mismo motor; `EscenasMongoSql.tsx` y
-`topics/mongoose-esquemas/EscenasMongoose.tsx`: escenas para
-`ReproductorEscenas`) generan su marcado como texto y lo encierran bajo una
+Las demos de un tema que simulan una app o narran con escenas (pasos para
+`TutorialSimulado`: `topics/mongodb-crud/Demos.tsx` con la instalación local
+y Atlas, `topics/react-componentes-props-state/TutorialVite.tsx`; escenas
+para `ReproductorEscenas`: `EscenasMongoSql.tsx`,
+`topics/mongoose-esquemas/EscenasMongoose.tsx`,
+`topics/react-componentes-props-state/EscenasReact.tsx`) generan su marcado
+como texto y lo encierran bajo una
 clase del módulo con `:global(...)`. Ojo con las clases globales que ya
 existen en el sitio (`.nav`, `.card`, `.radio`, `.tag`, `.rule`): dentro de
 esas demos se usan nombres propios (`s-nav`, `s-card`, `s-radio`, `e-card`,
@@ -177,7 +189,8 @@ bytes exactos) y nunca filtra el stack de error al cliente.
 - El sitio usa la **plantilla "terminal" de las diapositivas del curso**
   (paleta oscura de GitHub): fondo `#0D1117`, paneles `#161B22`, bordes
   `#30363D`, acento verde `#6CC24A`, amarillo `#F7DF1E` para el código en
-  línea, morado `#BC8CFF` (`--color-morado`) para la sintaxis y Mongoose.
+  línea, morado `#BC8CFF` (`--color-morado`) para la sintaxis y Mongoose,
+  cian `#61DAFB` (`--color-react`) para React.
   Los tokens viven en `src/styles/temas.css`, que manda sobre
   `nocturne.css` (espejo de un sistema remoto: no se toca). No se escriben hex
   ni px sueltos fuera de esos bloques de tokens.
