@@ -10,6 +10,8 @@ import {
 } from '../../components/exercises';
 import { Callout, Compare, Figure, RefTable, Step, Steps, Terminal } from '../../components/visuals';
 import { EstadoDemo, PropsDemo } from './Demos';
+import { ExplicaComponentes, ExplicaEstado, ExplicaProps } from './EscenasReact';
+import { CrearProyectoVite } from './TutorialVite';
 
 const SLUG = 'react-componentes-props-state';
 
@@ -74,6 +76,8 @@ export default function ReactComponentesPropsState() {
           <code>className</code> y <code>for</code> se vuelve <code>htmlFor</code> — esas palabras
           ya están tomadas por el lenguaje.
         </Callout>
+
+        <ExplicaComponentes />
       </Lesson>
 
       <Lesson title="3. Props: los datos que entran">
@@ -101,6 +105,8 @@ export default function ReactComponentesPropsState() {
           se vuelve a ejecutar. Eso es normal y es barato — React compara el resultado y solo toca
           del DOM lo que de verdad cambió.
         </Callout>
+
+        <ExplicaProps />
       </Lesson>
 
       <Lesson title="4. Estado: lo que el componente recuerda">
@@ -139,6 +145,8 @@ export default function ReactComponentesPropsState() {
           y la pantalla no se actualiza. Siempre a través de la función <code>set…</code>, y con
           listas creando una nueva: <code>setTareas([...tareas, nueva])</code>.
         </Callout>
+
+        <ExplicaEstado />
       </Lesson>
 
       <Lesson title="5. Listas: map y key">
@@ -211,10 +219,45 @@ export default function ReactComponentesPropsState() {
         </Callout>
       </Lesson>
 
-      <Lesson title="6. Arma tu primer componente, paso a paso">
+      <Lesson title="6. Crea tu proyecto: en el navegador o en tu computador">
+        <p>
+          Hay dos caminos y llegan al mismo proyecto. <strong>En el navegador</strong>, con
+          StackBlitz, no hay que instalar nada: es el de la clase. <strong>En tu computador</strong>{' '}
+          necesitas Node.js y VS Code, y es como vas a trabajar el proyecto integrador.
+        </p>
+
+        <CrearProyectoVite />
+
+        <p>
+          El <strong>Código 1</strong> reemplaza todo el <code>src/App.jsx</code> de la plantilla:
+        </p>
+        <Terminal
+          titulo="Código 1 · src/App.jsx"
+          lineas={[
+            "import './App.css';",
+            '',
+            'function App() {',
+            '  return (',
+            '    <main>',
+            '      <h1>Dulce Horno</h1>',
+            '      <p>Repostería artesanal en Medellín</p>',
+            '    </main>',
+            '  );',
+            '}',
+            '',
+            'export default App;',
+          ]}
+        />
+        <Callout>
+          Cambia <code>Dulce Horno</code> y la descripción por los de tu emprendimiento: desde aquí,
+          cada componente que hagas es una pieza de tu propia tienda.
+        </Callout>
+      </Lesson>
+
+      <Lesson title="7. Arma tu primer componente, paso a paso">
         <Steps>
           <Step title="Crea el proyecto">
-            <Terminal lineas={['$ npm create vite@latest mi-tienda -- --template react', '$ cd mi-tienda', '$ npm install', '$ npm run dev']} />
+            Con el tutorial de la lección 6: en el navegador o en tu computador.
           </Step>
           <Step title="Un archivo por componente">
             <code>src/componentes/TarjetaProducto.jsx</code>. Nombre en mayúscula, export al final.

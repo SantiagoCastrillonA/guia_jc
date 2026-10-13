@@ -52,6 +52,10 @@
   /* El morado de la sintaxis (palabras clave en los bloques de código) y el
      color de Mongoose en las animaciones. 7.6:1 sobre el fondo. */
   --color-morado: #bc8cff;
+  /* El cian de React: componentes en las animaciones y tutoriales de la
+     sesión 16, como el logo que los estudiantes ven en la documentación.
+     11.5:1 sobre el fondo. */
+  --color-react: #61dafb;
   --color-code-comment: #8b949e;
 
   --color-ok: #3fb950;

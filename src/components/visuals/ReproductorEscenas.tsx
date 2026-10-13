@@ -7,8 +7,9 @@ import styles from './ReproductorEscenas.module.css';
  *
  * Cada escena es HTML sobre un lienzo fijo de 1280 × 720 que se escala al
  * ancho. Sus piezas traen `data-t` (a qué milisegundo aparecen), a veces
- * `data-type` (texto que se teclea) y `data-at="ms:clase,ms:clase"` (a qué
- * milisegundo cambian de estado). El reproductor programa esos tiempos, lleva
+ * `data-type` (texto que se teclea), `data-at="ms:clase,ms:clase"` (a qué
+ * milisegundo cambian de estado) y `data-seq="ms:texto|ms:texto"` (a qué
+ * milisegundo cambia su texto). El reproductor programa esos tiempos, lleva
  * la barra de progreso y, si está en "reproducir", pasa solo a la siguiente.
  *
  * Aquí viven el motor y el marco (controles, narración). El aspecto de las
@@ -134,6 +135,21 @@ export function ReproductorEscenas({ prompt, titulo, leyenda, escenas, claseEsce
         const [ms, clase] = par.split(':');
         maxT = Math.max(maxT, Number(ms));
         en(Number(ms), () => el.classList.add(clase));
+      });
+    });
+    // Textos que cambian con el tiempo (un contador que sube, un hueco que se
+    // llena): data-seq="ms:texto|ms:texto". El de 0 ms es el texto inicial.
+    lienzo.querySelectorAll<HTMLElement>('[data-seq]').forEach((el) => {
+      (el.dataset.seq ?? '').split('|').forEach((par) => {
+        const k = par.indexOf(':');
+        const ms = Number(par.slice(0, k));
+        const texto = par.slice(k + 1);
+        maxT = Math.max(maxT, ms);
+        if (ms === 0) el.innerHTML = texto;
+        else
+          en(ms, () => {
+            el.innerHTML = texto;
+          });
       });
     });
 

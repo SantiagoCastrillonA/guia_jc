@@ -1,0 +1,257 @@
+/* Pantallas simuladas del tutorial de Vite (ver TutorialVite.tsx). El marco
+   y el motor están en components/visuals/TutorialSimulado.
+
+   Imitan apps reales, con su paleta fija: las páginas web son claras
+   (`--m-*`), y los editores (StackBlitz, VS Code) y la terminal, oscuros
+   (`--e-*`), como en la vida real. El cian es el acento del tutorial, que
+   llega del componente como `--acento`.
+
+   Todo va bajo `.pantallas :global(...)`: el marcado se genera como texto, y
+   encerrarlo aquí evita que choque con las clases globales del sitio. */
+
+.pantallas {
+  --m-bg: #f6f8fa;
+  --m-line: #d8dee4;
+  --m-fg: #1f2328;
+  --m-muted: #656d76;
+  --m-blue: #0969da;
+  --e-bg: #1e1f26;
+  --e-side: #191a20;
+  --e-top: #15161b;
+  --e-line: #2b2d36;
+  --e-fg: #d6d9e0;
+  --e-muted: #8a8f9c;
+  --e-sel: #2d3140;
+  --e-menu: #2a2c35;
+  --e-hover: #3b4bd8;
+  --v-bg: #242424;
+  --ok: #7ee787;
+  --mono: var(--font-mono);
+
+  background: var(--m-bg);
+  font-family: Arial, Helvetica, sans-serif;
+  color: var(--m-fg);
+  font-size: 14px;
+}
+
+.pantallas :global(.sim) {
+  position: absolute; right: 10px; bottom: 8px; z-index: 60;
+  font-family: var(--mono); font-size: 11px; color: #9aa3ad;
+  background: #00000066; padding: 2px 6px; border-radius: 4px;
+}
+
+/* señalar: la zona en foco y los rótulos amarillos */
+.pantallas :global(.spot) { outline: 3px solid var(--color-code) !important; outline-offset: -3px; }
+.pantallas :global(.co) {
+  position: absolute; z-index: 30; background: var(--color-code); color: #111;
+  font-family: var(--mono); font-weight: 800; font-size: 13px;
+  padding: 5px 10px; border-radius: 6px; box-shadow: 0 4px 12px #0006; white-space: nowrap;
+}
+.pantallas :global(.tenue) { color: var(--e-muted); }
+.pantallas :global(.dl .tenue) { color: var(--m-muted); }
+
+/* navegador */
+.pantallas :global(.br) { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.pantallas :global(.br-bar) {
+  height: 40px; flex: none; background: #e9edf1; border-bottom: 1px solid var(--m-line);
+  display: flex; align-items: center; gap: 10px; padding: 0 12px;
+}
+.pantallas :global(.br-dots) { display: flex; gap: 6px; }
+.pantallas :global(.br-dots i) { width: 10px; height: 10px; border-radius: 50%; background: #c3cad1; }
+.pantallas :global(.url) {
+  flex: 1; height: 26px; background: #fff; border: 1px solid var(--m-line); border-radius: 13px;
+  display: flex; align-items: center; padding: 0 12px; font-size: 13px; color: var(--m-muted); font-family: var(--mono);
+}
+.pantallas :global(.url b) { color: var(--m-fg); font-weight: 400; }
+.pantallas :global(.br-body) { flex: 1; position: relative; overflow: hidden; background: #fff; }
+.pantallas :global(.in) {
+  flex: 1; height: 26px; border: 1px solid var(--m-line); border-radius: 13px; background: #fff;
+  display: flex; align-items: center; padding: 0 12px; font-size: 13px; font-family: var(--mono);
+  white-space: nowrap; overflow: hidden;
+}
+.pantallas :global(.in .v:empty::before) { content: attr(data-ph); color: #9aa3ad; }
+.pantallas :global(.in.focus) { border-color: var(--m-blue); box-shadow: 0 0 0 3px #0969da33; }
+.pantallas :global(.caret) {
+  display: inline-block; width: 7px; height: 15px; background: currentColor;
+  vertical-align: -3px; opacity: 0.8; animation: titila 1s steps(1) infinite;
+}
+.pantallas :global(.in .caret) { display: none; }
+.pantallas :global(.in.focus .caret) { display: inline-block; background: var(--m-fg); }
+@keyframes titila { 50% { opacity: 0; } }
+.pantallas :global(.newtab) {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px; color: var(--m-muted); font-size: 15px;
+}
+.pantallas :global(.newtab b) { font-size: 26px; color: var(--m-fg); }
+.pantallas :global(.boot) {
+  position: absolute; inset: 0; background: var(--e-top); color: var(--e-fg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  font-family: var(--mono); font-size: 14px;
+}
+.pantallas :global(.spin) {
+  width: 26px; height: 26px; border: 3px solid #ffffff33; border-top-color: var(--acento);
+  border-radius: 50%; animation: giro 0.8s linear infinite;
+}
+@keyframes giro { to { transform: rotate(360deg); } }
+
+/* la página de ejemplo de Vite */
+.pantallas :global(.vpage) {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 16px; background: var(--v-bg); color: #f2f2f2;
+}
+.pantallas :global(.vpage .logos) { display: flex; gap: 26px; }
+.pantallas :global(.vpage .logos i) { width: 64px; height: 64px; border-radius: 50%; border: 3px solid #9fa8ff; }
+.pantallas :global(.vpage .logos i + i) { border-color: var(--acento); }
+.pantallas :global(.vpage h2) { margin: 0; font-size: 38px; color: #f2f2f2; }
+.pantallas :global(.vpage small) { color: #888; font-size: 13px; }
+.pantallas :global(.vbtn) {
+  background: #1a1a1a; color: #fff; border: 1px solid #444; border-radius: 8px;
+  padding: 10px 18px; font-size: 15px; font-weight: 600;
+}
+
+/* editores: StackBlitz y VS Code */
+.pantallas :global(.ed) {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  background: var(--e-bg); color: var(--e-fg);
+}
+.pantallas :global(.ed-top) {
+  height: 34px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 12px;
+  background: var(--e-top); border-bottom: 1px solid var(--e-line); font-size: 12px; color: var(--e-muted);
+  position: relative;
+}
+.pantallas :global(.ed-top b) { color: var(--e-fg); font-weight: 600; }
+.pantallas :global(.ed-btn) {
+  margin-left: auto; background: var(--e-sel); color: #fff; border-radius: 5px;
+  padding: 4px 10px; font-size: 12px; font-weight: 700;
+}
+.pantallas :global(.ed-btn + .ed-btn) { margin-left: 0; }
+.pantallas :global(.pressed) { filter: brightness(1.4); }
+.pantallas :global(.vbtn.pressed) { filter: brightness(1.3); }
+.pantallas :global(.ed-main) { flex: 1; display: flex; min-height: 0; position: relative; }
+.pantallas :global(.act) {
+  width: 36px; flex: none; background: var(--e-top); border-right: 1px solid var(--e-line);
+  display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: 12px;
+}
+.pantallas :global(.act i) { width: 18px; height: 18px; border-radius: 4px; border: 2px solid #5b6070; }
+.pantallas :global(.act i:first-child) { border-color: var(--e-fg); }
+.pantallas :global(.files) {
+  width: 160px; flex: none; background: var(--e-side); border-right: 1px solid var(--e-line);
+  padding: 10px 6px; font-family: var(--mono); font-size: 12px; line-height: 1.95; position: relative;
+}
+.pantallas :global(.files .hd) {
+  font-family: Arial, sans-serif; font-size: 10.5px; font-weight: 700; color: var(--e-muted);
+  letter-spacing: 0.6px; padding: 0 6px 4px;
+}
+.pantallas :global(.f) { padding: 0 6px; border-radius: 4px; white-space: nowrap; overflow: hidden; }
+.pantallas :global(.f.dir) { color: #e3c27a; }
+.pantallas :global(.f.sel) { background: var(--e-sel); color: #fff; }
+.pantallas :global(.f.in-row) { background: #11131a; outline: 1px solid var(--acento); color: #fff; }
+.pantallas :global(.code) {
+  flex: 1; min-width: 0; padding: 10px 0; font-family: var(--mono); font-size: 11.5px;
+  line-height: 1.7; position: relative; overflow: hidden;
+}
+.pantallas :global(.code .tabh) {
+  position: absolute; top: 0; left: 0; right: 0; height: 26px; background: var(--e-top);
+  border-bottom: 1px solid var(--e-line); font-size: 11.5px; display: flex; align-items: center;
+  padding: 0 12px; color: var(--e-fg);
+}
+.pantallas :global(.code .tabh span) { border-bottom: 2px solid var(--acento); padding: 4px 2px; }
+.pantallas :global(.code .body) {
+  position: absolute; top: 34px; left: 0; right: 0; bottom: 0; padding: 0 12px;
+  white-space: pre; counter-reset: ln;
+}
+.pantallas :global(.code .l) { display: block; padding-left: 30px; position: relative; }
+.pantallas :global(.code .l::before) {
+  counter-increment: ln; content: counter(ln); position: absolute; left: 0; width: 22px;
+  text-align: right; color: #4f5562;
+}
+.pantallas :global(.selall .body .l) { background: #264f78; }
+.pantallas :global(.k1) { color: #ff7b72; }
+.pantallas :global(.s1) { color: #a5d6ff; }
+.pantallas :global(.t1) { color: #7ee787; }
+.pantallas :global(.f1) { color: #d2a8ff; }
+.pantallas :global(.a1) { color: #79c0ff; }
+.pantallas :global(.hl) { background: #5a4b1b; border-radius: 3px; }
+.pantallas :global(.prev) {
+  width: 250px; flex: none; background: #fff; color: var(--m-fg);
+  display: flex; flex-direction: column; position: relative;
+}
+.pantallas :global(.prev .pb) {
+  height: 26px; flex: none; background: #eef1f4; border-bottom: 1px solid var(--m-line);
+  font-family: var(--mono); font-size: 11px; display: flex; align-items: center; padding: 0 10px; color: var(--m-muted);
+}
+.pantallas :global(.prev .pc) {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; text-align: center; padding: 12px; background: var(--v-bg); color: #f2f2f2;
+}
+.pantallas :global(.prev .pc.light) {
+  background: #fff; color: var(--m-fg); align-items: flex-start; justify-content: flex-start;
+  text-align: left; padding: 18px;
+}
+.pantallas :global(.prev h3) { margin: 0; font-size: 24px; color: inherit; }
+.pantallas :global(.prev p) { margin: 0; font-size: 13px; color: #888; }
+.pantallas :global(.prev .pc.light p) { color: var(--m-muted); }
+
+/* menús, ventanas y avisos */
+.pantallas :global(.ctx) {
+  position: absolute; z-index: 20; width: 150px; background: var(--e-menu); border: 1px solid #3a3d48;
+  border-radius: 6px; padding: 4px; font-size: 12px; box-shadow: 0 8px 20px #0008;
+}
+.pantallas :global(.ctx div) { padding: 5px 10px; border-radius: 4px; color: var(--e-fg); }
+.pantallas :global(.menu) {
+  position: absolute; right: 10px; top: 36px; z-index: 20; width: 190px; background: var(--e-menu);
+  border: 1px solid #3a3d48; border-radius: 6px; padding: 4px; font-size: 12.5px; box-shadow: 0 8px 20px #0008;
+}
+.pantallas :global(.menu div) { padding: 7px 10px; border-radius: 4px; }
+.pantallas :global(.ctx div.hv),
+.pantallas :global(.menu div.hv) { background: var(--e-hover); color: #fff; }
+.pantallas :global(.modal-bg) {
+  position: absolute; inset: 0; background: #0009; display: flex; align-items: center;
+  justify-content: center; z-index: 25;
+}
+.pantallas :global(.mcard) {
+  background: #fff; color: var(--m-fg); border-radius: 10px; width: 360px; padding: 22px 24px;
+  position: relative; display: flex; flex-direction: column; gap: 12px;
+}
+.pantallas :global(.mcard h4) { margin: 0; font-size: 19px; color: var(--m-fg); }
+.pantallas :global(.mcard p) { margin: 0; color: var(--m-muted); font-size: 13px; }
+.pantallas :global(.mbtn) {
+  display: flex; align-items: center; justify-content: center; height: 38px; border-radius: 6px;
+  font-weight: 700; font-size: 14px; background: #24292f; color: #fff;
+}
+.pantallas :global(.mx) { position: absolute; right: 12px; top: 8px; font-size: 20px; color: var(--m-muted); }
+.pantallas :global(.dl) {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 46px; background: #fff;
+  border-top: 1px solid var(--m-line); display: flex; align-items: center; gap: 12px;
+  padding: 0 16px; font-size: 13px; color: var(--m-fg); z-index: 22;
+}
+.pantallas :global(.fileic) {
+  width: 26px; height: 30px; border-radius: 4px; background: var(--m-blue); color: #fff;
+  font-size: 9px; font-weight: 700; display: grid; place-items: end center; padding-bottom: 3px;
+}
+.pantallas :global(.flash) { animation: destello 1.1s ease; }
+@keyframes destello { 30% { background: #fff3a6; color: #111; } }
+
+/* terminal */
+.pantallas :global(.term) { position: absolute; inset: 0; background: #0c0c0c; display: flex; flex-direction: column; }
+.pantallas :global(.term-bar) {
+  height: 32px; flex: none; background: #1f1f1f; color: #bbb; font-size: 12px;
+  display: flex; align-items: center; gap: 10px; padding: 0 12px;
+}
+.pantallas :global(.term-bar .tt) {
+  background: #0c0c0c; border-radius: 6px 6px 0 0; padding: 6px 14px; align-self: flex-end; color: #eee;
+}
+.pantallas :global(.term-body) {
+  flex: 1; padding: 14px 18px; font-family: var(--mono); font-size: 13.5px; line-height: 1.6;
+  color: #e6e6e6; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end;
+}
+.pantallas :global(.term-body .pr) { color: var(--acento); }
+.pantallas :global(.term-body .ou) { color: #b5b5b5; white-space: pre-wrap; word-break: break-word; }
+.pantallas :global(.term-body g) { color: var(--ok); font-weight: 700; }
+.pantallas :global(.term-body u) { color: var(--acento); text-decoration: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pantallas :global(.spin),
+  .pantallas :global(.caret),
+  .pantallas :global(.flash) { animation: none; }
+}
