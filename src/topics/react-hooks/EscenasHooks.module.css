@@ -1,0 +1,94 @@
+/* Piezas propias de las escenas de useEffect (ver EscenasHooks.tsx).
+
+   Las escenas se arman con las piezas de "React por dentro"
+   (react-componentes-props-state/EscenasReact.module.css): misma paleta,
+   mismo código, misma tarjeta de la tienda. Aquí solo va lo que esas no
+   tienen: los carriles del array de dependencias, la línea de código que se
+   ejecuta, el esqueleto de carga, el ciclo que gira y lo que se apaga.
+
+   Esta clase se suma a la de EscenasReact en el mismo lienzo, así que sus
+   variables (`--react`, `--props`, `--web-*`…) están disponibles aquí. */
+
+/* Algo que estaba en pantalla y se va. Más específico que `.a.in` para
+   poder ocultar una pieza que ya había entrado. */
+.escenas :global(.a.in.fuera),
+.escenas :global(.fuera) { opacity: 0; }
+
+/* La línea que se está ejecutando: se enciende con `act` y se apaga con
+   `done` (las clases de las escenas solo se agregan, nunca se quitan). */
+.escenas :global(.code .ln) { border-radius: 4px; transition: background 0.3s, color 0.3s; }
+.escenas :global(.code .ln.act) { background: color-mix(in srgb, var(--yellow) 20%, transparent); }
+.escenas :global(.code .ln.act.done) { background: transparent; }
+.escenas :global(.code .ln.ok) { background: color-mix(in srgb, var(--state) 18%, transparent); }
+.escenas :global(.code .ln.tenue) { color: var(--muted); }
+
+/* carriles del array de dependencias */
+.escenas :global(.carril) {
+  position: absolute; height: 2px; background: var(--line);
+}
+.escenas :global(.marca) {
+  position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%;
+  display: grid; place-items: center; border: 2px solid var(--line); background: var(--bg);
+  font-family: var(--mono); font-size: 18px; font-weight: 800; color: transparent;
+  transition: background 0.4s, border-color 0.4s, color 0.4s, transform 0.4s;
+}
+.escenas :global(.marca.corre) {
+  background: var(--c, var(--props)); border-color: var(--c, var(--props)); color: var(--bg);
+  transform: scale(1.12);
+}
+.escenas :global(.marca.quieto) { border-style: dashed; color: var(--muted); }
+
+/* cosas que se apagan o se descartan */
+.escenas :global(.apagado) {
+  opacity: 0.35; filter: grayscale(1); text-decoration: line-through;
+  transition: opacity 0.5s, filter 0.5s;
+}
+.escenas :global(.vivo) {
+  display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px;
+  border-radius: 999px; border: 2px solid var(--props); color: var(--props);
+  font-family: var(--mono); font-size: 16px; font-weight: 700; background: var(--panel);
+}
+.escenas :global(.vivo i) {
+  width: 10px; height: 10px; border-radius: 50%; background: currentColor;
+  animation: latido 1s ease-in-out infinite;
+}
+.escenas :global(.vivo.apagado i) { animation: none; }
+@keyframes latido { 50% { opacity: 0.2; } }
+
+/* esqueleto de carga dentro de la tarjeta clara */
+.escenas :global(.sk) {
+  height: 16px; border-radius: 6px; background: var(--web-bg-2);
+  background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+  background-size: 200% 100%; animation: brillo 1.4s linear infinite;
+}
+@keyframes brillo { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* el ciclo del bucle infinito */
+.escenas :global(.gira.go) { animation: gira 1.2s linear infinite; transform-origin: center; }
+.escenas :global(.gira.go.rapido) { animation-duration: 0.35s; }
+@keyframes gira { to { transform: rotate(360deg); } }
+
+/* ventana del navegador que se cuelga */
+.escenas :global(.colgado) {
+  position: absolute; background: #fff; color: var(--web-fg); border-radius: 12px;
+  padding: 18px 22px; box-shadow: 0 20px 50px #0009; font-family: var(--font-body);
+}
+.escenas :global(.colgado b) { display: block; font-size: 20px; margin-bottom: 6px; }
+.escenas :global(.colgado span) {
+  display: inline-block; margin: 12px 8px 0 0; padding: 6px 14px; border-radius: 6px;
+  background: var(--web-bg-2); font-weight: 700; font-size: 14px;
+}
+
+/* rótulo de una zona (sin limpieza / con limpieza) */
+.escenas :global(.rotulo) {
+  position: absolute; font-family: var(--mono); font-size: 15px; font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .escenas :global(.code .ln),
+  .escenas :global(.marca),
+  .escenas :global(.apagado) { transition: none; }
+  .escenas :global(.vivo i),
+  .escenas :global(.sk),
+  .escenas :global(.gira.go) { animation: none; }
+}

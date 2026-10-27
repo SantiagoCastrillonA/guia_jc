@@ -8,6 +8,7 @@ import {
   TrueFalse,
 } from '../../components/exercises';
 import { Callout, Compare, Figure, RefTable, Step, Steps, Terminal } from '../../components/visuals';
+import { ExplicaEfecto, ExplicaEstados, ExplicaLimpieza } from './EscenasHooks';
 
 const SLUG = 'react-hooks';
 
@@ -83,12 +84,16 @@ export default function ReactHooks() {
             'function ListaProductos() {',
             '  const [productos, setProductos] = useState([]);',
             '  const [cargando, setCargando] = useState(true);',
+            '  const [error, setError] = useState(null);',
             '',
             '  useEffect(() => {',
             '    async function traer() {',
             '      try {',
             "        const res = await fetch('/api/productos');",
+            '        if (!res.ok) throw new Error(`Error ${res.status}`);',
             '        setProductos(await res.json());',
+            '      } catch (err) {',
+            '        setError(err.message);',
             '      } finally {',
             '        setCargando(false);',
             '      }',
@@ -97,10 +102,31 @@ export default function ReactHooks() {
             '  }, []);   // ← el array de dependencias',
             '',
             '  if (cargando) return <p>Cargando…</p>;',
-            '  return <ul>{productos.map(p => <li key={p._id}>{p.nombre}</li>)}</ul>;',
+            '  if (error) return <p>No pudimos traer los productos ({error}).</p>;',
+            '  return <ul>{productos.map((p) => <li key={p._id}>{p.nombre}</li>)}</ul>;',
             '}',
           ]}
         />
+        <RefTable
+          cabeceras={['Pieza', 'Por qué está ahí']}
+          filas={[
+            [
+              <code key="a">async function traer()</code>,
+              'La función del efecto no puede ser async: tiene que devolver la limpieza, no una promesa',
+            ],
+            [<code key="b">if (!res.ok) throw …</code>, 'fetch no falla con un 404 ni un 500: hay que revisarlo a mano'],
+            [<code key="c">finally</code>, 'Apaga el «cargando» pase lo que pase, salga bien o mal'],
+            [<code key="d">[]</code>, 'Pide los datos una sola vez, cuando la lista aparece'],
+          ]}
+        />
+        <Callout>
+          ¿Y esa <code>/api/productos</code>? Funciona cuando el frontend y el backend salen del mismo
+          origen, como con el proxy de Vite que configuras en la sesión 19. Mientras tanto, usa la
+          dirección completa de tu servidor (por ejemplo <code>http://localhost:3000/productos</code>)
+          con CORS activado en Express, como en la sesión 12.
+        </Callout>
+
+        <ExplicaEfecto />
 
         <Figure
           label="Diagrama: el array de dependencias de useEffect"
@@ -136,6 +162,12 @@ export default function ReactHooks() {
           <code>setState</code>. El estado cambia, se redibuja, el efecto vuelve a correr, el estado
           cambia… hasta que el navegador se congela. Si tu página se traba, mira ahí primero.
         </Callout>
+        <Callout>
+          ¿Tu <code>console.log</code> del efecto sale dos veces? Es normal en desarrollo: la
+          plantilla de Vite envuelve la app en <code>&lt;StrictMode&gt;</code>, que monta, desmonta y
+          vuelve a montar cada componente para ver si al efecto le falta limpieza. En producción
+          corre una sola vez. No lo quites.
+        </Callout>
       </Lesson>
 
       <Lesson title="4. La limpieza del efecto">
@@ -157,9 +189,39 @@ export default function ReactHooks() {
           Se acumulan, consumen recursos y provocan actualizaciones sobre componentes que ya no
           existen.
         </Callout>
+        <RefTable
+          cabeceras={['React llama a la limpieza…', 'Ejemplo']}
+          filas={[
+            ['Cuando el componente desaparece', 'Cierras el modal que tenía el reloj'],
+            [
+              'Antes de volver a correr el efecto',
+              <span key="a">
+                Cambia <code>busqueda</code>: se limpia la búsqueda anterior y arranca la nueva
+              </span>,
+            ],
+          ]}
+        />
+        <p>
+          El segundo caso evita un error difícil de ver: si la búsqueda de «to» tarda más que la de
+          «tor», llega después y deja en pantalla resultados que no corresponden. La limpieza marca
+          la búsqueda vieja para ignorar su respuesta:
+        </p>
+        <Terminal
+          lineas={[
+            'useEffect(() => {',
+            '  let ignorar = false;',
+            '  buscar(busqueda).then((datos) => {',
+            '    if (!ignorar) setResultados(datos);',
+            '  });',
+            '  return () => { ignorar = true; };',
+            '}, [busqueda]);',
+          ]}
+        />
+
+        <ExplicaLimpieza />
       </Lesson>
 
-      <Lesson title="5. Los tres estados de una pantalla con datos">
+      <Lesson title="5. Los cuatro estados de una pantalla con datos">
         <Steps>
           <Step title="Cargando">
             Mientras la petición viaja. Un texto o un esqueleto: cualquier cosa menos una pantalla
@@ -180,6 +242,79 @@ export default function ReactHooks() {
         <Callout>
           Programar solo el caso feliz es la diferencia más visible entre un ejercicio de clase y
           una aplicación de verdad. En la defensa del proyecto, los tres primeros estados se notan.
+        </Callout>
+
+        <ExplicaEstados />
+      </Lesson>
+
+      <Lesson title="6. Cuándo NO necesitas useEffect">
+        <p>
+          Un efecto es para hablar con algo de afuera. Si un valor se puede calcular con lo que ya
+          tienes —props o estado—, se calcula mientras el componente se dibuja, sin efecto y sin
+          estado extra.
+        </p>
+        <Compare
+          bien={{
+            titulo: 'Calculado en el render',
+            items: [
+              <code key="1">const total = carrito.reduce((s, p) =&gt; s + p.precio, 0);</code>,
+              'Siempre coincide con el carrito',
+              'Un solo render por cambio',
+              'Menos código, menos errores',
+            ],
+          }}
+          mal={{
+            titulo: 'Copiado a un estado con un efecto',
+            items: [
+              <code key="2">useEffect(() =&gt; setTotal(…), [carrito]);</code>,
+              'Dos copias del mismo dato que pueden desincronizarse',
+              'Un render de más con el total viejo',
+              'Más código para lo mismo',
+            ],
+          }}
+        />
+        <RefTable
+          cabeceras={['Necesitas…', '¿useEffect?']}
+          filas={[
+            ['Traer datos de la API al abrir la pantalla', 'Sí: es hablar con el exterior'],
+            ['Un temporizador o escuchar el teclado', 'Sí, con su limpieza'],
+            ['El total del carrito, una lista filtrada, un precio formateado', 'No: se calcula en el render'],
+            ['Reaccionar a un clic', 'No: va en el manejador del evento (onClick)'],
+          ]}
+        />
+      </Lesson>
+
+      <Lesson title="7. Tu propio hook">
+        <p>
+          Si la misma carga de datos se repite en varios componentes, se saca a una función que
+          empiece por <code>use</code>: un hook propio. Por dentro usa los hooks de siempre y
+          devuelve lo que el componente necesita.
+        </p>
+        <Terminal
+          titulo="src/hooks/useProductos.js"
+          lineas={[
+            "import { useEffect, useState } from 'react';",
+            '',
+            'export function useProductos() {',
+            '  const [productos, setProductos] = useState([]);',
+            '  const [cargando, setCargando] = useState(true);',
+            '  const [error, setError] = useState(null);',
+            '',
+            '  useEffect(() => {',
+            '    // …el mismo traer() de la lección 3',
+            '  }, []);',
+            '',
+            '  return { productos, cargando, error };',
+            '}',
+          ]}
+        />
+        <Terminal
+          titulo="en cualquier componente"
+          lineas={['const { productos, cargando, error } = useProductos();']}
+        />
+        <Callout>
+          Un componente reutiliza interfaz; un hook propio reutiliza lógica. Y como es un hook, sigue
+          las mismas reglas: se llama en el nivel superior, nunca dentro de un <code>if</code>.
         </Callout>
       </Lesson>
 

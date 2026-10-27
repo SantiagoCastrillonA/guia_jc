@@ -131,7 +131,9 @@ Las demos de un tema que simulan una app o narran con escenas (pasos para
 y Atlas, `topics/react-componentes-props-state/TutorialVite.tsx`; escenas
 para `ReproductorEscenas`: `EscenasMongoSql.tsx`,
 `topics/mongoose-esquemas/EscenasMongoose.tsx`,
-`topics/react-componentes-props-state/EscenasReact.tsx`) generan su marcado
+`topics/react-componentes-props-state/EscenasReact.tsx`,
+`topics/react-hooks/EscenasHooks.tsx` —este reusa las piezas de
+`EscenasReact.module.css` y suma las suyas con una segunda clase—) generan su marcado
 como texto y lo encierran bajo una
 clase del módulo con `:global(...)`. Ojo con las clases globales que ya
 existen en el sitio (`.nav`, `.card`, `.radio`, `.tag`, `.rule`): dentro de
